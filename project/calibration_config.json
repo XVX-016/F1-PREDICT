@@ -1,0 +1,36 @@
+{
+  "team_factors": {
+    "Red Bull": 1.1330579952314903,
+    "McLaren": 0.87547737524242,
+    "Ferrari": 0.9271367899837503,
+    "Mercedes": 0.9668755409541709,
+    "Aston Martin": 1.1389463136852553,
+    "Alpine": 1.1039463725701495,
+    "Williams": 1.1451847427432988,
+    "Visa Cash App RB": 1.1231983369489575,
+    "Stake F1 Team": 0.9339157815350683,
+    "Haas F1 Team": 0.9080952076918712
+  },
+  "driver_factors": {
+    "Max Verstappen": 1.110857467848293,
+    "Sergio Perez": 0.8683708764110214,
+    "Lando Norris": 0.9971288109201326,
+    "Oscar Piastri": 0.968256932777254,
+    "Charles Leclerc": 1.1307130804380705,
+    "Carlos Sainz": 0.879019329708595,
+    "Lewis Hamilton": 1.132149103225109,
+    "George Russell": 1.013959288943866,
+    "Fernando Alonso": 0.9948209985774397,
+    "Lance Stroll": 0.9311481027521591,
+    "Esteban Ocon": 1.1030564258380746,
+    "Pierre Gasly": 1.142541498092048,
+    "Alex Albon": 1.1161470240129128,
+    "Logan Sargeant": 1.145958210663721,
+    "Daniel Ricciardo": 1.0695772873594571,
+    "Yuki Tsunoda": 1.0783470571642622,
+    "Valtteri Bottas": 1.005304999163834,
+    "Zhou Guanyu": 0.8737813545290906,
+    "Nico Hulkenberg": 1.0789967961197309,
+    "Kevin Magnussen": 1.0673506048605974
+  }
+}

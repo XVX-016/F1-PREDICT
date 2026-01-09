@@ -1,0 +1,14 @@
+{
+  "temperature_scaling": {
+    "brier_score": {
+      "before": 0.09145641199999999,
+      "after": 0.09209619085813422,
+      "improvement_pct": -0.699545110226102
+    },
+    "log_loss": {
+      "before": 0.3359818517602678,
+      "after": 0.341690369025494,
+      "improvement_pct": -1.6990552422156957
+    }
+  }
+}

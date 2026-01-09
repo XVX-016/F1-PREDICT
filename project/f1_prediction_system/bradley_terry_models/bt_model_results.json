@@ -1,0 +1,46 @@
+{
+  "model_info": {
+    "model_type": "Bradley-Terry Logistic Regression",
+    "n_drivers": 20,
+    "n_additional_features": 28,
+    "feature_names": [
+      1,
+      -1.3058572473559156,
+      0,
+      19,
+      20,
+      1,
+      1,
+      0,
+      0.0,
+      0.0,
+      0,
+      -1.0,
+      0.0,
+      -1,
+      -1,
+      0.125,
+      -0.1601964352944499,
+      -1.0,
+      0.0,
+      1.125,
+      -0.1601964352944499,
+      0,
+      -1,
+      0.0,
+      0.0,
+      0.0476126096816775,
+      0.0,
+      -0.125
+    ]
+  },
+  "training_metrics": {
+    "best_C": 1.0,
+    "cv_accuracy": 0.9991777997481854,
+    "test_accuracy": 0.9917763157894737,
+    "test_logloss": 0.10029378373243435,
+    "test_auc": 0.9971866343490304
+  },
+  "driver_count": 20,
+  "additional_feature_count": 28
+}

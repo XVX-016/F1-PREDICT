@@ -1,0 +1,13 @@
+{
+  "team_factors": {
+    "Red Bull": 0.95,
+    "McLaren": 1.1,
+    "Ferrari": 1.05,
+    "Mercedes": 0.98
+  },
+  "driver_factors": {
+    "Max Verstappen": 1.05,
+    "Lando Norris": 1.15,
+    "Charles Leclerc": 1.08
+  }
+}

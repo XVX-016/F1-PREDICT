@@ -1,0 +1,12 @@
+{
+  "mae": 0.28161249999999993,
+  "mse": 0.14474354999999994,
+  "rmse": 0.38045177092504107,
+  "correlation": 0.9995192854771024,
+  "spearman_correlation": 0.9983176550782797,
+  "spearman_p_value": 2.525993491788229e-197,
+  "kendall_correlation": 0.9746796646437217,
+  "kendall_p_value": 1.2910941017543091e-71,
+  "total_predictions": 160,
+  "races_covered": 8
+}

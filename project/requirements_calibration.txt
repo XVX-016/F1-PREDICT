@@ -1,0 +1,22 @@
+# F1 Calibration Auto-Tuning Service Dependencies
+
+# Core optimization and ML libraries
+optuna>=3.4.0
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# FastAPI and web framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+
+# Additional utilities
+python-multipart>=0.0.6
+requests>=2.31.0
+
+# Optional: For advanced features
+# plotly>=5.17.0  # For optimization visualization
+# sqlalchemy>=2.0.0  # For database storage of optimization results
+
+

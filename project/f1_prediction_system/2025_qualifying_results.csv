@@ -1,0 +1,161 @@
+round,raceName,driver,driverCode,constructor,q1,q2,q3,qualyPosition
+1,Bahrain Grand Prix,Lando Norris,NOR,McLaren,89.730,89.165,88.022,1
+1,Bahrain Grand Prix,Oscar Piastri,PIA,McLaren,90.722,89.323,88.498,2
+1,Bahrain Grand Prix,Max Verstappen,VER,Red Bull,90.859,89.945,89.073,3
+1,Bahrain Grand Prix,Charles Leclerc,LEC,Ferrari,91.651,90.338,89.544,4
+1,Bahrain Grand Prix,George Russell,RUS,Mercedes,91.820,90.893,89.919,5
+1,Bahrain Grand Prix,Lewis Hamilton,HAM,Ferrari,92.737,91.487,90.502,6
+1,Bahrain Grand Prix,Carlos Sainz,SAI,Kick Sauber,92.939,92.015,90.910,7
+1,Bahrain Grand Prix,Fernando Alonso,ALO,Aston Martin,93.536,92.550,91.600,8
+1,Bahrain Grand Prix,Lance Stroll,STR,Aston Martin,94.258,92.855,92.018,9
+1,Bahrain Grand Prix,Pierre Gasly,GAS,Alpine,94.255,93.472,92.590,10
+1,Bahrain Grand Prix,Esteban Ocon,OCO,Alpine,94.731,93.836,,11
+1,Bahrain Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.550,94.452,,12
+1,Bahrain Grand Prix,Zhou Guanyu,GUA,Kick Sauber,96.243,94.957,,13
+1,Bahrain Grand Prix,Nico Hulkenberg,HUL,Haas,96.464,95.316,,14
+1,Bahrain Grand Prix,Kevin Magnussen,MAG,Haas,97.046,96.001,,15
+1,Bahrain Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.455,,,16
+1,Bahrain Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,98.262,,,17
+1,Bahrain Grand Prix,Alexander Albon,ALB,Williams,98.432,,,18
+1,Bahrain Grand Prix,Logan Sargeant,SAR,Williams,98.980,,,19
+1,Bahrain Grand Prix,Oliver Bearman,BEA,Ferrari,99.582,,,20
+2,Saudi Arabian Grand Prix,Lando Norris,NOR,McLaren,89.955,89.016,87.916,1
+2,Saudi Arabian Grand Prix,Oscar Piastri,PIA,McLaren,90.341,89.658,88.587,2
+2,Saudi Arabian Grand Prix,Max Verstappen,VER,Red Bull,91.187,90.192,89.058,3
+2,Saudi Arabian Grand Prix,Charles Leclerc,LEC,Ferrari,91.529,90.572,89.401,4
+2,Saudi Arabian Grand Prix,George Russell,RUS,Mercedes,92.089,91.020,90.018,5
+2,Saudi Arabian Grand Prix,Lewis Hamilton,HAM,Ferrari,92.274,91.640,90.540,6
+2,Saudi Arabian Grand Prix,Carlos Sainz,SAI,Kick Sauber,93.259,91.885,90.953,7
+2,Saudi Arabian Grand Prix,Fernando Alonso,ALO,Aston Martin,93.452,92.582,91.421,8
+2,Saudi Arabian Grand Prix,Lance Stroll,STR,Aston Martin,93.816,92.923,92.020,9
+2,Saudi Arabian Grand Prix,Pierre Gasly,GAS,Alpine,94.388,93.652,92.547,10
+2,Saudi Arabian Grand Prix,Esteban Ocon,OCO,Alpine,95.231,94.039,,11
+2,Saudi Arabian Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.363,94.471,,12
+2,Saudi Arabian Grand Prix,Zhou Guanyu,GUA,Kick Sauber,96.034,95.018,,13
+2,Saudi Arabian Grand Prix,Nico Hulkenberg,HUL,Haas,96.774,95.467,,14
+2,Saudi Arabian Grand Prix,Kevin Magnussen,MAG,Haas,96.704,96.149,,15
+2,Saudi Arabian Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.274,,,16
+2,Saudi Arabian Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,97.817,,,17
+2,Saudi Arabian Grand Prix,Alexander Albon,ALB,Williams,98.447,,,18
+2,Saudi Arabian Grand Prix,Logan Sargeant,SAR,Williams,99.269,,,19
+2,Saudi Arabian Grand Prix,Oliver Bearman,BEA,Ferrari,99.359,,,20
+3,Australian Grand Prix,Lando Norris,NOR,McLaren,89.714,89.002,88.006,1
+3,Australian Grand Prix,Oscar Piastri,PIA,McLaren,90.317,89.571,88.573,2
+3,Australian Grand Prix,Max Verstappen,VER,Red Bull,91.283,90.168,88.993,3
+3,Australian Grand Prix,Charles Leclerc,LEC,Ferrari,91.747,90.441,89.469,4
+3,Australian Grand Prix,George Russell,RUS,Mercedes,92.126,90.998,90.016,5
+3,Australian Grand Prix,Lewis Hamilton,HAM,Ferrari,92.279,91.453,90.422,6
+3,Australian Grand Prix,Carlos Sainz,SAI,Kick Sauber,92.945,92.057,91.019,7
+3,Australian Grand Prix,Fernando Alonso,ALO,Aston Martin,93.304,92.615,91.445,8
+3,Australian Grand Prix,Lance Stroll,STR,Aston Martin,93.902,93.199,91.995,9
+3,Australian Grand Prix,Pierre Gasly,GAS,Alpine,94.378,93.617,92.417,10
+3,Australian Grand Prix,Esteban Ocon,OCO,Alpine,94.749,94.195,,11
+3,Australian Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.208,94.482,,12
+3,Australian Grand Prix,Zhou Guanyu,GUA,Kick Sauber,96.163,95.167,,13
+3,Australian Grand Prix,Nico Hulkenberg,HUL,Haas,96.790,95.693,,14
+3,Australian Grand Prix,Kevin Magnussen,MAG,Haas,97.171,95.868,,15
+3,Australian Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.733,,,16
+3,Australian Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,98.190,,,17
+3,Australian Grand Prix,Alexander Albon,ALB,Williams,98.273,,,18
+3,Australian Grand Prix,Logan Sargeant,SAR,Williams,99.044,,,19
+3,Australian Grand Prix,Oliver Bearman,BEA,Ferrari,99.331,,,20
+4,Japanese Grand Prix,Lando Norris,NOR,McLaren,90.290,89.100,87.972,1
+4,Japanese Grand Prix,Oscar Piastri,PIA,McLaren,89.929,89.010,87.988,1
+4,Japanese Grand Prix,Max Verstappen,VER,Red Bull,91.114,90.095,88.922,3
+4,Japanese Grand Prix,Charles Leclerc,LEC,Ferrari,91.311,90.336,89.496,4
+4,Japanese Grand Prix,George Russell,RUS,Mercedes,91.895,91.011,90.056,5
+4,Japanese Grand Prix,Lewis Hamilton,HAM,Ferrari,92.688,91.456,90.488,6
+4,Japanese Grand Prix,Carlos Sainz,SAI,Kick Sauber,93.152,91.853,91.089,7
+4,Japanese Grand Prix,Fernando Alonso,ALO,Aston Martin,93.443,92.515,91.466,8
+4,Japanese Grand Prix,Lance Stroll,STR,Aston Martin,94.027,92.908,92.050,9
+4,Japanese Grand Prix,Pierre Gasly,GAS,Alpine,94.661,93.469,92.413,10
+4,Japanese Grand Prix,Esteban Ocon,OCO,Alpine,94.853,94.033,,11
+4,Japanese Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.659,94.332,,12
+4,Japanese Grand Prix,Zhou Guanyu,GUA,Kick Sauber,96.023,94.822,,13
+4,Japanese Grand Prix,Nico Hulkenberg,HUL,Haas,96.492,95.367,,14
+4,Japanese Grand Prix,Kevin Magnussen,MAG,Haas,96.910,95.903,,15
+4,Japanese Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.318,,,16
+4,Japanese Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,98.169,,,17
+4,Japanese Grand Prix,Alexander Albon,ALB,Williams,98.239,,,18
+4,Japanese Grand Prix,Logan Sargeant,SAR,Williams,99.234,,,19
+4,Japanese Grand Prix,Oliver Bearman,BEA,Ferrari,99.666,,,20
+5,Chinese Grand Prix,Lando Norris,NOR,McLaren,89.807,89.003,87.920,1
+5,Chinese Grand Prix,Oscar Piastri,PIA,McLaren,90.286,88.918,88.093,1
+5,Chinese Grand Prix,Max Verstappen,VER,Red Bull,91.074,89.990,89.002,3
+5,Chinese Grand Prix,Charles Leclerc,LEC,Ferrari,91.456,90.365,89.575,4
+5,Chinese Grand Prix,George Russell,RUS,Mercedes,91.884,90.893,90.078,5
+5,Chinese Grand Prix,Lewis Hamilton,HAM,Ferrari,92.535,91.639,90.499,6
+5,Chinese Grand Prix,Carlos Sainz,SAI,Kick Sauber,93.048,91.930,90.948,7
+5,Chinese Grand Prix,Fernando Alonso,ALO,Aston Martin,93.434,92.323,91.479,8
+5,Chinese Grand Prix,Lance Stroll,STR,Aston Martin,93.705,92.894,91.984,9
+5,Chinese Grand Prix,Pierre Gasly,GAS,Alpine,94.363,93.664,92.564,10
+5,Chinese Grand Prix,Esteban Ocon,OCO,Alpine,94.890,93.961,,11
+5,Chinese Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.206,94.402,,12
+5,Chinese Grand Prix,Zhou Guanyu,GUA,Kick Sauber,96.119,94.806,,13
+5,Chinese Grand Prix,Nico Hulkenberg,HUL,Haas,96.493,95.414,,14
+5,Chinese Grand Prix,Kevin Magnussen,MAG,Haas,96.800,96.130,,15
+5,Chinese Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.243,,,16
+5,Chinese Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,97.776,,,17
+5,Chinese Grand Prix,Alexander Albon,ALB,Williams,98.321,,,18
+5,Chinese Grand Prix,Logan Sargeant,SAR,Williams,99.277,,,19
+5,Chinese Grand Prix,Oliver Bearman,BEA,Ferrari,99.338,,,20
+6,Miami Grand Prix,Lando Norris,NOR,McLaren,90.245,88.984,87.995,1
+6,Miami Grand Prix,Oscar Piastri,PIA,McLaren,89.872,88.816,87.980,1
+6,Miami Grand Prix,Max Verstappen,VER,Red Bull,90.906,90.030,88.947,3
+6,Miami Grand Prix,Charles Leclerc,LEC,Ferrari,91.491,90.527,89.546,4
+6,Miami Grand Prix,George Russell,RUS,Mercedes,91.946,91.188,89.926,5
+6,Miami Grand Prix,Lewis Hamilton,HAM,Ferrari,92.396,91.636,90.437,6
+6,Miami Grand Prix,Carlos Sainz,SAI,Kick Sauber,92.858,92.059,90.966,7
+6,Miami Grand Prix,Fernando Alonso,ALO,Aston Martin,93.229,92.432,91.533,8
+6,Miami Grand Prix,Lance Stroll,STR,Aston Martin,94.048,93.103,92.068,9
+6,Miami Grand Prix,Pierre Gasly,GAS,Alpine,94.393,93.461,92.466,10
+6,Miami Grand Prix,Esteban Ocon,OCO,Alpine,94.734,93.877,,11
+6,Miami Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.307,94.347,,12
+6,Miami Grand Prix,Zhou Guanyu,GUA,Kick Sauber,95.965,94.865,,13
+6,Miami Grand Prix,Nico Hulkenberg,HUL,Haas,96.572,95.472,,14
+6,Miami Grand Prix,Kevin Magnussen,MAG,Haas,96.776,95.931,,15
+6,Miami Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.227,,,16
+6,Miami Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,97.886,,,17
+6,Miami Grand Prix,Alexander Albon,ALB,Williams,98.782,,,18
+6,Miami Grand Prix,Logan Sargeant,SAR,Williams,98.772,,,19
+6,Miami Grand Prix,Oliver Bearman,BEA,Ferrari,99.415,,,20
+7,Emilia Romagna Grand Prix,Lando Norris,NOR,McLaren,90.201,89.134,88.061,1
+7,Emilia Romagna Grand Prix,Oscar Piastri,PIA,McLaren,89.706,88.817,88.065,1
+7,Emilia Romagna Grand Prix,Max Verstappen,VER,Red Bull,91.233,89.861,88.911,3
+7,Emilia Romagna Grand Prix,Charles Leclerc,LEC,Ferrari,91.763,90.523,89.500,4
+7,Emilia Romagna Grand Prix,George Russell,RUS,Mercedes,92.192,90.848,89.982,5
+7,Emilia Romagna Grand Prix,Lewis Hamilton,HAM,Ferrari,92.609,91.392,90.503,6
+7,Emilia Romagna Grand Prix,Carlos Sainz,SAI,Kick Sauber,93.081,91.813,91.031,7
+7,Emilia Romagna Grand Prix,Fernando Alonso,ALO,Aston Martin,93.569,92.592,91.581,8
+7,Emilia Romagna Grand Prix,Lance Stroll,STR,Aston Martin,94.191,92.904,92.062,9
+7,Emilia Romagna Grand Prix,Pierre Gasly,GAS,Alpine,94.377,93.470,92.534,10
+7,Emilia Romagna Grand Prix,Esteban Ocon,OCO,Alpine,95.036,94.178,,11
+7,Emilia Romagna Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.670,94.594,,12
+7,Emilia Romagna Grand Prix,Zhou Guanyu,GUA,Kick Sauber,96.048,95.177,,13
+7,Emilia Romagna Grand Prix,Nico Hulkenberg,HUL,Haas,96.774,95.552,,14
+7,Emilia Romagna Grand Prix,Kevin Magnussen,MAG,Haas,97.055,96.073,,15
+7,Emilia Romagna Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.695,,,16
+7,Emilia Romagna Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,97.756,,,17
+7,Emilia Romagna Grand Prix,Alexander Albon,ALB,Williams,98.514,,,18
+7,Emilia Romagna Grand Prix,Logan Sargeant,SAR,Williams,98.711,,,19
+7,Emilia Romagna Grand Prix,Oliver Bearman,BEA,Ferrari,99.766,,,20
+8,Monaco Grand Prix,Lando Norris,NOR,McLaren,89.855,89.122,87.901,1
+8,Monaco Grand Prix,Oscar Piastri,PIA,McLaren,90.188,88.861,88.010,1
+8,Monaco Grand Prix,Max Verstappen,VER,Red Bull,91.205,89.984,88.944,3
+8,Monaco Grand Prix,Charles Leclerc,LEC,Ferrari,91.671,90.637,89.417,4
+8,Monaco Grand Prix,George Russell,RUS,Mercedes,91.867,90.982,90.026,5
+8,Monaco Grand Prix,Lewis Hamilton,HAM,Ferrari,92.279,91.490,90.447,6
+8,Monaco Grand Prix,Carlos Sainz,SAI,Kick Sauber,93.129,91.890,90.901,7
+8,Monaco Grand Prix,Fernando Alonso,ALO,Aston Martin,93.519,92.361,91.593,8
+8,Monaco Grand Prix,Lance Stroll,STR,Aston Martin,94.103,92.941,92.088,9
+8,Monaco Grand Prix,Pierre Gasly,GAS,Alpine,94.447,93.530,92.533,10
+8,Monaco Grand Prix,Esteban Ocon,OCO,Alpine,94.795,93.911,,11
+8,Monaco Grand Prix,Valtteri Bottas,BOT,Kick Sauber,95.646,94.303,,12
+8,Monaco Grand Prix,Zhou Guanyu,GUA,Kick Sauber,95.934,95.091,,13
+8,Monaco Grand Prix,Nico Hulkenberg,HUL,Haas,96.607,95.400,,14
+8,Monaco Grand Prix,Kevin Magnussen,MAG,Haas,97.074,96.067,,15
+8,Monaco Grand Prix,Yuki Tsunoda,TSU,Racing Bulls,97.647,,,16
+8,Monaco Grand Prix,Daniel Ricciardo,RIC,Racing Bulls,98.257,,,17
+8,Monaco Grand Prix,Alexander Albon,ALB,Williams,98.403,,,18
+8,Monaco Grand Prix,Logan Sargeant,SAR,Williams,98.871,,,19
+8,Monaco Grand Prix,Oliver Bearman,BEA,Ferrari,99.512,,,20

@@ -1,0 +1,21 @@
+{
+  "pre": {
+    "brier": 0.09145641199999999,
+    "logloss": 0.3359818517602678,
+    "mean_pred": 0.05,
+    "mean_actual": 0.1,
+    "bias": -0.05
+  },
+  "post": {
+    "brier": 0.05185761442005936,
+    "logloss": 0.17803901563162478,
+    "mean_pred": 0.13844352856512382,
+    "mean_actual": 0.1,
+    "bias": 0.03844352856512381
+  },
+  "improvement": {
+    "brier_improvement": 0.03959879757994063,
+    "logloss_improvement": 0.15794283612864302,
+    "bias_improvement": 0.01155647143487619
+  }
+}

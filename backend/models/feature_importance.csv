@@ -1,0 +1,14 @@
+feature,importance
+driver_circuit_wins,0.5135242
+team_circuit_wins,0.4309313
+driver_wins,0.009262045
+team_podiums,0.009171005
+team_encoded,0.008343509
+race_encoded,0.0077446075
+team_avg_position,0.006831778
+round,0.006598516
+driver_avg_position,0.0050158184
+driver_encoded,0.0025772757
+circuit_type_encoded,0.0
+team_wins,0.0
+driver_podiums,0.0

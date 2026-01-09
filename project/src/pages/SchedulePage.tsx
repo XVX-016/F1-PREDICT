@@ -1,0 +1,1220 @@
+import { useState, useEffect } from 'react';
+import { Calendar, Clock, Flag, Bell, Target, MapPin, Trophy, X } from 'lucide-react';
+import { F1_2025_RESULTS } from '../data/f1-2025-results';
+import { F1_2025_CALENDAR } from '../data/f1-2025-calendar';
+
+// Derive status using UTC like homepage banner
+const CALENDAR = F1_2025_CALENDAR.map(r => ({
+  ...r,
+  startISO: `${r.date}T${r.time}:00Z`
+}));
+
+// Legacy literal removed; we now use shared calendar
+/* const F1_2025_CALENDAR = [
+  {
+    round: 1,
+    raceName: "Australian GP",
+    circuitName: "Albert Park Circuit",
+    country: "Australia",
+    city: "Melbourne",
+    date: "2025-03-16",
+    time: "09:30",
+    fp1: { date: "2025-03-14", time: "01:30" },
+    fp2: { date: "2025-03-14", time: "05:00" },
+    fp3: { date: null, time: null },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-03-15", time: "05:00" },
+    status: "upcoming"
+  },
+  {
+    round: 2,
+    raceName: "Chinese GP",
+    circuitName: "Shanghai International Circuit",
+    country: "China",
+    city: "Shanghai",
+    date: "2025-03-23",
+    time: "12:30",
+    fp1: { date: "2025-03-21", time: "03:30" },
+    fp2: { date: null, time: null },
+    fp3: { date: null, time: null },
+    sprintQualifying: { date: "2025-03-21", time: "07:30" },
+    sprint: { date: "2025-03-22", time: "03:00" },
+    qualifying: { date: "2025-03-22", time: "07:00" },
+    status: "upcoming"
+  },
+  {
+    round: 3,
+    raceName: "Japanese GP",
+    circuitName: "Suzuka International Racing Course",
+    country: "Japan",
+    city: "Suzuka",
+    date: "2025-04-06",
+    time: "10:30",
+    fp1: { date: "2025-04-04", time: "03:30" },
+    fp2: { date: "2025-04-04", time: "07:00" },
+    fp3: { date: "2025-04-05", time: "03:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-04-05", time: "07:00" },
+    status: "upcoming"
+  },
+  {
+    round: 4,
+    raceName: "Bahrain GP",
+    circuitName: "Bahrain International Circuit",
+    country: "Bahrain",
+    city: "Sakhir",
+    date: "2025-04-13",
+    time: "20:30",
+    fp1: { date: "2025-04-11", time: "12:30" },
+    fp2: { date: "2025-04-11", time: "16:00" },
+    fp3: { date: "2025-04-12", time: "13:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-04-12", time: "17:00" },
+    status: "upcoming"
+  },
+  {
+    round: 5,
+    raceName: "Saudi Arabian GP",
+    circuitName: "Jeddah Corniche Circuit",
+    country: "Saudi Arabia",
+    city: "Jeddah",
+    date: "2025-04-20",
+    time: "22:30",
+    fp1: { date: "2025-04-18", time: "14:30" },
+    fp2: { date: "2025-04-18", time: "18:00" },
+    fp3: { date: "2025-04-19", time: "14:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-04-19", time: "18:00" },
+    status: "upcoming"
+  },
+  {
+    round: 6,
+    raceName: "Miami GP",
+    circuitName: "Miami International Autodrome",
+    country: "USA",
+    city: "Miami",
+    date: "2025-05-05",
+    time: "01:30",
+    fp1: { date: "2025-05-02", time: "17:30" },
+    fp2: { date: null, time: null },
+    fp3: { date: null, time: null },
+    sprintQualifying: { date: "2025-05-02", time: "21:30" },
+    sprint: { date: "2025-05-03", time: "17:00" },
+    qualifying: { date: "2025-05-03", time: "21:00" },
+    status: "upcoming"
+  },
+  {
+    round: 7,
+    raceName: "Emilia Romagna GP",
+    circuitName: "Autodromo Enzo e Dino Ferrari",
+    country: "Italy",
+    city: "Imola",
+    date: "2025-05-18",
+    time: "18:30",
+    fp1: { date: "2025-05-16", time: "12:30" },
+    fp2: { date: "2025-05-16", time: "16:00" },
+    fp3: { date: "2025-05-17", time: "11:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-05-17", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 8,
+    raceName: "Monaco GP",
+    circuitName: "Circuit de Monaco",
+    country: "Monaco",
+    city: "Monte Carlo",
+    date: "2025-05-25",
+    time: "18:30",
+    fp1: { date: "2025-05-23", time: "12:30" },
+    fp2: { date: "2025-05-23", time: "16:00" },
+    fp3: { date: "2025-05-24", time: "11:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-05-24", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 9,
+    raceName: "Spanish GP",
+    circuitName: "Circuit de Barcelona-Catalunya",
+    country: "Spain",
+    city: "Barcelona",
+    date: "2025-06-01",
+    time: "18:30",
+    fp1: { date: "2025-05-30", time: "12:30" },
+    fp2: { date: "2025-05-30", time: "16:00" },
+    fp3: { date: "2025-05-31", time: "11:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-05-31", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 10,
+    raceName: "Canadian GP",
+    circuitName: "Circuit Gilles Villeneuve",
+    country: "Canada",
+    city: "Montreal",
+    date: "2025-06-15",
+    time: "23:30",
+    fp1: { date: "2025-06-13", time: "18:30" },
+    fp2: { date: "2025-06-13", time: "22:00" },
+    fp3: { date: "2025-06-14", time: "17:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-06-14", time: "21:00" },
+    status: "upcoming"
+  },
+  {
+    round: 11,
+    raceName: "Austrian GP",
+    circuitName: "Red Bull Ring",
+    country: "Austria",
+    city: "Spielberg",
+    date: "2025-06-29",
+    time: "18:30",
+    fp1: { date: "2025-06-27", time: "12:30" },
+    fp2: { date: "2025-06-27", time: "16:00" },
+    fp3: { date: "2025-06-28", time: "11:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-06-28", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 12,
+    raceName: "British GP",
+    circuitName: "Silverstone Circuit",
+    country: "United Kingdom",
+    city: "Silverstone",
+    date: "2025-07-06",
+    time: "19:30",
+    fp1: { date: "2025-07-04", time: "12:30" },
+    fp2: { date: "2025-07-04", time: "16:00" },
+    fp3: { date: "2025-07-05", time: "11:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-07-05", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 13,
+    raceName: "Belgian GP",
+    circuitName: "Circuit de Spa-Francorchamps",
+    country: "Belgium",
+    city: "Spa",
+    date: "2025-07-27",
+    time: "18:30",
+    fp1: { date: "2025-07-25", time: "11:30" },
+    fp2: { date: null, time: null },
+    fp3: { date: null, time: null },
+    sprintQualifying: { date: "2025-07-25", time: "15:30" },
+    sprint: { date: "2025-07-26", time: "11:00" },
+    qualifying: { date: "2025-07-26", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 14,
+    raceName: "Hungarian GP",
+    circuitName: "Hungaroring",
+    country: "Hungary",
+    city: "Budapest",
+    date: "2025-08-03",
+    time: "18:30",
+    fp1: { date: "2025-08-01", time: "12:30" },
+    fp2: { date: "2025-08-01", time: "16:00" },
+    fp3: { date: "2025-08-02", time: "11:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-08-02", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 15,
+    raceName: "Dutch GP",
+    circuitName: "Circuit Zandvoort",
+    country: "Netherlands",
+    city: "Zandvoort",
+    date: "2025-08-31",
+    time: "18:30",
+    fp1: { date: "2025-08-29", time: "11:30" },
+    fp2: { date: "2025-08-29", time: "15:00" },
+    fp3: { date: "2025-08-30", time: "10:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-08-30", time: "14:00" },
+    status: "upcoming"
+  },
+  {
+    round: 16,
+    raceName: "Italian GP",
+    circuitName: "Autodromo Nazionale di Monza",
+    country: "Italy",
+    city: "Monza",
+    date: "2025-09-07",
+    time: "18:30",
+    fp1: { date: "2025-09-05", time: "12:30" },
+    fp2: { date: "2025-09-05", time: "16:00" },
+    fp3: { date: "2025-09-06", time: "11:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-09-06", time: "15:00" },
+    status: "upcoming"
+  },
+  {
+    round: 17,
+    raceName: "Azerbaijan GP",
+    circuitName: "Baku City Circuit",
+    country: "Azerbaijan",
+    city: "Baku",
+    date: "2025-09-21",
+    time: "16:30",
+    fp1: { date: "2025-09-19", time: "09:30" },
+    fp2: { date: "2025-09-19", time: "13:00" },
+    fp3: { date: "2025-09-20", time: "09:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-09-20", time: "13:00" },
+    status: "upcoming"
+  },
+  {
+    round: 18,
+    raceName: "Singapore GP",
+    circuitName: "Marina Bay Street Circuit",
+    country: "Singapore",
+    city: "Marina Bay",
+    date: "2025-10-05",
+    time: "18:30",
+    fp1: { date: "2025-10-03", time: "10:30" },
+    fp2: { date: "2025-10-03", time: "14:00" },
+    fp3: { date: "2025-10-04", time: "10:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-10-04", time: "14:00" },
+    status: "upcoming"
+  },
+  {
+    round: 19,
+    raceName: "United States GP",
+    circuitName: "Circuit of the Americas",
+    country: "USA",
+    city: "Austin",
+    date: "2025-10-20",
+    time: "00:30",
+    fp1: { date: "2025-10-17", time: "18:30" },
+    fp2: { date: null, time: null },
+    fp3: { date: null, time: null },
+    sprintQualifying: { date: "2025-10-17", time: "22:30" },
+    sprint: { date: "2025-10-18", time: "18:00" },
+    qualifying: { date: "2025-10-18", time: "22:00" },
+    status: "upcoming"
+  },
+  {
+    round: 20,
+    raceName: "Mexican GP",
+    circuitName: "Autódromo Hermanos Rodríguez",
+    country: "Mexico",
+    city: "Mexico City",
+    date: "2025-10-27",
+    time: "01:30",
+    fp1: { date: "2025-10-24", time: "19:30" },
+    fp2: { date: "2025-10-24", time: "23:00" },
+    fp3: { date: "2025-10-25", time: "18:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-10-25", time: "22:00" },
+    status: "upcoming"
+  },
+  {
+    round: 21,
+    raceName: "Brazilian GP",
+    circuitName: "Autódromo José Carlos Pace",
+    country: "Brazil",
+    city: "São Paulo",
+    date: "2025-11-09",
+    time: "22:30",
+    fp1: { date: "2025-11-07", time: "14:00" },
+    fp2: { date: null, time: null },
+    fp3: { date: null, time: null },
+    sprintQualifying: { date: "2025-11-07", time: "18:30" },
+    sprint: { date: "2025-11-08", time: "13:00" },
+    qualifying: { date: "2025-11-08", time: "17:00" },
+    status: "upcoming"
+  },
+  {
+    round: 22,
+    raceName: "Las Vegas GP",
+    circuitName: "Las Vegas Strip Circuit",
+    country: "USA",
+    city: "Las Vegas",
+    date: "2025-11-23",
+    time: "09:30",
+    fp1: { date: "2025-11-21", time: "00:30" },
+    fp2: { date: "2025-11-21", time: "04:00" },
+    fp3: { date: "2025-11-22", time: "00:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-11-22", time: "04:00" },
+    status: "upcoming"
+  },
+  {
+    round: 23,
+    raceName: "Qatar GP",
+    circuitName: "Lusail International Circuit",
+    country: "Qatar",
+    city: "Lusail",
+    date: "2025-11-30",
+    time: "21:30",
+    fp1: { date: "2025-11-28", time: "13:30" },
+    fp2: { date: null, time: null },
+    fp3: { date: null, time: null },
+    sprintQualifying: { date: "2025-11-28", time: "17:30" },
+    sprint: { date: "2025-11-29", time: "13:00" },
+    qualifying: { date: "2025-11-29", time: "18:00" },
+    status: "upcoming"
+  },
+  {
+    round: 24,
+    raceName: "Abu Dhabi GP",
+    circuitName: "Yas Marina Circuit",
+    country: "UAE",
+    city: "Abu Dhabi",
+    date: "2025-12-07",
+    time: "18:30",
+    fp1: { date: "2025-12-05", time: "09:30" },
+    fp2: { date: "2025-12-05", time: "13:00" },
+    fp3: { date: "2025-12-06", time: "10:30" },
+    sprintQualifying: { date: null, time: null },
+    sprint: { date: null, time: null },
+    qualifying: { date: "2025-12-06", time: "14:00" },
+    status: "upcoming"
+  }
+]; */
+
+type RaceSession = { date: string | null; time: string | null };
+type RaceItem = {
+  round: number;
+  raceName: string;
+  circuitName: string;
+  country: string;
+  city: string;
+  date: string;
+  time: string;
+  fp1: RaceSession;
+  fp2: RaceSession;
+  fp3: RaceSession;
+  sprintQualifying: RaceSession;
+  sprint: RaceSession;
+  qualifying: RaceSession;
+  status: 'upcoming' | 'live' | 'completed';
+};
+
+interface SchedulePageProps {
+  onPageChange: (page: string, raceData?: any) => void;
+}
+
+export default function SchedulePage({ onPageChange }: SchedulePageProps) {
+  const [selectedFilter, setSelectedFilter] = useState<'all'|'upcoming'|'live'|'completed'>('all');
+  const [selectedMonth, setSelectedMonth] = useState<'all'|string>('all');
+  const [races, setRaces] = useState<RaceItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [selectedRace, setSelectedRace] = useState<RaceItem | null>(null);
+  const [showRaceModal, setShowRaceModal] = useState(false);
+  const [raceResults, setRaceResults] = useState<any[] | null>(null);
+  const [loadingResults, setLoadingResults] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setError('');
+    // Use shared calendar and add proper status (UTC)
+    const racesWithStatus = CALENDAR.map(race => ({
+      ...race,
+      status: getRaceStatusUTC(race.startISO)
+    }));
+    setRaces(racesWithStatus);
+    setLoading(false);
+  }, []);
+
+  const getRaceStatusUTC = (startISO: string) => {
+    const raceDateTime = new Date(startISO);
+    const now = new Date();
+    const diff = raceDateTime.getTime() - now.getTime();
+    
+    // If race is more than 2 hours in the future
+    if (diff > 2 * 60 * 60 * 1000) {
+      return 'upcoming';
+    }
+    // If race is within 2 hours (including during race)
+    else if (diff > -3 * 60 * 60 * 1000) {
+      return 'live';
+    }
+    // If race is more than 3 hours in the past
+    else {
+      return 'completed';
+    }
+  };
+
+  const getStatusColor = (status: 'upcoming'|'live'|'completed'|string) => {
+    switch (status) {
+      case 'completed': return 'bg-gray-600 text-gray-300';
+      case 'live': return 'bg-red-600 text-white animate-pulse';
+      case 'upcoming': return 'bg-green-600 text-white';
+      default: return 'bg-gray-600 text-gray-300';
+    }
+  };
+
+  const getCountdown = (dateString: string) => {
+    const raceDate = new Date(dateString);
+    const now = new Date();
+    const diff = raceDate.getTime() - now.getTime();
+    if (diff < 0) return null;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    if (days > 0) return `${days} days`;
+    if (hours > 0) return `${hours} hours`;
+    return 'Soon';
+  };
+
+  const getCountryFlag = (country: string) => {
+    const flags: Record<string, string> = {
+      'Australia': '🇦🇺',
+      'China': '🇨🇳',
+      'Japan': '🇯🇵',
+      'Bahrain': '🇧🇭',
+      'Saudi Arabia': '🇸🇦',
+      'USA': '🇺🇸',
+      'Italy': '🇮🇹',
+      'Monaco': '🇲🇨',
+      'Spain': '🇪🇸',
+      'Canada': '🇨🇦',
+      'Austria': '🇦🇹',
+      'United Kingdom': '🇬🇧',
+      'Belgium': '🇧🇪',
+      'Hungary': '🇭🇺',
+      'Netherlands': '🇳🇱',
+      'Azerbaijan': '🇦🇿',
+      'Singapore': '🇸🇬',
+      'Mexico': '🇲🇽',
+      'Brazil': '🇧🇷',
+      'Qatar': '🇶🇦',
+      'UAE': '🇦🇪'
+    };
+    return flags[country] || '🏁';
+  };
+
+  const getDriverNationalityFlag = (driverName: string) => {
+    const nationalityMap: Record<string, string> = {
+      'Max Verstappen': '🇳🇱',
+      'Lewis Hamilton': '🇬🇧',
+      'Charles Leclerc': '🇲🇨',
+      'Lando Norris': '🇬🇧',
+      'Carlos Sainz': '🇪🇸',
+      'George Russell': '🇬🇧',
+      'Fernando Alonso': '🇪🇸',
+      'Oscar Piastri': '🇦🇺',
+      'Lance Stroll': '🇨🇦',
+      'Pierre Gasly': '🇫🇷',
+      'Esteban Ocon': '🇫🇷',
+      'Alexander Albon': '🇹🇭',
+      'Yuki Tsunoda': '🇯🇵',
+      'Valtteri Bottas': '🇫🇮',
+      'Nico Hulkenberg': '🇩🇪',
+      'Daniel Ricciardo': '🇦🇺',
+      'Zhou Guanyu': '🇨🇳',
+      'Kevin Magnussen': '🇩🇰',
+      'Logan Sargeant': '🇺🇸',
+      'Jack Doohan': '🇦🇺',
+      'Andrea Kimi Antonelli': '🇮🇹',
+      'Kimi Antonelli': '🇮🇹'
+    };
+    return nationalityMap[driverName] || '🏁';
+  };
+
+  const getDriverNationality = (driverName: string) => {
+    const nationalityMap: Record<string, string> = {
+      'Max Verstappen': 'Netherlands',
+      'Lewis Hamilton': 'United Kingdom',
+      'Charles Leclerc': 'Monaco',
+      'Lando Norris': 'United Kingdom',
+      'Carlos Sainz': 'Spain',
+      'George Russell': 'United Kingdom',
+      'Fernando Alonso': 'Spain',
+      'Oscar Piastri': 'Australia',
+      'Lance Stroll': 'Canada',
+      'Pierre Gasly': 'France',
+      'Esteban Ocon': 'France',
+      'Alexander Albon': 'Thailand',
+      'Yuki Tsunoda': 'Japan',
+      'Valtteri Bottas': 'Finland',
+      'Nico Hulkenberg': 'Germany',
+      'Daniel Ricciardo': 'Australia',
+      'Zhou Guanyu': 'China',
+      'Kevin Magnussen': 'Denmark',
+      'Logan Sargeant': 'United States',
+      'Jack Doohan': 'Australia',
+      'Andrea Kimi Antonelli': 'Italy',
+      'Kimi Antonelli': 'Italy'
+    };
+    return nationalityMap[driverName] || 'Unknown';
+  };
+
+  const getRaceResults = async (raceName: string) => {
+    // Support both "GP" and "Grand Prix" naming
+    const aliases = [
+      raceName,
+      raceName.replace(/\bGP\b/, 'Grand Prix')
+    ];
+    for (const key of aliases) {
+      const found = (F1_2025_RESULTS as any)[key];
+      if (found) return found;
+    }
+    return null;
+  };
+
+  const openRaceDetails = async (race: RaceItem) => {
+    setSelectedRace(race);
+    setShowRaceModal(true);
+    setRaceResults(null);
+    
+    // Get real results for completed races
+    if (race.status === 'completed') {
+      setLoadingResults(true);
+      try {
+        const results = await getRaceResults(race.raceName);
+        if (results && results.length > 0) {
+          setRaceResults(results);
+        }
+      } catch (error) {
+        console.error('Error fetching race results:', error);
+      } finally {
+        setLoadingResults(false);
+      }
+    }
+  };
+
+  const closeRaceModal = () => {
+    setShowRaceModal(false);
+    setSelectedRace(null);
+    setRaceResults(null);
+  };
+
+  const filteredRaces = races.filter((race) => {
+    if (selectedFilter !== 'all' && race.status !== selectedFilter) return false;
+    if (selectedMonth !== 'all') {
+      const raceMonth = new Date(race.date).getMonth();
+      if (parseInt(selectedMonth) !== raceMonth) return false;
+    }
+    return true;
+  });
+
+  const renderPodiumResults = () => {
+    if (loadingResults) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-400">Loading race results...</div>
+        </div>
+      );
+    }
+
+    if (!raceResults || raceResults.length === 0) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-400">No results available</div>
+        </div>
+      );
+    }
+
+    const podium = raceResults.slice(0, 3);
+    const winner = podium[0];
+    const totalLaps = winner?.laps || 58;
+
+    return (
+      <div className="space-y-4">
+        {/* 1st Place */}
+        <div className="bg-gradient-to-r from-yellow-600/20 to-yellow-400/10 border border-yellow-500/30 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center font-bold text-black">
+                1
+              </div>
+              <div>
+                <div className="font-bold text-yellow-400">Winner</div>
+                <div className="text-sm text-gray-400">{winner?.driverName || 'Unknown'}</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="font-bold text-yellow-400">{winner?.time || 'N/A'}</div>
+              <div className="text-sm text-gray-400">{totalLaps} laps</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <span>{winner?.constructorName || 'Unknown Team'}</span>
+            <span>•</span>
+            <span>{getDriverNationalityFlag(winner?.driverName)} {getDriverNationality(winner?.driverName)}</span>
+          </div>
+        </div>
+
+        {/* 2nd Place */}
+        {podium[1] && (
+          <div className="bg-gradient-to-r from-gray-600/20 to-gray-400/10 border border-gray-500/30 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center font-bold text-black">
+                  2
+                </div>
+                <div>
+                  <div className="font-bold text-gray-300">Second</div>
+                  <div className="text-sm text-gray-400">{podium[1].driverName || 'Unknown'}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-gray-300">{podium[1].gap || 'N/A'}</div>
+                <div className="text-sm text-gray-400">{totalLaps} laps</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span>{podium[1].constructorName || 'Unknown Team'}</span>
+              <span>•</span>
+              <span>{getDriverNationalityFlag(podium[1].driverName)} {getDriverNationality(podium[1].driverName)}</span>
+            </div>
+          </div>
+        )}
+
+        {/* 3rd Place */}
+        {podium[2] && (
+          <div className="bg-gradient-to-r from-orange-600/20 to-orange-400/10 border border-orange-500/30 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center font-bold text-black">
+                  3
+                </div>
+                <div>
+                  <div className="font-bold text-orange-400">Third</div>
+                  <div className="text-sm text-gray-400">{podium[2].driverName || 'Unknown'}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-orange-400">{podium[2].gap || 'N/A'}</div>
+                <div className="text-sm text-gray-400">{totalLaps} laps</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span>{podium[2].constructorName || 'Unknown Team'}</span>
+              <span>•</span>
+              <span>{getDriverNationalityFlag(podium[2].driverName)} {getDriverNationality(podium[2].driverName)}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Race Stats */}
+        <div className="mt-4 pt-4 border-t border-gray-700">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Total Laps:</span>
+              <span className="font-semibold">{totalLaps}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Fastest Lap:</span>
+              <span className="font-semibold">
+                {raceResults.find(r => r.fastestLap)?.driverName || 'N/A'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Pole Position:</span>
+              <span className="font-semibold">
+                {raceResults.find(r => r.grid === 1)?.driverName || 'N/A'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Safety Cars:</span>
+              <span className="font-semibold">
+                {raceResults.some(r => r.status?.includes('Safety Car')) ? '1' : '0'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen text-white pt-24">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-4 flex items-center gap-3">
+            <Calendar className="w-10 h-10 text-red-500" />
+            Race Schedule 2025
+          </h1>
+          <p className="text-gray-400 text-lg">Complete Formula 1 calendar with race times and predictions</p>
+        </div>
+
+        {/* Filters */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-gray-900/50 backdrop-blur-sm border border-red-600/20 rounded-xl p-6">
+            <h3 className="font-bold mb-3 flex items-center gap-2">
+              <Flag className="w-5 h-5 text-blue-500" />
+              Filter by Status
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: 'all', label: 'All Races' },
+                { id: 'upcoming', label: 'Upcoming' },
+                { id: 'live', label: 'Live' },
+                { id: 'completed', label: 'Completed' }
+              ].map(filter => (
+                <button
+                  key={filter.id}
+                  onClick={() => setSelectedFilter(filter.id)}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                    selectedFilter === filter.id
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-700 hover:bg-gray-600'
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-gray-900/50 backdrop-blur-sm border border-red-600/20 rounded-xl p-6">
+            <h3 className="font-bold mb-3 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-green-500" />
+              Filter by Month
+            </h3>
+            <select 
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
+            >
+              <option value="all">All Months</option>
+              <option value="2">March</option>
+              <option value="3">April</option>
+              <option value="4">May</option>
+              <option value="5">June</option>
+              <option value="6">July</option>
+              <option value="7">August</option>
+              <option value="8">September</option>
+              <option value="9">October</option>
+              <option value="10">November</option>
+              <option value="11">December</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Race Calendar */}
+        {loading ? (
+          <div className="text-center py-12 text-lg text-gray-400">Loading...</div>
+        ) : error ? (
+          <div className="text-center py-12 text-lg text-red-400">{error}</div>
+        ) : (
+          <div className="space-y-4">
+            {filteredRaces.map((race) => (
+              <div 
+                key={race.round} 
+                className="bg-gray-900/50 backdrop-blur-sm border border-red-600/20 rounded-xl p-6 hover:border-red-500/50 transition-all cursor-pointer"
+                onClick={() => openRaceDetails(race)}
+              >
+                <div className="grid md:grid-cols-4 gap-6 items-center">
+                  {/* Race Info */}
+                  <div className="md:col-span-2">
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className="text-3xl">{getCountryFlag(race.country)}</div>
+                      <div>
+                        <h3 className="text-xl font-bold">{race.raceName}</h3>
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <MapPin className="w-4 h-4" />
+                          <span className="text-sm">{race.circuitName}, {race.city}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(race.status)}`}>
+                        {race.status ? race.status.toUpperCase() : 'UPCOMING'}
+                      </span>
+                      <span className="text-sm text-gray-400">Round {race.round}</span>
+                    </div>
+                  </div>
+                  {/* Date & Time */}
+                  <div className="text-center">
+                    <div className="text-lg font-bold mb-1">
+                      {new Date(race.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </div>
+                    <div className="text-gray-400 text-sm mb-2">{race.time} UTC</div>
+                    {race.status === 'upcoming' && getCountdown(race.date) && (
+                      <div className="bg-red-600 px-3 py-1 rounded-full text-sm font-semibold">
+                        {getCountdown(race.date)}
+                      </div>
+                    )}
+                  </div>
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2">
+                    <button 
+                      className="bg-gray-800 hover:bg-gray-700 border border-gray-600 hover:border-red-500 py-2 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Set reminder logic
+                      }}
+                    >
+                      <Bell className="w-4 h-4" />
+                      Set Reminder
+                    </button>
+                    <button 
+                      className="bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPageChange('predict', { raceName: race.raceName, raceId: race.raceName.toLowerCase().replace(/\s+/g, '-') });
+                      }}
+                    >
+                      <Target className="w-4 h-4" />
+                      Predict
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Detailed Schedule */}
+                <div className="mt-6 grid grid-cols-2 md:grid-cols-7 gap-4 text-sm">
+                  <div className="bg-gray-800/50 rounded-lg p-3">
+                    <div className="font-semibold text-blue-400 mb-1">FP1</div>
+                    <div className="text-gray-300">
+                      {race.fp1.date ? (
+                        <>
+                          <div>{new Date(race.fp1.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                          <div className="text-red-400">{race.fp1.time}</div>
+                        </>
+                      ) : (
+                        <span className="text-gray-500">—</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-800/50 rounded-lg p-3">
+                    <div className="font-semibold text-green-400 mb-1">
+                      {race.sprintQualifying.date ? 'Sprint Qual.' : 'FP2'}
+                    </div>
+                    <div className="text-gray-300">
+                      {race.sprintQualifying.date ? (
+                        <>
+                          <div>{new Date(race.sprintQualifying.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                          <div className="text-red-400">{race.sprintQualifying.time}</div>
+                        </>
+                      ) : race.fp2.date ? (
+                        <>
+                          <div>{new Date(race.fp2.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                          <div className="text-red-400">{race.fp2.time}</div>
+                        </>
+                      ) : (
+                        <span className="text-gray-500">—</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-800/50 rounded-lg p-3">
+                    <div className="font-semibold text-yellow-400 mb-1">
+                      {race.sprint.date ? 'Sprint' : 'FP3'}
+                    </div>
+                    <div className="text-gray-300">
+                      {race.sprint.date ? (
+                        <>
+                          <div>{new Date(race.sprint.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                          <div className="text-red-400">{race.sprint.time}</div>
+                        </>
+                      ) : race.fp3.date ? (
+                        <>
+                          <div>{new Date(race.fp3.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                          <div className="text-red-400">{race.fp3.time}</div>
+                        </>
+                      ) : (
+                        <span className="text-gray-500">—</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-800/50 rounded-lg p-3">
+                    <div className="font-semibold text-purple-400 mb-1">Qualifying</div>
+                    <div className="text-gray-300">
+                      <div>{new Date(race.qualifying.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                      <div className="text-red-400">{race.qualifying.time}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-800/50 rounded-lg p-3 col-span-2 md:col-span-1">
+                    <div className="font-semibold text-red-400 mb-1">Race</div>
+                    <div className="text-gray-300">
+                      <div>{new Date(race.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                      <div className="text-red-400 font-bold">{race.time}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {filteredRaces.length === 0 && !loading && !error && (
+          <div className="text-center py-12">
+            <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+            <h3 className="text-xl font-bold mb-2">No races found</h3>
+            <p className="text-gray-400">Try adjusting your filters to see more races</p>
+          </div>
+        )}
+      </div>
+
+      {/* Race Details Modal */}
+      {showRaceModal && selectedRace && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-red-600/20 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">{getCountryFlag(selectedRace.country)}</div>
+                  <div>
+                    <h2 className="text-3xl font-bold">{selectedRace.raceName}</h2>
+                    <p className="text-gray-400">{selectedRace.circuitName}, {selectedRace.city}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={closeRaceModal}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Race Information */}
+                <div className="bg-gray-800/50 rounded-lg p-4">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-yellow-500" />
+                    Race Information
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Round:</span>
+                      <span className="font-semibold">{selectedRace.round}/24</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Date:</span>
+                      <span className="font-semibold">
+                        {new Date(selectedRace.date).toLocaleDateString('en-US', { 
+                          weekday: 'long', 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Race Time:</span>
+                      <span className="font-semibold text-red-400">{selectedRace.time} UTC</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Status:</span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(selectedRace.status)}`}>
+                        {selectedRace.status.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Circuit Details */}
+                <div className="bg-gray-800/50 rounded-lg p-4">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-blue-500" />
+                    Circuit Details
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Circuit:</span>
+                      <span className="font-semibold">{selectedRace.circuitName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Location:</span>
+                      <span className="font-semibold">{selectedRace.city}, {selectedRace.country}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Type:</span>
+                      <span className="font-semibold">
+                        {selectedRace.circuitName.includes('Street') ? 'Street Circuit' : 'Permanent Circuit'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Podium Details - Only show for completed races */}
+                {selectedRace.status === 'completed' && (
+                  <div className="bg-gray-800/50 rounded-lg p-4 md:col-span-2">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-yellow-500" />
+                      Podium Results
+                    </h3>
+                    {renderPodiumResults()}
+                  </div>
+                )}
+
+                {/* Session Schedule */}
+                <div className="bg-gray-800/50 rounded-lg p-4 md:col-span-2">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-green-500" />
+                    Session Schedule
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedRace.fp1.date && (
+                      <div className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                        <div>
+                          <div className="font-semibold text-blue-400">Free Practice 1</div>
+                          <div className="text-sm text-gray-400">
+                            {new Date(selectedRace.fp1.date).toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold">{selectedRace.fp1.time}</div>
+                          <div className="text-sm text-gray-400">UTC</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedRace.sprintQualifying.date ? (
+                      <div className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                        <div>
+                          <div className="font-semibold text-green-400">Sprint Qualifying</div>
+                          <div className="text-sm text-gray-400">
+                            {new Date(selectedRace.sprintQualifying.date).toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold">{selectedRace.sprintQualifying.time}</div>
+                          <div className="text-sm text-gray-400">UTC</div>
+                        </div>
+                      </div>
+                    ) : selectedRace.fp2.date && (
+                      <div className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                        <div>
+                          <div className="font-semibold text-green-400">Free Practice 2</div>
+                          <div className="text-sm text-gray-400">
+                            {new Date(selectedRace.fp2.date).toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold">{selectedRace.fp2.time}</div>
+                          <div className="text-sm text-gray-400">UTC</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedRace.sprint.date ? (
+                      <div className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                        <div>
+                          <div className="font-semibold text-yellow-400">Sprint Race</div>
+                          <div className="text-sm text-gray-400">
+                            {new Date(selectedRace.sprint.date).toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold">{selectedRace.sprint.time}</div>
+                          <div className="text-sm text-gray-400">UTC</div>
+                        </div>
+                      </div>
+                    ) : selectedRace.fp3.date && (
+                      <div className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                        <div>
+                          <div className="font-semibold text-yellow-400">Free Practice 3</div>
+                          <div className="text-sm text-gray-400">
+                            {new Date(selectedRace.fp3.date).toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold">{selectedRace.fp3.time}</div>
+                          <div className="text-sm text-gray-400">UTC</div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                      <div>
+                        <div className="font-semibold text-purple-400">Qualifying</div>
+                        <div className="text-sm text-gray-400">
+                          {new Date(selectedRace.qualifying.date).toLocaleDateString('en-US', { 
+                            weekday: 'short', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">{selectedRace.qualifying.time}</div>
+                        <div className="text-sm text-gray-400">UTC</div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center p-3 bg-red-600/20 border border-red-500/30 rounded-lg">
+                      <div>
+                        <div className="font-semibold text-red-400">Race</div>
+                        <div className="text-sm text-gray-400">
+                          {new Date(selectedRace.date).toLocaleDateString('en-US', { 
+                            weekday: 'short', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-red-400">{selectedRace.time}</div>
+                        <div className="text-sm text-gray-400">UTC</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 mt-8">
+                <button 
+                  className="flex-1 bg-red-600 hover:bg-red-700 py-3 px-6 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+                  onClick={() => {
+                    closeRaceModal();
+                    onPageChange('predict', { raceName: selectedRace.raceName, raceId: selectedRace.raceName.toLowerCase().replace(/\s+/g, '-') });
+                  }}
+                >
+                  <Target className="w-5 h-5" />
+                  Make Prediction
+                </button>
+                <button className="flex-1 bg-gray-700 hover:bg-gray-600 py-3 px-6 rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
+                  <Bell className="w-5 h-5" />
+                  Set Reminder
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
