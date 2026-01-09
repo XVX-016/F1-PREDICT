@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from services.RaceCalendarService import RaceCalendarService
-from services.PredictionService import prediction_service
+from services.probability_engine import probability_engine
 from services.MarketService import market_service
 from services.BetService import bet_service
 from services.ResultService import result_service
@@ -27,7 +27,7 @@ class BettingLifecycleService:
     
     def __init__(self):
         self.calendar_service = RaceCalendarService()
-        self.prediction_service = prediction_service
+        self.probability_engine = probability_engine
         self.market_service = market_service
         self.bet_service = bet_service
         self.result_service = result_service
@@ -113,10 +113,18 @@ class BettingLifecycleService:
             # Get player history for smarter odds
             player_history = self.user_service.get_player_betting_patterns()
             
-            # Generate odds using prediction service
-            odds = self.prediction_service.generate_odds(
-                next_race, track_features, player_history
-            )
+            # Generate odds using probability engine and market engine
+            # Get probabilities from probability engine
+            race_id = next_race.get("circuit_id") or next_race.get("id")
+            probabilities = self.probability_engine.get_probabilities(race_id)
+            
+            # Market engine will derive odds from probabilities
+            from services.market_engine import MarketEngine
+            market_engine = MarketEngine()
+            # Convert probabilities to format expected by market engine
+            prob_dict = {str(driver_id): prob.get("win_probability", 0.0) 
+                        for driver_id, prob in probabilities.items()}
+            odds = market_engine.calculate_odds(prob_dict)
             
             # Create markets
             market_result = self.market_service.create_markets(next_race["circuit_id"], odds)
