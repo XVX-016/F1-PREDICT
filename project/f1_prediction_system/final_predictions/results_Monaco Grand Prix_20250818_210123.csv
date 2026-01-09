@@ -1,0 +1,21 @@
+driver,win_prob,podium_prob,points_prob,race,team,win_prob_calibrated
+Lando Norris,0.0664,0.1836,0.5822,Monaco Grand Prix,McLaren,0.4999751523663787
+Oscar Piastri,0.0634,0.1888,0.5874,Monaco Grand Prix,McLaren,0.4999762750004262
+Max Verstappen,0.0566,0.1558,0.5068,Monaco Grand Prix,Red Bull,0.0566
+Lewis Hamilton,0.0538,0.1672,0.5228,Monaco Grand Prix,Mercedes,0.4999570152543502
+Charles Leclerc,0.0526,0.1568,0.5168,Monaco Grand Prix,Ferrari,0.0526
+Yuki Tsunoda,0.0516,0.1466,0.4764,Monaco Grand Prix,Racing Bulls,0.0516
+Fernando Alonso,0.051,0.156,0.533,Monaco Grand Prix,Aston Martin,0.051
+Lance Stroll,0.0502,0.1498,0.4976,Monaco Grand Prix,Aston Martin,0.0502
+Logan Sargeant,0.049,0.1454,0.4836,Monaco Grand Prix,Williams,0.049
+Daniel Ricciardo,0.0486,0.1346,0.4716,Monaco Grand Prix,Racing Bulls,0.0486
+Nico Hulkenberg,0.0474,0.1428,0.478,Monaco Grand Prix,Haas,0.0474
+George Russell,0.0474,0.15,0.4928,Monaco Grand Prix,Mercedes,0.4999621286813211
+Pierre Gasly,0.047,0.1398,0.4936,Monaco Grand Prix,Alpine,0.047
+Alexander Albon,0.0468,0.1436,0.475,Monaco Grand Prix,Williams,0.0468
+Oliver Bearman,0.046,0.1344,0.4726,Monaco Grand Prix,Ferrari,0.046
+Zhou Guanyu,0.0456,0.1346,0.4814,Monaco Grand Prix,Kick Sauber,0.0456
+Carlos Sainz,0.045,0.1466,0.4814,Monaco Grand Prix,Ferrari,0.045
+Kevin Magnussen,0.0446,0.1466,0.4774,Monaco Grand Prix,Haas,0.0446
+Esteban Ocon,0.0444,0.1376,0.4786,Monaco Grand Prix,Alpine,0.0444
+Valtteri Bottas,0.0426,0.1394,0.491,Monaco Grand Prix,Kick Sauber,0.0426

@@ -1,0 +1,33 @@
+// Auto-generated calibration parameters
+export const CALIBRATION_PARAMS = {
+  temperature: 1.0612244897959184,
+  logisticSlope: 2.404681514733838,
+  logisticIntercept: -3.1335518959229196,
+  driverBiases: {
+    "Max Verstappen": 0.004584421117908515,
+    "Lando Norris": -0.0027276253441879507,
+    "Oscar Piastri": 0.007213182413958911,
+    "Charles Leclerc": -0.0052913771974311685,
+    "Carlos Sainz": -0.0017606558592463488,
+    "George Russell": -0.005038441055948017,
+    "Lewis Hamilton": 0.01692828997417206,
+    "Fernando Alonso": -0.001531431499437384,
+    "Lance Stroll": 0.01254634567419795,
+    "Pierre Gasly": 0.0003405494557052463,
+    "Esteban Ocon": -0.01572444153354404,
+    "Nico Hulkenberg": 0.004259850767200073,
+    "Kevin Magnussen": -0.010982038597410444,
+    "Yuki Tsunoda": 0.01981634843245462,
+    "Daniel Ricciardo": -0.010808343631738975,
+    "Alexander Albon": 0.00038335998016863425,
+    "Valtteri Bottas": -0.0024115257919341136,
+    "Zhou Guanyu": -0.010798249629460042,
+    "Andrea Kimi Antonelli": -0.014728149660658241,
+    "Oliver Bearman": 0.01572993198523071,
+  },
+  trackTypeAdjustments: {
+    "street_circuit": 1.15,
+    "permanent_circuit": 1.0,
+    "high_speed": 0.95,
+  }
+};

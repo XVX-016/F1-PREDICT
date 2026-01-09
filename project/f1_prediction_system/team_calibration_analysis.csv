@@ -1,0 +1,11 @@
+team,method,brier,logloss,brier_iso,logloss_iso,brier_platt,logloss_platt
+Red Bull,identity,,,,,,
+Ferrari,identity,,,,,,
+Racing Bulls,identity,,,,,,
+Aston Martin,identity,,,,,,
+Williams,identity,,,,,,
+Haas,identity,,,,,,
+Alpine,identity,,,,,,
+Kick Sauber,identity,,,,,,
+Mercedes,platt,0.2499974449274771,0.6931420704148661,0.25,0.6931471805599453,0.2499974449274771,0.6931420704148661
+McLaren,platt,0.24999943927311652,0.6931460591061755,0.25,0.6931471805599453,0.24999943927311652,0.6931460591061755

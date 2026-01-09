@@ -1,0 +1,3751 @@
+{
+  "generatedAt": "2025-08-29T21:00:33.608Z",
+  "totalTracks": 24,
+  "totalDrivers": 20,
+  "predictions": [
+    {
+      "trackName": "Bahrain Grand Prix",
+      "circuit": "Bahrain International Circuit",
+      "date": "2025-03-02",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-03-02",
+        "tempC": 29,
+        "windKmh": 23,
+        "rainChancePct": 5,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07095364226436925,
+          "podiumProbability": 0.07095364226436925
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06891283516245093,
+          "podiumProbability": 0.06891283516245093
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06237682836428064,
+          "podiumProbability": 0.06237682836428064
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 4,
+          "winProbability": 0.05424072031676577,
+          "podiumProbability": 0.05424072031676577
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.05195809000343523,
+          "podiumProbability": 0.05195809000343523
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.049833661791028556,
+          "podiumProbability": 0.049833661791028556
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.04959635863964271,
+          "podiumProbability": 0.04959635863964271
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04746063027717007,
+          "podiumProbability": 0.04746063027717007
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04746063027717007,
+          "podiumProbability": 0.04746063027717007
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.045200600263971484,
+          "podiumProbability": 0.045200600263971484
+        }
+      ]
+    },
+    {
+      "trackName": "Saudi Arabian Grand Prix",
+      "circuit": "Jeddah Corniche Circuit",
+      "date": "2025-03-09",
+      "trackType": "street_circuit",
+      "difficulty": "high",
+      "weather": {
+        "date": "2025-03-09",
+        "tempC": 29,
+        "windKmh": 12,
+        "rainChancePct": 3,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.06946912632378915,
+          "podiumProbability": 0.06946912632378915
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.06515863219403023,
+          "podiumProbability": 0.06515863219403023
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.060146429717566376,
+          "podiumProbability": 0.060146429717566376
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.055373941272585575,
+          "podiumProbability": 0.055373941272585575
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05491630539429974,
+          "podiumProbability": 0.05491630539429974
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 6,
+          "winProbability": 0.050466111891169355,
+          "podiumProbability": 0.050466111891169355
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04805176722001227,
+          "podiumProbability": 0.04805176722001227
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.045878283537426685,
+          "podiumProbability": 0.045878283537426685
+        }
+      ]
+    },
+    {
+      "trackName": "Australian Grand Prix",
+      "circuit": "Albert Park Circuit",
+      "date": "2025-03-23",
+      "trackType": "street_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-03-23",
+        "tempC": 33,
+        "windKmh": 33,
+        "rainChancePct": 38,
+        "condition": "Rain"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.07565089241853615,
+          "podiumProbability": 0.07565089241853615
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.07180830740680098,
+          "podiumProbability": 0.07180830740680098
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06628459145243168,
+          "podiumProbability": 0.06628459145243168
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.06340265269363031,
+          "podiumProbability": 0.06340265269363031
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.0524753015665084,
+          "podiumProbability": 0.0524753015665084
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.0523988865236614,
+          "podiumProbability": 0.0523988865236614
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.048141476993613916,
+          "podiumProbability": 0.048141476993613916
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04584902570820373,
+          "podiumProbability": 0.04584902570820373
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04366573876971784,
+          "podiumProbability": 0.04366573876971784
+        }
+      ]
+    },
+    {
+      "trackName": "Japanese Grand Prix",
+      "circuit": "Suzuka International Racing Course",
+      "date": "2025-04-06",
+      "trackType": "permanent_circuit",
+      "difficulty": "very_high",
+      "weather": {
+        "date": "2025-04-06",
+        "tempC": 26,
+        "windKmh": 18,
+        "rainChancePct": 34,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07053756386463618,
+          "podiumProbability": 0.07053756386463618
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06850872423508478,
+          "podiumProbability": 0.06850872423508478
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06201104515572411,
+          "podiumProbability": 0.06201104515572411
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 4,
+          "winProbability": 0.05931491275764915,
+          "podiumProbability": 0.05931491275764915
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.05437200336117839,
+          "podiumProbability": 0.05437200336117839
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.04954143281462741,
+          "podiumProbability": 0.04954143281462741
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.04930552122979585,
+          "podiumProbability": 0.04930552122979585
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04718231696631183,
+          "podiumProbability": 0.04718231696631183
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04493553996791602,
+          "podiumProbability": 0.04493553996791602
+        }
+      ]
+    },
+    {
+      "trackName": "Chinese Grand Prix",
+      "circuit": "Shanghai International Circuit",
+      "date": "2025-04-13",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-04-13",
+        "tempC": 29,
+        "windKmh": 30,
+        "rainChancePct": 35,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.0707601390184862,
+          "podiumProbability": 0.0707601390184862
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.0687248975617672,
+          "podiumProbability": 0.0687248975617672
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.062206715620647196,
+          "podiumProbability": 0.062206715620647196
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.054543569493466025,
+          "podiumProbability": 0.054543569493466025
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.054092796191867125,
+          "podiumProbability": 0.054092796191867125
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.049697756501277925,
+          "podiumProbability": 0.049697756501277925
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.0494611005179385,
+          "podiumProbability": 0.0494611005179385
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04733119666788374,
+          "podiumProbability": 0.04733119666788374
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04733119666788374,
+          "podiumProbability": 0.04733119666788374
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        }
+      ]
+    },
+    {
+      "trackName": "Miami Grand Prix",
+      "circuit": "Miami International Autodrome",
+      "date": "2025-05-04",
+      "trackType": "street_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-05-04",
+        "tempC": 32,
+        "windKmh": 31,
+        "rainChancePct": 44,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.07586755036488683,
+          "podiumProbability": 0.07586755036488683
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.07201396050508306,
+          "podiumProbability": 0.07201396050508306
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 3,
+          "winProbability": 0.06676344432110043,
+          "podiumProbability": 0.06676344432110043
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 4,
+          "winProbability": 0.060431295528741026,
+          "podiumProbability": 0.060431295528741026
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.0526255865229453,
+          "podiumProbability": 0.0526255865229453
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.05254895263368784,
+          "podiumProbability": 0.05254895263368784
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04827935023220071,
+          "podiumProbability": 0.04827935023220071
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04598033355447687,
+          "podiumProbability": 0.04598033355447687
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        }
+      ]
+    },
+    {
+      "trackName": "Emilia Romagna Grand Prix",
+      "circuit": "Imola Circuit",
+      "date": "2025-05-18",
+      "trackType": "permanent_circuit",
+      "difficulty": "high",
+      "weather": {
+        "date": "2025-05-18",
+        "tempC": 34,
+        "windKmh": 21,
+        "rainChancePct": 41,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07400130314218896,
+          "podiumProbability": 0.07400130314218896
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06845032149224932,
+          "podiumProbability": 0.06845032149224932
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.061958181594716014,
+          "podiumProbability": 0.061958181594716014
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.057041934576874426,
+          "podiumProbability": 0.057041934576874426
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05387667964757914,
+          "podiumProbability": 0.05387667964757914
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.049499199426213336,
+          "podiumProbability": 0.049499199426213336
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.049263488952755174,
+          "podiumProbability": 0.049263488952755174
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.047142094691631754,
+          "podiumProbability": 0.047142094691631754
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.044897233039649286,
+          "podiumProbability": 0.044897233039649286
+        }
+      ]
+    },
+    {
+      "trackName": "Monaco Grand Prix",
+      "circuit": "Circuit de Monaco",
+      "date": "2025-05-25",
+      "trackType": "street_circuit",
+      "difficulty": "very_high",
+      "weather": {
+        "date": "2025-05-25",
+        "tempC": 22,
+        "windKmh": 29,
+        "rainChancePct": 45,
+        "condition": "Rain"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.07589954098849021,
+          "podiumProbability": 0.07589954098849021
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 2,
+          "winProbability": 0.06997214826367482,
+          "podiumProbability": 0.06997214826367482
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06844210989771633,
+          "podiumProbability": 0.06844210989771633
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 4,
+          "winProbability": 0.060456777237585274,
+          "podiumProbability": 0.060456777237585274
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.05264777684439717,
+          "podiumProbability": 0.05264777684439717
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.052571110641378496,
+          "podiumProbability": 0.052571110641378496
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.0482997079017665,
+          "podiumProbability": 0.0482997079017665
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04599972181120619,
+          "podiumProbability": 0.04599972181120619
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04380925886781542,
+          "podiumProbability": 0.04380925886781542
+        }
+      ]
+    },
+    {
+      "trackName": "Canadian Grand Prix",
+      "circuit": "Circuit Gilles Villeneuve",
+      "date": "2025-06-08",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-06-08",
+        "tempC": 34,
+        "windKmh": 31,
+        "rainChancePct": 32,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07074463260731544,
+          "podiumProbability": 0.07074463260731544
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.068709837154396,
+          "podiumProbability": 0.068709837154396
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.062193083610826747,
+          "podiumProbability": 0.062193083610826747
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05453161678920317,
+          "podiumProbability": 0.05453161678920317
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05408094227028413,
+          "podiumProbability": 0.05408094227028413
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 6,
+          "winProbability": 0.0519227746678106,
+          "podiumProbability": 0.0519227746678106
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04968686571082354,
+          "podiumProbability": 0.04968686571082354
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.047320824486498624,
+          "podiumProbability": 0.047320824486498624
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04506745189190344,
+          "podiumProbability": 0.04506745189190344
+        }
+      ]
+    },
+    {
+      "trackName": "Spanish Grand Prix",
+      "circuit": "Circuit de Barcelona-Catalunya",
+      "date": "2025-06-22",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-06-22",
+        "tempC": 32,
+        "windKmh": 24,
+        "rainChancePct": 42,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07044260257313509,
+          "podiumProbability": 0.07044260257313509
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06841649427170043,
+          "podiumProbability": 0.06841649427170043
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06192756270165721,
+          "podiumProbability": 0.06192756270165721
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05429880497754003,
+          "podiumProbability": 0.05429880497754003
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05385005452318018,
+          "podiumProbability": 0.05385005452318018
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.049474737593171794,
+          "podiumProbability": 0.049474737593171794
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 7,
+          "winProbability": 0.04936254997958184,
+          "podiumProbability": 0.04936254997958184
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 8,
+          "winProbability": 0.04923914360463288,
+          "podiumProbability": 0.04923914360463288
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 9,
+          "winProbability": 0.04711879770778267,
+          "podiumProbability": 0.04711879770778267
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 10,
+          "winProbability": 0.04711879770778267,
+          "podiumProbability": 0.04711879770778267
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 11,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 13,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 15,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 17,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04487504543598349,
+          "podiumProbability": 0.04487504543598349
+        }
+      ]
+    },
+    {
+      "trackName": "Austrian Grand Prix",
+      "circuit": "Red Bull Ring",
+      "date": "2025-06-29",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-06-29",
+        "tempC": 26,
+        "windKmh": 20,
+        "rainChancePct": 35,
+        "condition": "Rain"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07188938545033356,
+          "podiumProbability": 0.07188938545033356
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06966333822721105,
+          "podiumProbability": 0.06966333822721105
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06018996165386378,
+          "podiumProbability": 0.06018996165386378
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05277525623273564,
+          "podiumProbability": 0.05277525623273564
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05233909709031633,
+          "podiumProbability": 0.05233909709031633
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 6,
+          "winProbability": 0.048207063109501895,
+          "podiumProbability": 0.048207063109501895
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04808654545172813,
+          "podiumProbability": 0.04808654545172813
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04591148867571609,
+          "podiumProbability": 0.04591148867571609
+        }
+      ]
+    },
+    {
+      "trackName": "British Grand Prix",
+      "circuit": "Silverstone Circuit",
+      "date": "2025-07-06",
+      "trackType": "permanent_circuit",
+      "difficulty": "high",
+      "weather": {
+        "date": "2025-07-06",
+        "tempC": 19,
+        "windKmh": 22,
+        "rainChancePct": 62,
+        "condition": "Rain"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07389596539315742,
+          "podiumProbability": 0.07389596539315742
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06509798603105715,
+          "podiumProbability": 0.06509798603105715
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06186998672373199,
+          "podiumProbability": 0.06186998672373199
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.054248321692547626,
+          "podiumProbability": 0.054248321692547626
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.054112700888316254,
+          "podiumProbability": 0.054112700888316254
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.05379998845541912,
+          "podiumProbability": 0.05379998845541912
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.051900176363087136,
+          "podiumProbability": 0.051900176363087136
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.047074989898491744,
+          "podiumProbability": 0.047074989898491744
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.044833323712849274,
+          "podiumProbability": 0.044833323712849274
+        }
+      ]
+    },
+    {
+      "trackName": "Hungarian Grand Prix",
+      "circuit": "Hungaroring",
+      "date": "2025-07-27",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-07-27",
+        "tempC": 33,
+        "windKmh": 15,
+        "rainChancePct": 38,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07072666324241032,
+          "podiumProbability": 0.07072666324241032
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.0686923846341002,
+          "podiumProbability": 0.0686923846341002
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.062177286366954125,
+          "podiumProbability": 0.062177286366954125
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05724365386175017,
+          "podiumProbability": 0.05724365386175017
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.054067205536481845,
+          "podiumProbability": 0.054067205536481845
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.0496742450866427,
+          "podiumProbability": 0.0496742450866427
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.04943770106242059,
+          "podiumProbability": 0.04943770106242059
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.047308804844421626,
+          "podiumProbability": 0.047308804844421626
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04505600461373487,
+          "podiumProbability": 0.04505600461373487
+        }
+      ]
+    },
+    {
+      "trackName": "Belgian Grand Prix",
+      "circuit": "Circuit de Spa-Francorchamps",
+      "date": "2025-08-03",
+      "trackType": "high_speed",
+      "difficulty": "very_high",
+      "weather": {
+        "date": "2025-08-03",
+        "tempC": 20,
+        "windKmh": 41,
+        "rainChancePct": 48,
+        "condition": "Cloudy"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.07249077448407541,
+          "podiumProbability": 0.07249077448407541
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.06814731898812874,
+          "podiumProbability": 0.06814731898812874
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.05990973097857472,
+          "podiumProbability": 0.05990973097857472
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05515602406397044,
+          "podiumProbability": 0.05515602406397044
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05209541824223889,
+          "podiumProbability": 0.05209541824223889
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 6,
+          "winProbability": 0.05026750883023051,
+          "podiumProbability": 0.05026750883023051
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04786266551005698,
+          "podiumProbability": 0.04786266551005698
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.045697735300209555,
+          "podiumProbability": 0.045697735300209555
+        }
+      ]
+    },
+    {
+      "trackName": "Dutch Grand Prix",
+      "circuit": "Circuit Zandvoort",
+      "date": "2025-08-24",
+      "trackType": "high_speed",
+      "difficulty": "high",
+      "weather": {
+        "date": "2025-08-24",
+        "tempC": 19,
+        "windKmh": 35,
+        "rainChancePct": 55,
+        "condition": "Cloudy"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.07249077448407538,
+          "podiumProbability": 0.07249077448407538
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.06814731898812872,
+          "podiumProbability": 0.06814731898812872
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.0599097309785747,
+          "podiumProbability": 0.0599097309785747
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05515602406397041,
+          "podiumProbability": 0.05515602406397041
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05209541824223887,
+          "podiumProbability": 0.05209541824223887
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 6,
+          "winProbability": 0.0502675088302305,
+          "podiumProbability": 0.0502675088302305
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04786266551005696,
+          "podiumProbability": 0.04786266551005696
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04569773530020954,
+          "podiumProbability": 0.04569773530020954
+        }
+      ]
+    },
+    {
+      "trackName": "Italian Grand Prix",
+      "circuit": "Monza",
+      "date": "2025-09-07",
+      "trackType": "high_speed",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-09-07",
+        "tempC": 31,
+        "windKmh": 34,
+        "rainChancePct": 40,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.06865606593286959,
+          "podiumProbability": 0.06865606593286959
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.0665435715964736,
+          "podiumProbability": 0.0665435715964736
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06049415599679417,
+          "podiumProbability": 0.06049415599679417
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.055694076227483354,
+          "podiumProbability": 0.055694076227483354
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.050885085785763874,
+          "podiumProbability": 0.050885085785763874
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.05009867991452934,
+          "podiumProbability": 0.05009867991452934
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04625916889614898,
+          "podiumProbability": 0.04625916889614898
+        }
+      ]
+    },
+    {
+      "trackName": "Azerbaijan Grand Prix",
+      "circuit": "Baku City Circuit",
+      "date": "2025-09-21",
+      "trackType": "street_circuit",
+      "difficulty": "high",
+      "weather": {
+        "date": "2025-09-21",
+        "tempC": 27,
+        "windKmh": 22,
+        "rainChancePct": 37,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.07586755036488683,
+          "podiumProbability": 0.07586755036488683
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.07201396050508306,
+          "podiumProbability": 0.07201396050508306
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 3,
+          "winProbability": 0.06676344432110043,
+          "podiumProbability": 0.06676344432110043
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 4,
+          "winProbability": 0.060431295528741026,
+          "podiumProbability": 0.060431295528741026
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.0526255865229453,
+          "podiumProbability": 0.0526255865229453
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.05254895263368784,
+          "podiumProbability": 0.05254895263368784
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04827935023220071,
+          "podiumProbability": 0.04827935023220071
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04598033355447687,
+          "podiumProbability": 0.04598033355447687
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        }
+      ]
+    },
+    {
+      "trackName": "Singapore Grand Prix",
+      "circuit": "Marina Bay Street Circuit",
+      "date": "2025-10-05",
+      "trackType": "street_circuit",
+      "difficulty": "very_high",
+      "weather": {
+        "date": "2025-10-05",
+        "tempC": 25,
+        "windKmh": 26,
+        "rainChancePct": 53,
+        "condition": "Rain"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.0758675503648868,
+          "podiumProbability": 0.0758675503648868
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.07201396050508303,
+          "podiumProbability": 0.07201396050508303
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 3,
+          "winProbability": 0.0667634443211004,
+          "podiumProbability": 0.0667634443211004
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 4,
+          "winProbability": 0.060431295528741,
+          "podiumProbability": 0.060431295528741
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.05262558652294528,
+          "podiumProbability": 0.05262558652294528
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.05254895263368782,
+          "podiumProbability": 0.05254895263368782
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.048279350232200695,
+          "podiumProbability": 0.048279350232200695
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04598033355447685,
+          "podiumProbability": 0.04598033355447685
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.043790793861406524,
+          "podiumProbability": 0.043790793861406524
+        }
+      ]
+    },
+    {
+      "trackName": "United States Grand Prix",
+      "circuit": "Circuit of the Americas",
+      "date": "2025-10-19",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-10-19",
+        "tempC": 33,
+        "windKmh": 32,
+        "rainChancePct": 31,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07397307305864088,
+          "podiumProbability": 0.07397307305864088
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06842420900216376,
+          "podiumProbability": 0.06842420900216376
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06503127301858537,
+          "podiumProbability": 0.06503127301858537
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05430492777949504,
+          "podiumProbability": 0.05430492777949504
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.053856126723466145,
+          "podiumProbability": 0.053856126723466145
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.04948031642718453,
+          "podiumProbability": 0.04948031642718453
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.049244695872769355,
+          "podiumProbability": 0.049244695872769355
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04712411088303289,
+          "podiumProbability": 0.04712411088303289
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04488010560288846,
+          "podiumProbability": 0.04488010560288846
+        }
+      ]
+    },
+    {
+      "trackName": "Mexican Grand Prix",
+      "circuit": "Autódromo Hermanos Rodríguez",
+      "date": "2025-10-26",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-10-26",
+        "tempC": 23,
+        "windKmh": 24,
+        "rainChancePct": 27,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07076013901848621,
+          "podiumProbability": 0.07076013901848621
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06872489756176722,
+          "podiumProbability": 0.06872489756176722
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06220671562064722,
+          "podiumProbability": 0.06220671562064722
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05454356949346604,
+          "podiumProbability": 0.05454356949346604
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.054092796191867146,
+          "podiumProbability": 0.054092796191867146
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.04969775650127794,
+          "podiumProbability": 0.04969775650127794
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.04946110051793851,
+          "podiumProbability": 0.04946110051793851
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04733119666788376,
+          "podiumProbability": 0.04733119666788376
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04733119666788376,
+          "podiumProbability": 0.04733119666788376
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04507733015988929,
+          "podiumProbability": 0.04507733015988929
+        }
+      ]
+    },
+    {
+      "trackName": "Brazilian Grand Prix",
+      "circuit": "Autódromo José Carlos Pace",
+      "date": "2025-11-02",
+      "trackType": "permanent_circuit",
+      "difficulty": "high",
+      "weather": {
+        "date": "2025-11-02",
+        "tempC": 28,
+        "windKmh": 21,
+        "rainChancePct": 47,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.07074463260731545,
+          "podiumProbability": 0.07074463260731545
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06870983715439602,
+          "podiumProbability": 0.06870983715439602
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.06219308361082677,
+          "podiumProbability": 0.06219308361082677
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05453161678920319,
+          "podiumProbability": 0.05453161678920319
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05408094227028415,
+          "podiumProbability": 0.05408094227028415
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 6,
+          "winProbability": 0.05192277466781062,
+          "podiumProbability": 0.05192277466781062
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04968686571082356,
+          "podiumProbability": 0.04968686571082356
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04732082448649864,
+          "podiumProbability": 0.04732082448649864
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.045067451891903455,
+          "podiumProbability": 0.045067451891903455
+        }
+      ]
+    },
+    {
+      "trackName": "Las Vegas Grand Prix",
+      "circuit": "Las Vegas Strip Circuit",
+      "date": "2025-11-09",
+      "trackType": "street_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-11-09",
+        "tempC": 25,
+        "windKmh": 31,
+        "rainChancePct": 42,
+        "condition": "Rain"
+      },
+      "predictions": [
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "winProbability": 0.07586755036488683,
+          "podiumProbability": 0.07586755036488683
+        },
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 2,
+          "winProbability": 0.07201396050508306,
+          "podiumProbability": 0.07201396050508306
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 3,
+          "winProbability": 0.06676344432110043,
+          "podiumProbability": 0.06676344432110043
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 4,
+          "winProbability": 0.060431295528741026,
+          "podiumProbability": 0.060431295528741026
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 5,
+          "winProbability": 0.0526255865229453,
+          "podiumProbability": 0.0526255865229453
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 6,
+          "winProbability": 0.05254895263368784,
+          "podiumProbability": 0.05254895263368784
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 7,
+          "winProbability": 0.04827935023220071,
+          "podiumProbability": 0.04827935023220071
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04598033355447687,
+          "podiumProbability": 0.04598033355447687
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.043790793861406545,
+          "podiumProbability": 0.043790793861406545
+        }
+      ]
+    },
+    {
+      "trackName": "Qatar Grand Prix",
+      "circuit": "Lusail International Circuit",
+      "date": "2025-11-23",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-11-23",
+        "tempC": 42,
+        "windKmh": 19,
+        "rainChancePct": 4,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.0707601390184862,
+          "podiumProbability": 0.0707601390184862
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.0687248975617672,
+          "podiumProbability": 0.0687248975617672
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.062206715620647196,
+          "podiumProbability": 0.062206715620647196
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.054543569493466025,
+          "podiumProbability": 0.054543569493466025
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.054092796191867125,
+          "podiumProbability": 0.054092796191867125
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.049697756501277925,
+          "podiumProbability": 0.049697756501277925
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.0494611005179385,
+          "podiumProbability": 0.0494611005179385
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.04733119666788374,
+          "podiumProbability": 0.04733119666788374
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04733119666788374,
+          "podiumProbability": 0.04733119666788374
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.045077330159889274,
+          "podiumProbability": 0.045077330159889274
+        }
+      ]
+    },
+    {
+      "trackName": "Abu Dhabi Grand Prix",
+      "circuit": "Yas Marina Circuit",
+      "date": "2025-12-07",
+      "trackType": "permanent_circuit",
+      "difficulty": "medium",
+      "weather": {
+        "date": "2025-12-07",
+        "tempC": 41,
+        "windKmh": 18,
+        "rainChancePct": 5,
+        "condition": "Sunny"
+      },
+      "predictions": [
+        {
+          "driverName": "Lando Norris",
+          "team": "McLaren",
+          "position": 1,
+          "winProbability": 0.0707266632424103,
+          "podiumProbability": 0.0707266632424103
+        },
+        {
+          "driverName": "Max Verstappen",
+          "team": "Red Bull Racing",
+          "position": 2,
+          "winProbability": 0.06869238463410017,
+          "podiumProbability": 0.06869238463410017
+        },
+        {
+          "driverName": "Oscar Piastri",
+          "team": "McLaren",
+          "position": 3,
+          "winProbability": 0.0621772863669541,
+          "podiumProbability": 0.0621772863669541
+        },
+        {
+          "driverName": "Charles Leclerc",
+          "team": "Ferrari",
+          "position": 4,
+          "winProbability": 0.05724365386175014,
+          "podiumProbability": 0.05724365386175014
+        },
+        {
+          "driverName": "Yuki Tsunoda",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "winProbability": 0.05406720553648182,
+          "podiumProbability": 0.05406720553648182
+        },
+        {
+          "driverName": "George Russell",
+          "team": "Mercedes",
+          "position": 6,
+          "winProbability": 0.04967424508664268,
+          "podiumProbability": 0.04967424508664268
+        },
+        {
+          "driverName": "Lewis Hamilton",
+          "team": "Ferrari",
+          "position": 7,
+          "winProbability": 0.04943770106242056,
+          "podiumProbability": 0.04943770106242056
+        },
+        {
+          "driverName": "Kimi Antonelli",
+          "team": "Mercedes",
+          "position": 8,
+          "winProbability": 0.047308804844421605,
+          "podiumProbability": 0.047308804844421605
+        },
+        {
+          "driverName": "Fernando Alonso",
+          "team": "Aston Martin",
+          "position": 9,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Lance Stroll",
+          "team": "Aston Martin",
+          "position": 10,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Pierre Gasly",
+          "team": "Alpine",
+          "position": 11,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Franco Colapinto",
+          "team": "Alpine",
+          "position": 12,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Esteban Ocon",
+          "team": "Haas",
+          "position": 13,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Oliver Bearman",
+          "team": "Haas",
+          "position": 14,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Liam Lawson",
+          "team": "Racing Bulls",
+          "position": 15,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Isack Hadjar",
+          "team": "Racing Bulls",
+          "position": 16,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Alex Albon",
+          "team": "Williams",
+          "position": 17,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Carlos Sainz",
+          "team": "Williams",
+          "position": 18,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Nico Hülkenberg",
+          "team": "Sauber",
+          "position": 19,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        },
+        {
+          "driverName": "Gabriel Bortoleto",
+          "team": "Sauber",
+          "position": 20,
+          "winProbability": 0.04505600461373486,
+          "podiumProbability": 0.04505600461373486
+        }
+      ]
+    }
+  ]
+}

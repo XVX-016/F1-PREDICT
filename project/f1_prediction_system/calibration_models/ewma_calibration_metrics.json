@@ -1,0 +1,28 @@
+{
+  "ewma_calibration": {
+    "driver_level": {
+      "brier_score": {
+        "before": 0.09209619085813422,
+        "after": 0.09209619085813422,
+        "improvement_pct": 0.0
+      },
+      "log_loss": {
+        "before": 0.3416903690254941,
+        "after": 0.3416903690254941,
+        "improvement_pct": 0.0
+      }
+    },
+    "team_level": {
+      "brier_score": {
+        "before": 0.09209619085813422,
+        "after": 0.09209619085813422,
+        "improvement_pct": 0.0
+      },
+      "log_loss": {
+        "before": 0.3416903690254941,
+        "after": 0.3416903690254941,
+        "improvement_pct": 0.0
+      }
+    }
+  }
+}
