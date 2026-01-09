@@ -26,7 +26,7 @@ class ResultService:
         self.results_file = "backend/data/results.json"
         self.results = self._load_results()
         self.ergast_base_url = "http://ergast.com/api/f1"
-        logger.info("✅ ResultService initialized")
+        logger.info("ResultService initialized")
 
     def _load_results(self) -> Dict[str, Any]:
         """Load results from persistent storage"""
@@ -46,7 +46,7 @@ class ResultService:
                 self._save_results(initial_results)
                 return initial_results
         except Exception as e:
-            logger.error(f"❌ Failed to load results: {e}")
+            logger.error(f"Failed to load results: {e}")
             return {"race_results": {}, "metadata": {}}
 
     def _save_results(self, results_data: Dict[str, Any]):
@@ -57,17 +57,17 @@ class ResultService:
             with open(self.results_file, 'w') as f:
                 json.dump(results_data, f, indent=2)
         except Exception as e:
-            logger.error(f"❌ Failed to save results: {e}")
+            logger.error(f"Failed to save results: {e}")
 
     def get_results(self, race_id: str) -> Optional[Dict[str, Any]]:
         """Get race results for a specific race"""
         try:
-            logger.info(f"🏆 Getting results for race: {race_id}")
+            logger.info(f"Getting results for race: {race_id}")
             
             # Check if we have cached results
             if race_id in self.results["race_results"]:
                 cached_result = self.results["race_results"][race_id]
-                logger.info(f"✅ Found cached results for race: {race_id}")
+                logger.info(f"Found cached results for race: {race_id}")
                 return cached_result
             
             # Try to fetch from API
@@ -77,13 +77,13 @@ class ResultService:
                 self.results["race_results"][race_id] = api_result
                 self.results["metadata"]["total_races_processed"] += 1
                 self._save_results(self.results)
-                logger.info(f"✅ Fetched and cached results for race: {race_id}")
+                logger.info(f"Fetched and cached results for race: {race_id}")
                 return api_result
             
-            logger.warning(f"⚠️ No results available for race: {race_id}")
+            logger.warning(f"No results available for race: {race_id}")
             return None
         except Exception as e:
-            logger.error(f"❌ Failed to get results for {race_id}: {e}")
+            logger.error(f"Failed to get results for {race_id}: {e}")
             return None
 
     def _fetch_results_from_api(self, race_id: str) -> Optional[Dict[str, Any]]:
@@ -98,7 +98,7 @@ class ResultService:
             
             for endpoint in endpoints_to_try:
                 try:
-                    logger.info(f"🌐 Fetching results from: {endpoint}")
+                    logger.info(f"Fetching results from: {endpoint}")
                     response = requests.get(endpoint, timeout=10)
                     response.raise_for_status()
                     
@@ -107,15 +107,15 @@ class ResultService:
                     if results:
                         return results
                 except Exception as e:
-                    logger.warning(f"⚠️ Failed to fetch from {endpoint}: {e}")
+                    logger.warning(f"Failed to fetch from {endpoint}: {e}")
                     continue
             
             # If API fails, try to create mock results for testing
-            logger.info("🔄 API failed, creating mock results for testing")
+            logger.info("API failed, creating mock results for testing")
             return self._create_mock_results(race_id)
             
         except Exception as e:
-            logger.error(f"❌ Failed to fetch results from API: {e}")
+            logger.error(f"Failed to fetch results from API: {e}")
             return None
 
     def _parse_ergast_results(self, api_data: Dict[str, Any], race_id: str) -> Optional[Dict[str, Any]]:
@@ -250,14 +250,14 @@ class ResultService:
             # Save to storage
             self._save_results(self.results)
             
-            logger.info(f"✅ Results stored for race: {race_id}")
+            logger.info(f"Results stored for race: {race_id}")
             return {
                 "status": "success",
                 "message": f"Results stored for race {race_id}",
                 "race_id": race_id
             }
         except Exception as e:
-            logger.error(f"❌ Failed to store results for {race_id}: {e}")
+            logger.error(f"Failed to store results for {race_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to store results: {str(e)}",
@@ -279,7 +279,7 @@ class ResultService:
                 "total_processed": self.results["metadata"].get("total_races_processed", 0)
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get results status: {e}")
+            logger.error(f"Failed to get results status: {e}")
             return {
                 "total_races": 0,
                 "error": str(e)
@@ -292,13 +292,13 @@ class ResultService:
                 # Clear specific race
                 if race_id in self.results["race_results"]:
                     del self.results["race_results"][race_id]
-                    logger.info(f"🗑️ Cleared results for race: {race_id}")
+                    logger.info(f"Cleared results for race: {race_id}")
                 else:
-                    logger.warning(f"⚠️ No results found for race: {race_id}")
+                    logger.warning(f"No results found for race: {race_id}")
             else:
                 # Clear all results
                 self.results["race_results"] = {}
-                logger.info("🗑️ Cleared all results")
+                logger.info("Cleared all results")
             
             self._save_results(self.results)
             
@@ -307,7 +307,7 @@ class ResultService:
                 "message": f"Results cleared for {race_id if race_id else 'all races'}"
             }
         except Exception as e:
-            logger.error(f"❌ Failed to clear results: {e}")
+            logger.error(f"Failed to clear results: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to clear results: {str(e)}"

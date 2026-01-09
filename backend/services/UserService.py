@@ -25,7 +25,7 @@ class UserService:
     def __init__(self):
         self.users_file = "backend/data/users.json"
         self.users = self._load_users()
-        logger.info("✅ UserService initialized")
+        logger.info("UserService initialized")
 
     def _load_users(self) -> Dict[str, Any]:
         """Load users from persistent storage"""
@@ -47,7 +47,7 @@ class UserService:
                 self._save_users(initial_users)
                 return initial_users
         except Exception as e:
-            logger.error(f"❌ Failed to load users: {e}")
+            logger.error(f"Failed to load users: {e}")
             return {"users": {}, "betting_patterns": {}, "metadata": {}}
 
     def _save_users(self, users_data: Dict[str, Any]):
@@ -58,12 +58,12 @@ class UserService:
             with open(self.users_file, 'w') as f:
                 json.dump(users_data, f, indent=2)
         except Exception as e:
-            logger.error(f"❌ Failed to save users: {e}")
+            logger.error(f"Failed to save users: {e}")
 
     def create_user(self, user_id: str, username: str, email: str = None) -> Dict[str, Any]:
         """Create a new user"""
         try:
-            logger.info(f"👤 Creating user: {user_id}")
+            logger.info(f"Creating user: {user_id}")
             
             if user_id in self.users["users"]:
                 return {
@@ -104,13 +104,13 @@ class UserService:
             # Save to storage
             self._save_users(self.users)
             
-            logger.info(f"✅ User created: {user_id}")
+            logger.info(f"User created: {user_id}")
             return {
                 "status": "success",
                 "user": user
             }
         except Exception as e:
-            logger.error(f"❌ Failed to create user {user_id}: {e}")
+            logger.error(f"Failed to create user {user_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to create user: {str(e)}"
@@ -121,7 +121,7 @@ class UserService:
         try:
             return self.users["users"].get(user_id)
         except Exception as e:
-            logger.error(f"❌ Failed to get user {user_id}: {e}")
+            logger.error(f" Failed to get user {user_id}: {e}")
             return None
 
     def update_user_activity(self, user_id: str) -> Dict[str, Any]:
@@ -134,7 +134,7 @@ class UserService:
             else:
                 return {"status": "error", "message": "User not found"}
         except Exception as e:
-            logger.error(f"❌ Failed to update user activity {user_id}: {e}")
+            logger.error(f" Failed to update user activity {user_id}: {e}")
             return {"status": "error", "message": str(e)}
 
     def record_bet(self, user_id: str, bet_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -157,7 +157,7 @@ class UserService:
             
             return {"status": "success"}
         except Exception as e:
-            logger.error(f"❌ Failed to record bet for user {user_id}: {e}")
+            logger.error(f" Failed to record bet for user {user_id}: {e}")
             return {"status": "error", "message": str(e)}
 
     def record_bet_settlement(self, user_id: str, bet_data: Dict[str, Any], 
@@ -181,7 +181,7 @@ class UserService:
             
             return {"status": "success"}
         except Exception as e:
-            logger.error(f"❌ Failed to record bet settlement for user {user_id}: {e}")
+            logger.error(f" Failed to record bet settlement for user {user_id}: {e}")
             return {"status": "error", "message": str(e)}
 
     def _update_betting_patterns(self, user_id: str, bet_data: Dict[str, Any]):
@@ -222,7 +222,7 @@ class UserService:
                 patterns["odds_preferences"] = patterns["odds_preferences"][-100:]
                 
         except Exception as e:
-            logger.error(f"❌ Failed to update betting patterns for user {user_id}: {e}")
+            logger.error(f" Failed to update betting patterns for user {user_id}: {e}")
 
     def _update_user_statistics(self, user_id: str):
         """Update user statistics based on betting history"""
@@ -258,12 +258,12 @@ class UserService:
                 user["betting_preferences"]["average_stake"] = statistics.mean(stake_patterns)
                 
         except Exception as e:
-            logger.error(f"❌ Failed to update user statistics for user {user_id}: {e}")
+            logger.error(f" Failed to update user statistics for user {user_id}: {e}")
 
     def get_player_betting_patterns(self) -> Dict[str, Any]:
         """Get aggregated betting patterns across all players for smarter odds generation"""
         try:
-            logger.info("📊 Analyzing player betting patterns")
+            logger.info(" Analyzing player betting patterns")
             
             all_patterns = {
                 "total_players": len(self.users["users"]),
@@ -277,7 +277,7 @@ class UserService:
             }
             
             if not self.users["users"]:
-                logger.info("ℹ️ No users found for pattern analysis")
+                logger.info(" No users found for pattern analysis")
                 return all_patterns
             
             # Aggregate patterns across all users
@@ -328,11 +328,11 @@ class UserService:
                 key=lambda x: x[1], reverse=True
             ))
             
-            logger.info(f"✅ Analyzed patterns for {all_patterns['total_players']} players")
+            logger.info(f" Analyzed patterns for {all_patterns['total_players']} players")
             return all_patterns
             
         except Exception as e:
-            logger.error(f"❌ Failed to analyze player betting patterns: {e}")
+            logger.error(f" Failed to analyze player betting patterns: {e}")
             return {
                 "total_players": 0,
                 "error": str(e)
@@ -364,7 +364,7 @@ class UserService:
                 }
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get user statistics for {user_id}: {e}")
+            logger.error(f" Failed to get user statistics for {user_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to get user statistics: {str(e)}"
@@ -392,7 +392,7 @@ class UserService:
                 ])
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get users status: {e}")
+            logger.error(f" Failed to get users status: {e}")
             return {
                 "total_users": 0,
                 "error": str(e)

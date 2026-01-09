@@ -64,9 +64,9 @@ class WeatherService:
         }
         
         if self.openweather_api_key:
-            logger.info("✅ OpenWeatherMap API configured")
+            logger.info("OpenWeatherMap API configured")
         else:
-            logger.info("⚠️ OpenWeatherMap API key not found - using simulated forecasts")
+            logger.info("OpenWeatherMap API key not found - using simulated forecasts")
     
     def get_forecast(self, race_name: str, circuit_id: str = None) -> Dict:
         """
@@ -90,7 +90,7 @@ class WeatherService:
                 return self._get_simulated_forecast(circuit_id, race_name)
                 
         except Exception as e:
-            logger.error(f"❌ Error getting weather forecast for {race_name}: {e}")
+            logger.error(f"Error getting weather forecast for {race_name}: {e}")
             return self._get_default_forecast()
     
     def _extract_circuit_id(self, race_name: str) -> str:
@@ -174,11 +174,11 @@ class WeatherService:
             impact = self.weather_impact.get(f1_condition, {"multiplier": 1.0, "description": "Standard conditions"})
             forecast["f1_impact"] = impact
             
-            logger.info(f"✅ Fetched real weather for {circuit_id}: {f1_condition}")
+            logger.info(f"Fetched real weather for {circuit_id}: {f1_condition}")
             return forecast
             
         except Exception as e:
-            logger.error(f"❌ OpenWeatherMap API error: {e}")
+            logger.error(f"OpenWeatherMap API error: {e}")
             return self._get_simulated_forecast(circuit_id, "Unknown")
     
     def _get_simulated_forecast(self, circuit_id: str, race_name: str) -> Dict:
@@ -231,7 +231,7 @@ class WeatherService:
         impact = self.weather_impact.get(condition, {"multiplier": 1.0, "description": "Standard conditions"})
         forecast["f1_impact"] = impact
         
-        logger.info(f"🌤️ Generated simulated weather for {circuit_id}: {condition}")
+        logger.info(f"Generated simulated weather for {circuit_id}: {condition}")
         return forecast
     
     def _map_weather_to_f1(self, weather_main: str, description: str) -> str:

@@ -80,7 +80,7 @@ class BayesianProbabilisticLayer:
         self.priors = {}
         self.posteriors = {}
         
-        logger.info(f"🧠 Bayesian Probabilistic Layer initialized with prior strength {prior_strength}")
+        logger.info(f" Bayesian Probabilistic Layer initialized with prior strength {prior_strength}")
     
     def initialize_priors(
         self,
@@ -97,7 +97,7 @@ class BayesianProbabilisticLayer:
         Returns:
             Dictionary of Bayesian priors for each driver
         """
-        logger.info("🔧 Initializing Bayesian priors for all drivers...")
+        logger.info(" Initializing Bayesian priors for all drivers...")
         
         for driver_id, profile in driver_profiles.items():
             prior = self._create_driver_prior(profile, historical_data)

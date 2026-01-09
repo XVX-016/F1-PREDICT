@@ -19,9 +19,9 @@ class F1DataService:
     def __init__(self):
         self.jolpica_available = bool(JOLPICA_API_KEY)
         if self.jolpica_available:
-            logger.info("✅ Jolpica API configured - using live 2024/2025 data")
+            logger.info(" Jolpica API configured - using live 2024/2025 data")
         else:
-            logger.info("⚠️ Jolpica API key not found - using Ergast API (historical data only)")
+            logger.info(" Jolpica API key not found - using Ergast API (historical data only)")
     
     def get_entry_list_for_gp(self, circuit: str, season: int = 2025) -> List[Dict[str, Any]]:
         """
@@ -97,7 +97,7 @@ class F1DataService:
         
         # Sort by qualifying position
         entry_list.sort(key=lambda x: x["qualifying_position"])
-        logger.info(f"✅ Fetched {len(entry_list)} drivers from Jolpica API for {circuit}")
+        logger.info(f" Fetched {len(entry_list)} drivers from Jolpica API for {circuit}")
         return entry_list
     
     def _get_ergast_entry_list(self, circuit: str, season: int) -> List[Dict[str, Any]]:
@@ -123,7 +123,7 @@ class F1DataService:
                         "constructor_id": driver["team"].replace(" ", "_").lower()
                     })
                 
-                logger.info(f"✅ Loaded {len(entry_list)} drivers from local file for {circuit}")
+                logger.info(f" Loaded {len(entry_list)} drivers from local file for {circuit}")
                 return entry_list
             
             # Fallback to API call
@@ -148,7 +148,7 @@ class F1DataService:
                     "constructor_id": driver.get("constructorId", "")
                 })
             
-            logger.info(f"✅ Fetched {len(entry_list)} drivers from Ergast API for {circuit}")
+            logger.info(f" Fetched {len(entry_list)} drivers from Ergast API for {circuit}")
             return entry_list
             
         except Exception as e:
@@ -179,7 +179,7 @@ class F1DataService:
             {"driver": "Isack Hadjar", "team": "Racing Bulls", "qualifying_position": 19, "season_points": 0.0},
             {"driver": "Gabriel Bortoleto", "team": "Sauber", "qualifying_position": 20, "season_points": 0.0}
         ]
-        logger.warning("⚠️ Using fallback driver list - API data unavailable")
+        logger.warning(" Using fallback driver list - API data unavailable")
         return fallback_drivers
     
     def get_next_race(self, season: int = 2025) -> Optional[Dict[str, Any]]:
