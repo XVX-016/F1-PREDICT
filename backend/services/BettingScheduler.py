@@ -38,7 +38,7 @@ class BettingScheduler:
         # Register cleanup function
         atexit.register(self.shutdown)
         
-        logger.info("✅ BettingScheduler initialized")
+        logger.info(" BettingScheduler initialized")
 
     def start(self):
         """Start the scheduler"""
@@ -66,13 +66,13 @@ class BettingScheduler:
                 
                 self.scheduler.start()
                 self.is_running = True
-                logger.info("🚀 BettingScheduler started - running every 5 minutes")
+                logger.info(" BettingScheduler started - running every 5 minutes")
                 return True
             else:
-                logger.warning("⚠️ Scheduler is already running")
+                logger.warning(" Scheduler is already running")
                 return False
         except Exception as e:
-            logger.error(f"❌ Failed to start scheduler: {e}")
+            logger.error(f" Failed to start scheduler: {e}")
             return False
 
     def stop(self):
@@ -81,37 +81,37 @@ class BettingScheduler:
             if self.is_running:
                 self.scheduler.shutdown(wait=True)
                 self.is_running = False
-                logger.info("🛑 BettingScheduler stopped")
+                logger.info(" BettingScheduler stopped")
                 return True
             else:
-                logger.warning("⚠️ Scheduler is not running")
+                logger.warning(" Scheduler is not running")
                 return False
         except Exception as e:
-            logger.error(f"❌ Failed to stop scheduler: {e}")
+            logger.error(f" Failed to stop scheduler: {e}")
             return False
 
     def shutdown(self):
         """Clean shutdown of the scheduler"""
         if self.is_running:
-            logger.info("🔄 Shutting down BettingScheduler...")
+            logger.info(" Shutting down BettingScheduler...")
             self.stop()
 
     def _run_lifecycle(self):
         """Execute the betting lifecycle management"""
         try:
-            logger.info("🔄 Executing betting lifecycle check...")
+            logger.info(" Executing betting lifecycle check...")
             result = betting_lifecycle_service.run_lifecycle()
             
             if result["status"] == "success":
-                logger.info("✅ Betting lifecycle check completed successfully")
+                logger.info(" Betting lifecycle check completed successfully")
             elif result["status"] == "warning":
-                logger.warning(f"⚠️ Betting lifecycle check completed with warnings: {result.get('message', '')}")
+                logger.warning(f" Betting lifecycle check completed with warnings: {result.get('message', '')}")
             else:
-                logger.error(f"❌ Betting lifecycle check failed: {result.get('message', '')}")
+                logger.error(f" Betting lifecycle check failed: {result.get('message', '')}")
                 
             return result
         except Exception as e:
-            logger.error(f"❌ Error in betting lifecycle execution: {e}")
+            logger.error(f" Error in betting lifecycle execution: {e}")
             return {
                 "status": "error",
                 "message": f"Execution error: {str(e)}",
@@ -125,14 +125,14 @@ class BettingScheduler:
             status = betting_lifecycle_service.get_lifecycle_status()
             
             if status["status"] == "success":
-                logger.info("✅ Daily status check completed")
+                logger.info(" Daily status check completed")
                 # Here you could send status reports, notifications, etc.
             else:
-                logger.error(f"❌ Daily status check failed: {status.get('message', '')}")
+                logger.error(f" Daily status check failed: {status.get('message', '')}")
                 
             return status
         except Exception as e:
-            logger.error(f"❌ Error in daily status check: {e}")
+            logger.error(f" Error in daily status check: {e}")
             return {
                 "status": "error",
                 "message": f"Status check error: {str(e)}",
@@ -143,14 +143,14 @@ class BettingScheduler:
         """Handle successful job execution"""
         job_id = event.job_id
         execution_time = datetime.fromtimestamp(event.scheduled_run_time, tz=timezone.utc)
-        logger.info(f"✅ Job '{job_id}' executed successfully at {execution_time}")
+        logger.info(f" Job '{job_id}' executed successfully at {execution_time}")
 
     def _job_error(self, event):
         """Handle job execution errors"""
         job_id = event.job_id
         exception = event.exception
         execution_time = datetime.fromtimestamp(event.scheduled_run_time, tz=timezone.utc)
-        logger.error(f"❌ Job '{job_id}' failed at {execution_time}: {exception}")
+        logger.error(f" Job '{job_id}' failed at {execution_time}: {exception}")
 
     def get_scheduler_status(self):
         """Get current scheduler status"""
@@ -171,7 +171,7 @@ class BettingScheduler:
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get scheduler status: {e}")
+            logger.error(f" Failed to get scheduler status: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to get status: {str(e)}",
@@ -185,7 +185,7 @@ class BettingScheduler:
             result = self._run_lifecycle()
             return result
         except Exception as e:
-            logger.error(f"❌ Manual lifecycle trigger failed: {e}")
+            logger.error(f" Manual lifecycle trigger failed: {e}")
             return {
                 "status": "error",
                 "message": f"Manual trigger failed: {str(e)}",
@@ -210,13 +210,13 @@ class BettingScheduler:
                     coalesce=True
                 )
                 
-                logger.info(f"✅ Schedule updated to run every {interval_minutes} minutes")
+                logger.info(f" Schedule updated to run every {interval_minutes} minutes")
                 return True
             else:
-                logger.warning("⚠️ Cannot update schedule - scheduler not running")
+                logger.warning(" Cannot update schedule - scheduler not running")
                 return False
         except Exception as e:
-            logger.error(f"❌ Failed to update schedule: {e}")
+            logger.error(f" Failed to update schedule: {e}")
             return False
 
 

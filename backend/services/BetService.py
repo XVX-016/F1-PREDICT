@@ -25,7 +25,7 @@ class BetService:
     def __init__(self):
         self.bets_file = "backend/data/bets.json"
         self.bets = self._load_bets()
-        logger.info("✅ BetService initialized")
+        logger.info(" BetService initialized")
 
     def _load_bets(self) -> Dict[str, Any]:
         """Load bets from persistent storage"""
@@ -48,7 +48,7 @@ class BetService:
                 self._save_bets(initial_bets)
                 return initial_bets
         except Exception as e:
-            logger.error(f"❌ Failed to load bets: {e}")
+            logger.error(f" Failed to load bets: {e}")
             return {"pending_bets": {}, "settled_bets": {}, "metadata": {}}
 
     def _save_bets(self, bets_data: Dict[str, Any]):
@@ -59,13 +59,13 @@ class BetService:
             with open(self.bets_file, 'w') as f:
                 json.dump(bets_data, f, indent=2)
         except Exception as e:
-            logger.error(f"❌ Failed to save bets: {e}")
+            logger.error(f" Failed to save bets: {e}")
 
     def place_bet(self, user_id: str, race_id: str, market_id: str, 
                   selection: str, stake: float, odds: float) -> Dict[str, Any]:
         """Place a new bet"""
         try:
-            logger.info(f"💰 Placing bet for user {user_id} on {race_id}")
+            logger.info(f" Placing bet for user {user_id} on {race_id}")
             
             # Validate bet
             validation_result = self._validate_bet(user_id, race_id, market_id, stake, odds)
@@ -108,14 +108,14 @@ class BetService:
             # Save to storage
             self._save_bets(self.bets)
             
-            logger.info(f"✅ Bet placed successfully: {bet_id}")
+            logger.info(f" Bet placed successfully: {bet_id}")
             return {
                 "status": "success",
                 "bet_id": bet_id,
                 "bet": bet
             }
         except Exception as e:
-            logger.error(f"❌ Failed to place bet: {e}")
+            logger.error(f" Failed to place bet: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to place bet: {str(e)}"
@@ -147,7 +147,7 @@ class BetService:
     def settle_bets(self, race_id: str, results: Dict[str, Any]) -> Dict[str, Any]:
         """Settle all pending bets for a race using race results"""
         try:
-            logger.info(f"💰 Settling bets for race: {race_id}")
+            logger.info(f" Settling bets for race: {race_id}")
             
             if not results:
                 logger.warning(f"⚠️ No results provided for race {race_id}")
@@ -198,7 +198,7 @@ class BetService:
             # Save to storage
             self._save_bets(self.bets)
             
-            logger.info(f"✅ Settled {len(settled_bets)} bets for race: {race_id}")
+            logger.info(f" Settled {len(settled_bets)} bets for race: {race_id}")
             return {
                 "status": "success",
                 "message": f"Settled {len(settled_bets)} bets for race {race_id}",
@@ -208,7 +208,7 @@ class BetService:
                 "settlements": settled_bets
             }
         except Exception as e:
-            logger.error(f"❌ Failed to settle bets for {race_id}: {e}")
+            logger.error(f" Failed to settle bets for {race_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to settle bets: {str(e)}",
@@ -248,7 +248,7 @@ class BetService:
                 "won": result["won"]
             }
         except Exception as e:
-            logger.error(f"❌ Failed to settle individual bet {bet.get('bet_id', 'unknown')}: {e}")
+            logger.error(f" Failed to settle individual bet {bet.get('bet_id', 'unknown')}: {e}")
             return {
                 "bet_id": bet.get("bet_id", "unknown"),
                 "result": {"won": False, "reason": f"Settlement error: {str(e)}"},
@@ -338,7 +338,7 @@ class BetService:
                 "last_updated": self.bets["metadata"].get("last_updated")
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get bets status: {e}")
+            logger.error(f" Failed to get bets status: {e}")
             return {
                 "pending_bets": 0,
                 "settled_bets": 0,
@@ -368,7 +368,7 @@ class BetService:
                 "total_settled": len(user_settled)
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get bets for user {user_id}: {e}")
+            logger.error(f" Failed to get bets for user {user_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to get user bets: {str(e)}",
@@ -397,7 +397,7 @@ class BetService:
                 "total_settled": len(race_settled)
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get bets for race {race_id}: {e}")
+            logger.error(f" Failed to get bets for race {race_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to get race bets: {str(e)}",

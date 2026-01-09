@@ -71,7 +71,7 @@ class MonteCarloEngine:
         if random_seed is not None:
             np.random.seed(random_seed)
         
-        logger.info(f"🚀 Monte Carlo Engine initialized with {num_simulations} simulations")
+        logger.info(f"Monte Carlo Engine initialized with {num_simulations} simulations")
     
     def simulate_race(
         self,
@@ -368,7 +368,7 @@ class MonteCarloEngine:
         aggregated_stats = self._aggregate_simulation_results(all_results)
         
         elapsed_time = time.time() - start_time
-        logger.info(f"✅ Completed {num_simulations} simulations in {elapsed_time:.2f}s")
+        logger.info(f"Completed {num_simulations} simulations in {elapsed_time:.2f}s")
         
         return aggregated_stats
     
@@ -487,7 +487,7 @@ class MonteCarloEngine:
         simulations_per_worker = num_simulations // max_workers
         remaining_simulations = num_simulations % max_workers
         
-        logger.info(f"🚀 Running {num_simulations} simulations with {max_workers} workers...")
+        logger.info(f"Running {num_simulations} simulations with {max_workers} workers...")
         start_time = time.time()
         
         all_results = []
@@ -518,13 +518,13 @@ class MonteCarloEngine:
                     all_results.extend(worker_results)
                     logger.info(f"   Worker {worker_id} completed {len(worker_results)} simulations")
                 except Exception as e:
-                    logger.error(f"❌ Worker {worker_id} failed: {e}")
+                    logger.error(f"Worker {worker_id} failed: {e}")
         
         # Aggregate results
         aggregated_stats = self._aggregate_simulation_results(all_results)
         
         elapsed_time = time.time() - start_time
-        logger.info(f"✅ Completed {len(all_results)} simulations in {elapsed_time:.2f}s")
+        logger.info(f"Completed {len(all_results)} simulations in {elapsed_time:.2f}s")
         
         return aggregated_stats
     
@@ -586,5 +586,5 @@ class MonteCarloEngine:
         df = pd.DataFrame(data)
         df.to_csv(filename, index=False)
         
-        logger.info(f"💾 Simulation data exported to {filename}")
+        logger.info(f"Simulation data exported to {filename}")
         return filename
