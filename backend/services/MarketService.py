@@ -24,7 +24,7 @@ class MarketService:
     def __init__(self):
         self.markets_file = "backend/data/markets.json"
         self.markets = self._load_markets()
-        logger.info("✅ MarketService initialized")
+        logger.info("MarketService initialized")
 
     def _load_markets(self) -> Dict[str, Any]:
         """Load markets from persistent storage"""
@@ -45,7 +45,7 @@ class MarketService:
                 self._save_markets(initial_markets)
                 return initial_markets
         except Exception as e:
-            logger.error(f"❌ Failed to load markets: {e}")
+            logger.error(f"Failed to load markets: {e}")
             return {"active_markets": {}, "closed_markets": {}, "metadata": {}}
 
     def _save_markets(self, markets_data: Dict[str, Any]):
@@ -61,7 +61,7 @@ class MarketService:
     def create_markets(self, race_id: str, odds: Dict[str, Any]) -> Dict[str, Any]:
         """Create new betting markets for a race"""
         try:
-            logger.info(f"🎯 Creating markets for race: {race_id}")
+            logger.info(f"Creating markets for race: {race_id}")
             
             # Generate market types based on odds
             markets = self._generate_market_types(race_id, odds)
@@ -82,7 +82,7 @@ class MarketService:
             # Save to storage
             self._save_markets(self.markets)
             
-            logger.info(f"✅ Created {len(markets)} markets for race: {race_id}")
+            logger.info(f"Created {len(markets)} markets for race: {race_id}")
             return {
                 "status": "success",
                 "race_id": race_id,
@@ -90,7 +90,7 @@ class MarketService:
                 "markets": markets
             }
         except Exception as e:
-            logger.error(f"❌ Failed to create markets for {race_id}: {e}")
+            logger.error(f"Failed to create markets for {race_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to create markets: {str(e)}",

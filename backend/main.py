@@ -5,8 +5,7 @@ from fastapi.responses import JSONResponse
 import logging
 import asyncio
 from typing import List, Dict, Any, Optional
-import firebase_admin
-from firebase_admin import credentials, firestore
+# Firebase removed - using Supabase exclusively
 import numpy as np
 import fastf1
 import pandas as pd
@@ -37,7 +36,7 @@ race_encoders = None
 
 def load_race_model():
     """Model loading removed - using simplified prediction system"""
-    print("✅ Using simplified prediction system with McLaren dominance")
+    print("Using simplified prediction system with McLaren dominance")
     return True
 
 # REMOVED: predict_race_winner_probabilities() - This function predicted winners directly
@@ -627,7 +626,7 @@ def get_race_prediction(name: str, date: str | None = None, season: int = 2025):
         return result
         
     except Exception as e:
-        print(f"❌ Race prediction failed: {e}")
+        print(f"Race prediction failed: {e}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 @app.get("/predictions/next-race")
@@ -645,7 +644,7 @@ def get_next_race_prediction(season: int = 2025):
         return result
         
     except Exception as e:
-        print(f"❌ Next race prediction failed: {e}")
+        print(f"Next race prediction failed: {e}")
         raise HTTPException(status_code=500, detail=f"Next race prediction failed: {str(e)}")
 
 # New enhanced hybrid Monte Carlo prediction endpoints
@@ -662,7 +661,7 @@ def get_next_race_simple_predictions(season: int = 2025):
         return result
         
     except Exception as e:
-        print(f"❌ Next race simple predictions failed: {e}")
+        print(f"Next race simple predictions failed: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get simple predictions: {str(e)}")
 
 @app.get("/predict/{race_identifier}")
@@ -678,7 +677,7 @@ def get_race_predictions(race_identifier: str, season: int = 2025):
         return result
         
     except Exception as e:
-        print(f"❌ Race predictions failed: {e}")
+        print(f"Race predictions failed: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get race predictions: {str(e)}")
 
 
@@ -749,7 +748,7 @@ def get_api_v1_markets(
         }
         
     except Exception as e:
-        print(f"❌ Error getting API v1 markets: {e}")
+        print(f"Error getting API v1 markets: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get markets: {str(e)}")
 
 @app.get("/api/v1/markets/{race_id}")
@@ -803,7 +802,7 @@ def get_api_v1_race_markets(race_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error getting API v1 race markets: {e}")
+        print(f"Error getting API v1 race markets: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get race markets: {str(e)}")
 
 # Circuit type mapping for race-aware features
@@ -1028,7 +1027,7 @@ def _load_probabilities(name: str, date: str | None) -> list[dict] | None:
             return res.get("probabilities")
         
         # 3) Fallback to dynamic race-aware probabilities
-        print(f"📊 Using dynamic predictions for {name}")
+        print(f"Using dynamic predictions for {name}")
         return _get_dynamic_probabilities(name, date)
     except HTTPException as e:
         if e.status_code == 404:
@@ -1583,11 +1582,11 @@ async def predict_next_race():
     weather conditions, and rich driver metadata.
     """
     try:
-        logger.info("🎯 Generating enhanced hybrid predictions for next race...")
+        logger.info("Generating enhanced hybrid predictions for next race...")
         prediction = await hybrid_service.predict_next_race()
         return prediction
     except Exception as e:
-        logger.error(f"❌ Error generating enhanced hybrid predictions: {e}")
+        logger.error(f"Error generating enhanced hybrid predictions: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate enhanced predictions: {str(e)}"
@@ -1605,11 +1604,11 @@ async def predict_specific_race(race_identifier: str):
     - /predict/6
     """
     try:
-        logger.info(f"🎯 Generating predictions for race: {race_identifier}")
+        logger.info(f"Generating predictions for race: {race_identifier}")
         prediction = await hybrid_service.predict_race(race_identifier)
         return prediction
     except Exception as e:
-        logger.error(f"❌ Error generating race predictions: {e}")
+        logger.error(f"Error generating race predictions: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate race predictions: {str(e)}"
@@ -1646,7 +1645,7 @@ async def predict_next_race_simple():
             "model_version": prediction.model_version
         }
     except Exception as e:
-        logger.error(f"❌ Error generating simple predictions: {e}")
+        logger.error(f"Error generating simple predictions: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate simple predictions: {str(e)}"
@@ -1670,7 +1669,7 @@ async def retrain_model(background_tasks: BackgroundTasks):
             "triggered_at": datetime.now().isoformat()
         }
     except Exception as e:
-        logger.error(f"❌ Error triggering retraining: {e}")
+        logger.error(f"Error triggering retraining: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to trigger retraining: {str(e)}"
@@ -1714,7 +1713,7 @@ async def predict_track_specific_race(
     try:
         from services.TrackSpecificPredictionService import TrackSpecificPredictionService
         
-        logger.info(f"🎯 Generating track-specific predictions for: {race_identifier}")
+        logger.info(f"Generating track-specific predictions for: {race_identifier}")
         
         # Initialize the track-specific prediction service
         service = TrackSpecificPredictionService()
@@ -1791,7 +1790,7 @@ async def predict_track_specific_race(
         return serializable_prediction
         
     except Exception as e:
-        logger.error(f"❌ Error generating track-specific predictions: {e}")
+        logger.error(f"Error generating track-specific predictions: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate track-specific predictions: {str(e)}"
@@ -1814,7 +1813,7 @@ async def predict_all_track_specific_races(
     try:
         from services.TrackSpecificPredictionService import TrackSpecificPredictionService
         
-        logger.info("🎯 Generating track-specific predictions for all Grand Prix")
+        logger.info("Generating track-specific predictions for all Grand Prix")
         
         # Initialize the track-specific prediction service
         service = TrackSpecificPredictionService()
@@ -1898,7 +1897,7 @@ async def predict_all_track_specific_races(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error generating all track-specific predictions: {e}")
+        logger.error(f"Error generating all track-specific predictions: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate all track-specific predictions: {str(e)}"
@@ -1927,7 +1926,7 @@ async def predict_next_race_track_specific(
     try:
         from services.TrackSpecificPredictionService import TrackSpecificPredictionService
         
-        logger.info("🎯 Generating track-specific predictions for next race")
+        logger.info("Generating track-specific predictions for next race")
         
         # Initialize the track-specific prediction service
         service = TrackSpecificPredictionService()
@@ -2008,7 +2007,7 @@ async def predict_next_race_track_specific(
         return serializable_prediction
         
     except Exception as e:
-        logger.error(f"❌ Error generating next race track-specific predictions: {e}")
+        logger.error(f"Error generating next race track-specific predictions: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate next race track-specific predictions: {str(e)}"
@@ -2024,7 +2023,7 @@ async def get_season_calendar():
         calendar_info = hybrid_service.calendar_service.get_season_info()
         return calendar_info
     except Exception as e:
-        logger.error(f"❌ Error fetching season calendar: {e}")
+        logger.error(f"Error fetching season calendar: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch season calendar: {str(e)}"
@@ -2039,7 +2038,7 @@ async def get_all_races():
         races = hybrid_service.calendar_service.get_all_races()
         return {"races": races, "total": len(races)}
     except Exception as e:
-        logger.error(f"❌ Error fetching races: {e}")
+        logger.error(f"Error fetching races: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch races: {str(e)}"
@@ -2061,7 +2060,7 @@ async def get_race_info(race_identifier: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error fetching race info: {e}")
+        logger.error(f"Error fetching race info: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch race info: {str(e)}"
@@ -2091,7 +2090,7 @@ async def get_race_weather(race_identifier: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error fetching weather forecast: {e}")
+        logger.error(f"Error fetching weather forecast: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch weather forecast: {str(e)}"
@@ -2116,7 +2115,7 @@ async def get_driver_entry_list(round: int):
             "total_drivers": len(entry_list)
         }
     except Exception as e:
-        logger.error(f"❌ Error getting entry list: {e}")
+        logger.error(f"Error getting entry list: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to get entry list: {str(e)}"
@@ -2136,7 +2135,7 @@ async def get_driver_standings():
             "last_updated": datetime.now().isoformat()
         }
     except Exception as e:
-        logger.error(f"❌ Error getting standings: {e}")
+        logger.error(f"Error getting standings: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to get standings: {str(e)}"
@@ -2222,7 +2221,7 @@ async def legacy_predictions():
             "generated_at": datetime.now().isoformat()
         }
     except Exception as e:
-        logger.error(f"❌ Error in legacy predictions: {e}")
+        logger.error(f"Error in legacy predictions: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Legacy prediction service error: {str(e)}"
@@ -2232,7 +2231,7 @@ async def legacy_predictions():
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     """Global exception handler"""
-    logger.error(f"❌ Unhandled exception: {exc}")
+    logger.error(f"Unhandled exception: {exc}")
     return JSONResponse(
         status_code=500,
         content={
@@ -2246,15 +2245,15 @@ async def global_exception_handler(request, exc):
 @app.on_event("startup")
 async def startup_event():
     """Application startup event"""
-    logger.info("🚀 F1 Prediction API starting up...")
-    logger.info(f"📊 Hybrid service initialized: {hybrid_service.model_version}")
-    logger.info("✅ All services ready")
+    logger.info("F1 Prediction API starting up...")
+    logger.info(f"Hybrid service initialized: {hybrid_service.model_version}")
+    logger.info("All services ready")
 
 # Shutdown event
 @app.on_event("shutdown")
 async def shutdown_event():
     """Application shutdown event"""
-    logger.info("🛑 F1 Prediction API shutting down...")
+    logger.info("F1 Prediction API shutting down...")
 
 if __name__ == "__main__":
     import uvicorn

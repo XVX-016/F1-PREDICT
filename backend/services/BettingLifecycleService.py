@@ -33,14 +33,14 @@ class BettingLifecycleService:
         self.result_service = result_service
         self.user_service = user_service
         
-        logger.info("✅ BettingLifecycleService initialized")
+        logger.info(" BettingLifecycleService initialized")
 
     def close_current_markets(self, race_id: str) -> Dict[str, Any]:
         """Close all active markets for the current race."""
         try:
-            logger.info(f"🔒 Closing markets for race: {race_id}")
+            logger.info(f" Closing markets for race: {race_id}")
             result = self.market_service.close_markets(race_id)
-            logger.info(f"✅ Markets closed for race: {race_id}")
+            logger.info(f" Markets closed for race: {race_id}")
             return {
                 "status": "success",
                 "message": f"Markets closed for race {race_id}",
@@ -48,7 +48,7 @@ class BettingLifecycleService:
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
         except Exception as e:
-            logger.error(f"❌ Failed to close markets for race {race_id}: {e}")
+            logger.error(f" Failed to close markets for race {race_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to close markets: {str(e)}",
@@ -59,12 +59,12 @@ class BettingLifecycleService:
     def settle_race(self, race_id: str) -> Dict[str, Any]:
         """Settle all bets after race results are available."""
         try:
-            logger.info(f"💰 Settling bets for race: {race_id}")
+            logger.info(f" Settling bets for race: {race_id}")
             
             # Get race results
             results = self.result_service.get_results(race_id)
             if not results:
-                logger.warning(f"⚠️ No results available for race {race_id}")
+                logger.warning(f" No results available for race {race_id}")
                 return {
                     "status": "warning",
                     "message": f"No results available for race {race_id}",
@@ -75,7 +75,7 @@ class BettingLifecycleService:
             # Settle bets using results
             settlement_result = self.bet_service.settle_bets(race_id, results)
             
-            logger.info(f"✅ Bets settled for race: {race_id}")
+            logger.info(f" Bets settled for race: {race_id}")
             return {
                 "status": "success",
                 "message": f"Bets settled for race {race_id}",
@@ -84,7 +84,7 @@ class BettingLifecycleService:
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
         except Exception as e:
-            logger.error(f"❌ Failed to settle bets for race {race_id}: {e}")
+            logger.error(f" Failed to settle bets for race {race_id}: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to settle bets: {str(e)}",
@@ -95,12 +95,12 @@ class BettingLifecycleService:
     def generate_next_markets(self) -> Dict[str, Any]:
         """Generate new betting markets for the next race."""
         try:
-            logger.info("🎯 Generating new markets for next race")
+            logger.info(" Generating new markets for next race")
             
             # Get next race info
             next_race = self.calendar_service.get_next_race()
             if not next_race:
-                logger.warning("⚠️ No next race found")
+                logger.warning(" No next race found")
                 return {
                     "status": "warning",
                     "message": "No next race found",
@@ -121,7 +121,7 @@ class BettingLifecycleService:
             # Create markets
             market_result = self.market_service.create_markets(next_race["circuit_id"], odds)
             
-            logger.info(f"✅ New markets generated for: {next_race['name']}")
+            logger.info(f" New markets generated for: {next_race['name']}")
             return {
                 "status": "success",
                 "message": f"New markets generated for {next_race['name']}",
@@ -130,7 +130,7 @@ class BettingLifecycleService:
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
         except Exception as e:
-            logger.error(f"❌ Failed to generate next markets: {e}")
+            logger.error(f" Failed to generate next markets: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to generate next markets: {str(e)}",
@@ -172,7 +172,7 @@ class BettingLifecycleService:
                 generate_result = self.generate_next_markets()
                 results.append(generate_result)
             
-            logger.info("✅ Betting lifecycle check completed")
+            logger.info(" Betting lifecycle check completed")
             return {
                 "status": "success",
                 "message": "Lifecycle check completed",
@@ -182,7 +182,7 @@ class BettingLifecycleService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Betting lifecycle failed: {e}")
+            logger.error(f" Betting lifecycle failed: {e}")
             return {
                 "status": "error",
                 "message": f"Lifecycle failed: {str(e)}",
@@ -243,7 +243,7 @@ class BettingLifecycleService:
                 "timestamp": current_time.isoformat()
             }
         except Exception as e:
-            logger.error(f"❌ Failed to get lifecycle status: {e}")
+            logger.error(f" Failed to get lifecycle status: {e}")
             return {
                 "status": "error",
                 "message": f"Failed to get status: {str(e)}",

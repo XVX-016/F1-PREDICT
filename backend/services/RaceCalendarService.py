@@ -78,14 +78,14 @@ class RaceCalendarService:
                 # Find next race
                 self._update_next_race()
                 
-                logger.info(f"✅ Loaded {len(races_data)} races from local calendar for F1 {self.season}")
+                logger.info(f"Loaded {len(races_data)} races from local calendar for F1 {self.season}")
                 return
                 
         except Exception as e:
-            logger.error(f"❌ Failed to load local calendar: {e}")
+            logger.error(f"Failed to load local calendar: {e}")
         
         # Fallback to basic calendar
-        logger.warning("⚠️ Using fallback F1 2025 calendar")
+        logger.warning(" Using fallback F1 2025 calendar")
         self._create_fallback_calendar()
     # Add this method to the RaceCalendarService class:
 
@@ -94,9 +94,9 @@ class RaceCalendarService:
         try:
             self.races = self._fetch_calendar()
             self._update_next_race()
-            logger.info("✅ Calendar refreshed successfully")
+            logger.info("Calendar refreshed successfully")
         except Exception as e:
-            logger.error(f"❌ Error refreshing calendar: {e}")
+            logger.error(f"Error refreshing calendar: {e}")
 
             
     def _classify_track_type(self, circuit_name: str, circuit_id: str) -> str:
@@ -140,14 +140,14 @@ class RaceCalendarService:
             # Sort by date and take the earliest
             upcoming_races.sort(key=lambda x: x[0])
             self.next_race = upcoming_races[0][1]
-            logger.info(f"🎯 Next race: {self.next_race['name']} on {self.next_race['date']}")
+            logger.info(f"Next race: {self.next_race['name']} on {self.next_race['date']}")
         else:
             self.next_race = None
-            logger.info("⚠️ No upcoming races found")
+            logger.info("No upcoming races found")
     
     def _create_fallback_calendar(self):
         """Create fallback calendar when API fails"""
-        logger.warning("⚠️ Using fallback F1 2025 calendar")
+        logger.warning(" Using fallback F1 2025 calendar")
         
         fallback_races = [
             {
@@ -492,7 +492,7 @@ class RaceCalendarService:
             
             return None
         except Exception as e:
-            logger.error(f"❌ Failed to get current race: {e}")
+            logger.error(f" Failed to get current race: {e}")
             return None
 
     def get_track_features(self, circuit_id: str) -> Dict[str, Any]:
@@ -515,7 +515,7 @@ class RaceCalendarService:
             
             return features
         except Exception as e:
-            logger.error(f"❌ Failed to get track features for {circuit_id}: {e}")
+            logger.error(f" Failed to get track features for {circuit_id}: {e}")
             return {}
 
     def _get_track_characteristics(self, track_type: str) -> Dict[str, Any]:
