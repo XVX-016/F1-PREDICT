@@ -88,6 +88,11 @@ dev:
 	@echo "Starting development server..."
 	cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
+# Alternative: Start with main_refactored (if exists)
+dev-refactored:
+	@echo "Starting development server (refactored)..."
+	cd backend && uvicorn main_refactored:app --reload --host 0.0.0.0 --port 8000 || uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
 # Linting
 lint:
 	@echo "Running linter..."
