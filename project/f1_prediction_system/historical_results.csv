@@ -1,0 +1,419 @@
+race,date,driver,team,position,points
+Australian Grand Prix,2024-03-24,Esteban Ocon,Alpine,1,25
+Australian Grand Prix,2024-03-24,Lando Norris,McLaren,2,24
+Australian Grand Prix,2024-03-24,Kevin Magnussen,Haas,3,23
+Australian Grand Prix,2024-03-24,Zhou Guanyu,Kick Sauber,4,22
+Australian Grand Prix,2024-03-24,Lance Stroll,Aston Martin,5,21
+Australian Grand Prix,2024-03-24,Yuki Tsunoda,RB,6,20
+Australian Grand Prix,2024-03-24,Carlos Sainz,Ferrari,7,19
+Australian Grand Prix,2024-03-24,Daniel Ricciardo,RB,8,18
+Australian Grand Prix,2024-03-24,Valtteri Bottas,Kick Sauber,9,17
+Australian Grand Prix,2024-03-24,George Russell,Mercedes,10,16
+Australian Grand Prix,2024-03-24,Alexander Albon,Williams,11,0
+Australian Grand Prix,2024-03-24,Max Verstappen,Red Bull Racing,12,0
+Australian Grand Prix,2024-03-24,Pierre Gasly,Alpine,13,0
+Australian Grand Prix,2024-03-24,Oscar Piastri,McLaren,14,0
+Australian Grand Prix,2024-03-24,Fernando Alonso,Aston Martin,15,0
+Australian Grand Prix,2024-03-24,Logan Sargeant,Williams,16,0
+Australian Grand Prix,2024-03-24,Lewis Hamilton,Mercedes,17,0
+Australian Grand Prix,2024-03-24,Charles Leclerc,Ferrari,18,0
+Australian Grand Prix,2024-03-24,Nico Hulkenberg,Haas,19,0
+Japanese Grand Prix,2024-04-07,Esteban Ocon,Alpine,1,25
+Japanese Grand Prix,2024-04-07,Lewis Hamilton,Mercedes,2,24
+Japanese Grand Prix,2024-04-07,Kevin Magnussen,Haas,3,23
+Japanese Grand Prix,2024-04-07,Carlos Sainz,Ferrari,4,22
+Japanese Grand Prix,2024-04-07,Alexander Albon,Williams,5,21
+Japanese Grand Prix,2024-04-07,Valtteri Bottas,Kick Sauber,6,20
+Japanese Grand Prix,2024-04-07,Zhou Guanyu,Kick Sauber,7,19
+Japanese Grand Prix,2024-04-07,Lance Stroll,Aston Martin,8,18
+Japanese Grand Prix,2024-04-07,Fernando Alonso,Aston Martin,9,17
+Japanese Grand Prix,2024-04-07,Oscar Piastri,McLaren,10,16
+Japanese Grand Prix,2024-04-07,Charles Leclerc,Ferrari,11,0
+Japanese Grand Prix,2024-04-07,Lando Norris,McLaren,12,0
+Japanese Grand Prix,2024-04-07,Pierre Gasly,Alpine,13,0
+Japanese Grand Prix,2024-04-07,Daniel Ricciardo,RB,14,0
+Japanese Grand Prix,2024-04-07,Max Verstappen,Red Bull Racing,15,0
+Japanese Grand Prix,2024-04-07,Nico Hulkenberg,Haas,16,0
+Japanese Grand Prix,2024-04-07,George Russell,Mercedes,17,0
+Japanese Grand Prix,2024-04-07,Logan Sargeant,Williams,18,0
+Japanese Grand Prix,2024-04-07,Yuki Tsunoda,RB,19,0
+Chinese Grand Prix,2024-04-21,Lewis Hamilton,Mercedes,1,25
+Chinese Grand Prix,2024-04-21,Zhou Guanyu,Kick Sauber,2,24
+Chinese Grand Prix,2024-04-21,Max Verstappen,Red Bull Racing,3,23
+Chinese Grand Prix,2024-04-21,Lando Norris,McLaren,4,22
+Chinese Grand Prix,2024-04-21,Valtteri Bottas,Kick Sauber,5,21
+Chinese Grand Prix,2024-04-21,Kevin Magnussen,Haas,6,20
+Chinese Grand Prix,2024-04-21,Esteban Ocon,Alpine,7,19
+Chinese Grand Prix,2024-04-21,Charles Leclerc,Ferrari,8,18
+Chinese Grand Prix,2024-04-21,Nico Hulkenberg,Haas,9,17
+Chinese Grand Prix,2024-04-21,Logan Sargeant,Williams,10,16
+Chinese Grand Prix,2024-04-21,Alexander Albon,Williams,11,0
+Chinese Grand Prix,2024-04-21,Pierre Gasly,Alpine,12,0
+Chinese Grand Prix,2024-04-21,Daniel Ricciardo,RB,13,0
+Chinese Grand Prix,2024-04-21,Carlos Sainz,Ferrari,14,0
+Chinese Grand Prix,2024-04-21,Lance Stroll,Aston Martin,15,0
+Chinese Grand Prix,2024-04-21,George Russell,Mercedes,16,0
+Chinese Grand Prix,2024-04-21,Fernando Alonso,Aston Martin,17,0
+Chinese Grand Prix,2024-04-21,Yuki Tsunoda,RB,18,0
+Chinese Grand Prix,2024-04-21,Oscar Piastri,McLaren,19,0
+Miami Grand Prix,2024-05-05,Oscar Piastri,McLaren,1,25
+Miami Grand Prix,2024-05-05,Kevin Magnussen,Haas,2,24
+Miami Grand Prix,2024-05-05,Yuki Tsunoda,RB,3,23
+Miami Grand Prix,2024-05-05,Max Verstappen,Red Bull Racing,4,22
+Miami Grand Prix,2024-05-05,Carlos Sainz,Ferrari,5,21
+Miami Grand Prix,2024-05-05,Lewis Hamilton,Mercedes,6,20
+Miami Grand Prix,2024-05-05,Charles Leclerc,Ferrari,7,19
+Miami Grand Prix,2024-05-05,Esteban Ocon,Alpine,8,18
+Miami Grand Prix,2024-05-05,Valtteri Bottas,Kick Sauber,9,17
+Miami Grand Prix,2024-05-05,Pierre Gasly,Alpine,10,16
+Miami Grand Prix,2024-05-05,Lando Norris,McLaren,11,0
+Miami Grand Prix,2024-05-05,Alexander Albon,Williams,12,0
+Miami Grand Prix,2024-05-05,Logan Sargeant,Williams,13,0
+Miami Grand Prix,2024-05-05,Nico Hulkenberg,Haas,14,0
+Miami Grand Prix,2024-05-05,Zhou Guanyu,Kick Sauber,15,0
+Miami Grand Prix,2024-05-05,Daniel Ricciardo,RB,16,0
+Miami Grand Prix,2024-05-05,George Russell,Mercedes,17,0
+Miami Grand Prix,2024-05-05,Fernando Alonso,Aston Martin,18,0
+Miami Grand Prix,2024-05-05,Lance Stroll,Aston Martin,19,0
+Emilia Romagna Grand Prix,2024-05-19,Esteban Ocon,Alpine,1,25
+Emilia Romagna Grand Prix,2024-05-19,Max Verstappen,Red Bull Racing,2,24
+Emilia Romagna Grand Prix,2024-05-19,Valtteri Bottas,Kick Sauber,3,23
+Emilia Romagna Grand Prix,2024-05-19,Oscar Piastri,McLaren,4,22
+Emilia Romagna Grand Prix,2024-05-19,George Russell,Mercedes,5,21
+Emilia Romagna Grand Prix,2024-05-19,Charles Leclerc,Ferrari,6,20
+Emilia Romagna Grand Prix,2024-05-19,Carlos Sainz,Ferrari,7,19
+Emilia Romagna Grand Prix,2024-05-19,Lando Norris,McLaren,8,18
+Emilia Romagna Grand Prix,2024-05-19,Zhou Guanyu,Kick Sauber,9,17
+Emilia Romagna Grand Prix,2024-05-19,Lance Stroll,Aston Martin,10,16
+Emilia Romagna Grand Prix,2024-05-19,Alexander Albon,Williams,11,0
+Emilia Romagna Grand Prix,2024-05-19,Lewis Hamilton,Mercedes,12,0
+Emilia Romagna Grand Prix,2024-05-19,Fernando Alonso,Aston Martin,13,0
+Emilia Romagna Grand Prix,2024-05-19,Pierre Gasly,Alpine,14,0
+Emilia Romagna Grand Prix,2024-05-19,Logan Sargeant,Williams,15,0
+Emilia Romagna Grand Prix,2024-05-19,Yuki Tsunoda,RB,16,0
+Emilia Romagna Grand Prix,2024-05-19,Daniel Ricciardo,RB,17,0
+Emilia Romagna Grand Prix,2024-05-19,Kevin Magnussen,Haas,18,0
+Emilia Romagna Grand Prix,2024-05-19,Nico Hulkenberg,Haas,19,0
+Monaco Grand Prix,2024-05-26,Lando Norris,McLaren,1,25
+Monaco Grand Prix,2024-05-26,Yuki Tsunoda,RB,2,24
+Monaco Grand Prix,2024-05-26,Nico Hulkenberg,Haas,3,23
+Monaco Grand Prix,2024-05-26,George Russell,Mercedes,4,22
+Monaco Grand Prix,2024-05-26,Lewis Hamilton,Mercedes,5,21
+Monaco Grand Prix,2024-05-26,Pierre Gasly,Alpine,6,20
+Monaco Grand Prix,2024-05-26,Charles Leclerc,Ferrari,7,19
+Monaco Grand Prix,2024-05-26,Logan Sargeant,Williams,8,18
+Monaco Grand Prix,2024-05-26,Zhou Guanyu,Kick Sauber,9,17
+Monaco Grand Prix,2024-05-26,Esteban Ocon,Alpine,10,16
+Monaco Grand Prix,2024-05-26,Oscar Piastri,McLaren,11,0
+Monaco Grand Prix,2024-05-26,Daniel Ricciardo,RB,12,0
+Monaco Grand Prix,2024-05-26,Lance Stroll,Aston Martin,13,0
+Monaco Grand Prix,2024-05-26,Valtteri Bottas,Kick Sauber,14,0
+Monaco Grand Prix,2024-05-26,Kevin Magnussen,Haas,15,0
+Monaco Grand Prix,2024-05-26,Max Verstappen,Red Bull Racing,16,0
+Monaco Grand Prix,2024-05-26,Alexander Albon,Williams,17,0
+Monaco Grand Prix,2024-05-26,Carlos Sainz,Ferrari,18,0
+Monaco Grand Prix,2024-05-26,Fernando Alonso,Aston Martin,19,0
+Canadian Grand Prix,2024-06-09,Oscar Piastri,McLaren,1,25
+Canadian Grand Prix,2024-06-09,Yuki Tsunoda,RB,2,24
+Canadian Grand Prix,2024-06-09,Kevin Magnussen,Haas,3,23
+Canadian Grand Prix,2024-06-09,Carlos Sainz,Ferrari,4,22
+Canadian Grand Prix,2024-06-09,Lando Norris,McLaren,5,21
+Canadian Grand Prix,2024-06-09,Daniel Ricciardo,RB,6,20
+Canadian Grand Prix,2024-06-09,Esteban Ocon,Alpine,7,19
+Canadian Grand Prix,2024-06-09,Max Verstappen,Red Bull Racing,8,18
+Canadian Grand Prix,2024-06-09,Lance Stroll,Aston Martin,9,17
+Canadian Grand Prix,2024-06-09,Pierre Gasly,Alpine,10,16
+Canadian Grand Prix,2024-06-09,Valtteri Bottas,Kick Sauber,11,0
+Canadian Grand Prix,2024-06-09,Nico Hulkenberg,Haas,12,0
+Canadian Grand Prix,2024-06-09,Fernando Alonso,Aston Martin,13,0
+Canadian Grand Prix,2024-06-09,Lewis Hamilton,Mercedes,14,0
+Canadian Grand Prix,2024-06-09,Charles Leclerc,Ferrari,15,0
+Canadian Grand Prix,2024-06-09,Logan Sargeant,Williams,16,0
+Canadian Grand Prix,2024-06-09,George Russell,Mercedes,17,0
+Canadian Grand Prix,2024-06-09,Alexander Albon,Williams,18,0
+Canadian Grand Prix,2024-06-09,Zhou Guanyu,Kick Sauber,19,0
+Spanish Grand Prix,2024-06-23,Kevin Magnussen,Haas,1,25
+Spanish Grand Prix,2024-06-23,Lando Norris,McLaren,2,24
+Spanish Grand Prix,2024-06-23,Daniel Ricciardo,RB,3,23
+Spanish Grand Prix,2024-06-23,Zhou Guanyu,Kick Sauber,4,22
+Spanish Grand Prix,2024-06-23,Nico Hulkenberg,Haas,5,21
+Spanish Grand Prix,2024-06-23,Max Verstappen,Red Bull Racing,6,20
+Spanish Grand Prix,2024-06-23,Lewis Hamilton,Mercedes,7,19
+Spanish Grand Prix,2024-06-23,George Russell,Mercedes,8,18
+Spanish Grand Prix,2024-06-23,Valtteri Bottas,Kick Sauber,9,17
+Spanish Grand Prix,2024-06-23,Charles Leclerc,Ferrari,10,16
+Spanish Grand Prix,2024-06-23,Logan Sargeant,Williams,11,0
+Spanish Grand Prix,2024-06-23,Alexander Albon,Williams,12,0
+Spanish Grand Prix,2024-06-23,Yuki Tsunoda,RB,13,0
+Spanish Grand Prix,2024-06-23,Esteban Ocon,Alpine,14,0
+Spanish Grand Prix,2024-06-23,Oscar Piastri,McLaren,15,0
+Spanish Grand Prix,2024-06-23,Pierre Gasly,Alpine,16,0
+Spanish Grand Prix,2024-06-23,Carlos Sainz,Ferrari,17,0
+Spanish Grand Prix,2024-06-23,Lance Stroll,Aston Martin,18,0
+Spanish Grand Prix,2024-06-23,Fernando Alonso,Aston Martin,19,0
+Austrian Grand Prix,2024-06-30,George Russell,Mercedes,1,25
+Austrian Grand Prix,2024-06-30,Pierre Gasly,Alpine,2,24
+Austrian Grand Prix,2024-06-30,Lando Norris,McLaren,3,23
+Austrian Grand Prix,2024-06-30,Nico Hulkenberg,Haas,4,22
+Austrian Grand Prix,2024-06-30,Logan Sargeant,Williams,5,21
+Austrian Grand Prix,2024-06-30,Carlos Sainz,Ferrari,6,20
+Austrian Grand Prix,2024-06-30,Lance Stroll,Aston Martin,7,19
+Austrian Grand Prix,2024-06-30,Zhou Guanyu,Kick Sauber,8,18
+Austrian Grand Prix,2024-06-30,Oscar Piastri,McLaren,9,17
+Austrian Grand Prix,2024-06-30,Fernando Alonso,Aston Martin,10,16
+Austrian Grand Prix,2024-06-30,Max Verstappen,Red Bull Racing,11,0
+Austrian Grand Prix,2024-06-30,Charles Leclerc,Ferrari,12,0
+Austrian Grand Prix,2024-06-30,Lewis Hamilton,Mercedes,13,0
+Austrian Grand Prix,2024-06-30,Yuki Tsunoda,RB,14,0
+Austrian Grand Prix,2024-06-30,Kevin Magnussen,Haas,15,0
+Austrian Grand Prix,2024-06-30,Esteban Ocon,Alpine,16,0
+Austrian Grand Prix,2024-06-30,Daniel Ricciardo,RB,17,0
+Austrian Grand Prix,2024-06-30,Valtteri Bottas,Kick Sauber,18,0
+Austrian Grand Prix,2024-06-30,Alexander Albon,Williams,19,0
+British Grand Prix,2024-07-07,Daniel Ricciardo,RB,1,25
+British Grand Prix,2024-07-07,Lewis Hamilton,Mercedes,2,24
+British Grand Prix,2024-07-07,Kevin Magnussen,Haas,3,23
+British Grand Prix,2024-07-07,Yuki Tsunoda,RB,4,22
+British Grand Prix,2024-07-07,George Russell,Mercedes,5,21
+British Grand Prix,2024-07-07,Alexander Albon,Williams,6,20
+British Grand Prix,2024-07-07,Oscar Piastri,McLaren,7,19
+British Grand Prix,2024-07-07,Charles Leclerc,Ferrari,8,18
+British Grand Prix,2024-07-07,Esteban Ocon,Alpine,9,17
+British Grand Prix,2024-07-07,Valtteri Bottas,Kick Sauber,10,16
+British Grand Prix,2024-07-07,Logan Sargeant,Williams,11,0
+British Grand Prix,2024-07-07,Pierre Gasly,Alpine,12,0
+British Grand Prix,2024-07-07,Nico Hulkenberg,Haas,13,0
+British Grand Prix,2024-07-07,Lance Stroll,Aston Martin,14,0
+British Grand Prix,2024-07-07,Fernando Alonso,Aston Martin,15,0
+British Grand Prix,2024-07-07,Zhou Guanyu,Kick Sauber,16,0
+British Grand Prix,2024-07-07,Lando Norris,McLaren,17,0
+British Grand Prix,2024-07-07,Carlos Sainz,Ferrari,18,0
+British Grand Prix,2024-07-07,Max Verstappen,Red Bull Racing,19,0
+Hungarian Grand Prix,2024-07-21,Yuki Tsunoda,RB,1,25
+Hungarian Grand Prix,2024-07-21,Nico Hulkenberg,Haas,2,24
+Hungarian Grand Prix,2024-07-21,Zhou Guanyu,Kick Sauber,3,23
+Hungarian Grand Prix,2024-07-21,Oscar Piastri,McLaren,4,22
+Hungarian Grand Prix,2024-07-21,Lando Norris,McLaren,5,21
+Hungarian Grand Prix,2024-07-21,Alexander Albon,Williams,6,20
+Hungarian Grand Prix,2024-07-21,Logan Sargeant,Williams,7,19
+Hungarian Grand Prix,2024-07-21,Carlos Sainz,Ferrari,8,18
+Hungarian Grand Prix,2024-07-21,Kevin Magnussen,Haas,9,17
+Hungarian Grand Prix,2024-07-21,Fernando Alonso,Aston Martin,10,16
+Hungarian Grand Prix,2024-07-21,Lewis Hamilton,Mercedes,11,0
+Hungarian Grand Prix,2024-07-21,Lance Stroll,Aston Martin,12,0
+Hungarian Grand Prix,2024-07-21,Esteban Ocon,Alpine,13,0
+Hungarian Grand Prix,2024-07-21,Pierre Gasly,Alpine,14,0
+Hungarian Grand Prix,2024-07-21,Valtteri Bottas,Kick Sauber,15,0
+Hungarian Grand Prix,2024-07-21,Daniel Ricciardo,RB,16,0
+Hungarian Grand Prix,2024-07-21,Charles Leclerc,Ferrari,17,0
+Hungarian Grand Prix,2024-07-21,George Russell,Mercedes,18,0
+Hungarian Grand Prix,2024-07-21,Max Verstappen,Red Bull Racing,19,0
+Belgian Grand Prix,2024-07-28,Nico Hulkenberg,Haas,1,25
+Belgian Grand Prix,2024-07-28,Logan Sargeant,Williams,2,24
+Belgian Grand Prix,2024-07-28,Daniel Ricciardo,RB,3,23
+Belgian Grand Prix,2024-07-28,Kevin Magnussen,Haas,4,22
+Belgian Grand Prix,2024-07-28,Yuki Tsunoda,RB,5,21
+Belgian Grand Prix,2024-07-28,Esteban Ocon,Alpine,6,20
+Belgian Grand Prix,2024-07-28,Lewis Hamilton,Mercedes,7,19
+Belgian Grand Prix,2024-07-28,Alexander Albon,Williams,8,18
+Belgian Grand Prix,2024-07-28,Carlos Sainz,Ferrari,9,17
+Belgian Grand Prix,2024-07-28,George Russell,Mercedes,10,16
+Belgian Grand Prix,2024-07-28,Oscar Piastri,McLaren,11,0
+Belgian Grand Prix,2024-07-28,Fernando Alonso,Aston Martin,12,0
+Belgian Grand Prix,2024-07-28,Max Verstappen,Red Bull Racing,13,0
+Belgian Grand Prix,2024-07-28,Charles Leclerc,Ferrari,14,0
+Belgian Grand Prix,2024-07-28,Lance Stroll,Aston Martin,15,0
+Belgian Grand Prix,2024-07-28,Pierre Gasly,Alpine,16,0
+Belgian Grand Prix,2024-07-28,Zhou Guanyu,Kick Sauber,17,0
+Belgian Grand Prix,2024-07-28,Lando Norris,McLaren,18,0
+Belgian Grand Prix,2024-07-28,Valtteri Bottas,Kick Sauber,19,0
+Dutch Grand Prix,2024-08-25,Max Verstappen,Red Bull Racing,1,25
+Dutch Grand Prix,2024-08-25,Alexander Albon,Williams,2,24
+Dutch Grand Prix,2024-08-25,Valtteri Bottas,Kick Sauber,3,23
+Dutch Grand Prix,2024-08-25,Lance Stroll,Aston Martin,4,22
+Dutch Grand Prix,2024-08-25,Charles Leclerc,Ferrari,5,21
+Dutch Grand Prix,2024-08-25,Lewis Hamilton,Mercedes,6,20
+Dutch Grand Prix,2024-08-25,Carlos Sainz,Ferrari,7,19
+Dutch Grand Prix,2024-08-25,Zhou Guanyu,Kick Sauber,8,18
+Dutch Grand Prix,2024-08-25,Fernando Alonso,Aston Martin,9,17
+Dutch Grand Prix,2024-08-25,Lando Norris,McLaren,10,16
+Dutch Grand Prix,2024-08-25,Pierre Gasly,Alpine,11,0
+Dutch Grand Prix,2024-08-25,Logan Sargeant,Williams,12,0
+Dutch Grand Prix,2024-08-25,Kevin Magnussen,Haas,13,0
+Dutch Grand Prix,2024-08-25,Daniel Ricciardo,RB,14,0
+Dutch Grand Prix,2024-08-25,Oscar Piastri,McLaren,15,0
+Dutch Grand Prix,2024-08-25,Nico Hulkenberg,Haas,16,0
+Dutch Grand Prix,2024-08-25,George Russell,Mercedes,17,0
+Dutch Grand Prix,2024-08-25,Yuki Tsunoda,RB,18,0
+Dutch Grand Prix,2024-08-25,Esteban Ocon,Alpine,19,0
+Italian Grand Prix,2024-09-01,Alexander Albon,Williams,1,25
+Italian Grand Prix,2024-09-01,Oscar Piastri,McLaren,2,24
+Italian Grand Prix,2024-09-01,Pierre Gasly,Alpine,3,23
+Italian Grand Prix,2024-09-01,Zhou Guanyu,Kick Sauber,4,22
+Italian Grand Prix,2024-09-01,Esteban Ocon,Alpine,5,21
+Italian Grand Prix,2024-09-01,Max Verstappen,Red Bull Racing,6,20
+Italian Grand Prix,2024-09-01,Charles Leclerc,Ferrari,7,19
+Italian Grand Prix,2024-09-01,Kevin Magnussen,Haas,8,18
+Italian Grand Prix,2024-09-01,Yuki Tsunoda,RB,9,17
+Italian Grand Prix,2024-09-01,Daniel Ricciardo,RB,10,16
+Italian Grand Prix,2024-09-01,Logan Sargeant,Williams,11,0
+Italian Grand Prix,2024-09-01,Valtteri Bottas,Kick Sauber,12,0
+Italian Grand Prix,2024-09-01,Fernando Alonso,Aston Martin,13,0
+Italian Grand Prix,2024-09-01,Nico Hulkenberg,Haas,14,0
+Italian Grand Prix,2024-09-01,Lando Norris,McLaren,15,0
+Italian Grand Prix,2024-09-01,Lance Stroll,Aston Martin,16,0
+Italian Grand Prix,2024-09-01,George Russell,Mercedes,17,0
+Italian Grand Prix,2024-09-01,Lewis Hamilton,Mercedes,18,0
+Italian Grand Prix,2024-09-01,Carlos Sainz,Ferrari,19,0
+Singapore Grand Prix,2024-09-15,Charles Leclerc,Ferrari,1,25
+Singapore Grand Prix,2024-09-15,Oscar Piastri,McLaren,2,24
+Singapore Grand Prix,2024-09-15,Esteban Ocon,Alpine,3,23
+Singapore Grand Prix,2024-09-15,Zhou Guanyu,Kick Sauber,4,22
+Singapore Grand Prix,2024-09-15,George Russell,Mercedes,5,21
+Singapore Grand Prix,2024-09-15,Carlos Sainz,Ferrari,6,20
+Singapore Grand Prix,2024-09-15,Daniel Ricciardo,RB,7,19
+Singapore Grand Prix,2024-09-15,Pierre Gasly,Alpine,8,18
+Singapore Grand Prix,2024-09-15,Lewis Hamilton,Mercedes,9,17
+Singapore Grand Prix,2024-09-15,Logan Sargeant,Williams,10,16
+Singapore Grand Prix,2024-09-15,Valtteri Bottas,Kick Sauber,11,0
+Singapore Grand Prix,2024-09-15,Max Verstappen,Red Bull Racing,12,0
+Singapore Grand Prix,2024-09-15,Fernando Alonso,Aston Martin,13,0
+Singapore Grand Prix,2024-09-15,Yuki Tsunoda,RB,14,0
+Singapore Grand Prix,2024-09-15,Alexander Albon,Williams,15,0
+Singapore Grand Prix,2024-09-15,Nico Hulkenberg,Haas,16,0
+Singapore Grand Prix,2024-09-15,Lando Norris,McLaren,17,0
+Singapore Grand Prix,2024-09-15,Lance Stroll,Aston Martin,18,0
+Singapore Grand Prix,2024-09-15,Kevin Magnussen,Haas,19,0
+Japanese Grand Prix,2024-09-22,Alexander Albon,Williams,1,25
+Japanese Grand Prix,2024-09-22,Lewis Hamilton,Mercedes,2,24
+Japanese Grand Prix,2024-09-22,Lando Norris,McLaren,3,23
+Japanese Grand Prix,2024-09-22,George Russell,Mercedes,4,22
+Japanese Grand Prix,2024-09-22,Pierre Gasly,Alpine,5,21
+Japanese Grand Prix,2024-09-22,Lance Stroll,Aston Martin,6,20
+Japanese Grand Prix,2024-09-22,Max Verstappen,Red Bull Racing,7,19
+Japanese Grand Prix,2024-09-22,Charles Leclerc,Ferrari,8,18
+Japanese Grand Prix,2024-09-22,Oscar Piastri,McLaren,9,17
+Japanese Grand Prix,2024-09-22,Logan Sargeant,Williams,10,16
+Japanese Grand Prix,2024-09-22,Fernando Alonso,Aston Martin,11,0
+Japanese Grand Prix,2024-09-22,Esteban Ocon,Alpine,12,0
+Japanese Grand Prix,2024-09-22,Yuki Tsunoda,RB,13,0
+Japanese Grand Prix,2024-09-22,Daniel Ricciardo,RB,14,0
+Japanese Grand Prix,2024-09-22,Carlos Sainz,Ferrari,15,0
+Japanese Grand Prix,2024-09-22,Nico Hulkenberg,Haas,16,0
+Japanese Grand Prix,2024-09-22,Kevin Magnussen,Haas,17,0
+Japanese Grand Prix,2024-09-22,Valtteri Bottas,Kick Sauber,18,0
+Japanese Grand Prix,2024-09-22,Zhou Guanyu,Kick Sauber,19,0
+Qatar Grand Prix,2024-10-06,Zhou Guanyu,Kick Sauber,1,25
+Qatar Grand Prix,2024-10-06,Oscar Piastri,McLaren,2,24
+Qatar Grand Prix,2024-10-06,Valtteri Bottas,Kick Sauber,3,23
+Qatar Grand Prix,2024-10-06,Daniel Ricciardo,RB,4,22
+Qatar Grand Prix,2024-10-06,Kevin Magnussen,Haas,5,21
+Qatar Grand Prix,2024-10-06,Alexander Albon,Williams,6,20
+Qatar Grand Prix,2024-10-06,Charles Leclerc,Ferrari,7,19
+Qatar Grand Prix,2024-10-06,Yuki Tsunoda,RB,8,18
+Qatar Grand Prix,2024-10-06,Nico Hulkenberg,Haas,9,17
+Qatar Grand Prix,2024-10-06,Lewis Hamilton,Mercedes,10,16
+Qatar Grand Prix,2024-10-06,Logan Sargeant,Williams,11,0
+Qatar Grand Prix,2024-10-06,Lando Norris,McLaren,12,0
+Qatar Grand Prix,2024-10-06,Fernando Alonso,Aston Martin,13,0
+Qatar Grand Prix,2024-10-06,George Russell,Mercedes,14,0
+Qatar Grand Prix,2024-10-06,Pierre Gasly,Alpine,15,0
+Qatar Grand Prix,2024-10-06,Lance Stroll,Aston Martin,16,0
+Qatar Grand Prix,2024-10-06,Esteban Ocon,Alpine,17,0
+Qatar Grand Prix,2024-10-06,Carlos Sainz,Ferrari,18,0
+Qatar Grand Prix,2024-10-06,Max Verstappen,Red Bull Racing,19,0
+United States Grand Prix,2024-10-20,Max Verstappen,Red Bull Racing,1,25
+United States Grand Prix,2024-10-20,Oscar Piastri,McLaren,2,24
+United States Grand Prix,2024-10-20,Nico Hulkenberg,Haas,3,23
+United States Grand Prix,2024-10-20,Pierre Gasly,Alpine,4,22
+United States Grand Prix,2024-10-20,Carlos Sainz,Ferrari,5,21
+United States Grand Prix,2024-10-20,Fernando Alonso,Aston Martin,6,20
+United States Grand Prix,2024-10-20,Lando Norris,McLaren,7,19
+United States Grand Prix,2024-10-20,Logan Sargeant,Williams,8,18
+United States Grand Prix,2024-10-20,Esteban Ocon,Alpine,9,17
+United States Grand Prix,2024-10-20,Charles Leclerc,Ferrari,10,16
+United States Grand Prix,2024-10-20,Zhou Guanyu,Kick Sauber,11,0
+United States Grand Prix,2024-10-20,Alexander Albon,Williams,12,0
+United States Grand Prix,2024-10-20,Valtteri Bottas,Kick Sauber,13,0
+United States Grand Prix,2024-10-20,Yuki Tsunoda,RB,14,0
+United States Grand Prix,2024-10-20,Lance Stroll,Aston Martin,15,0
+United States Grand Prix,2024-10-20,Daniel Ricciardo,RB,16,0
+United States Grand Prix,2024-10-20,Kevin Magnussen,Haas,17,0
+United States Grand Prix,2024-10-20,George Russell,Mercedes,18,0
+United States Grand Prix,2024-10-20,Lewis Hamilton,Mercedes,19,0
+Mexico City Grand Prix,2024-10-27,Lance Stroll,Aston Martin,1,25
+Mexico City Grand Prix,2024-10-27,Charles Leclerc,Ferrari,2,24
+Mexico City Grand Prix,2024-10-27,Oscar Piastri,McLaren,3,23
+Mexico City Grand Prix,2024-10-27,Lewis Hamilton,Mercedes,4,22
+Mexico City Grand Prix,2024-10-27,Lando Norris,McLaren,5,21
+Mexico City Grand Prix,2024-10-27,George Russell,Mercedes,6,20
+Mexico City Grand Prix,2024-10-27,Carlos Sainz,Ferrari,7,19
+Mexico City Grand Prix,2024-10-27,Esteban Ocon,Alpine,8,18
+Mexico City Grand Prix,2024-10-27,Kevin Magnussen,Haas,9,17
+Mexico City Grand Prix,2024-10-27,Nico Hulkenberg,Haas,10,16
+Mexico City Grand Prix,2024-10-27,Valtteri Bottas,Kick Sauber,11,0
+Mexico City Grand Prix,2024-10-27,Yuki Tsunoda,RB,12,0
+Mexico City Grand Prix,2024-10-27,Daniel Ricciardo,RB,13,0
+Mexico City Grand Prix,2024-10-27,Fernando Alonso,Aston Martin,14,0
+Mexico City Grand Prix,2024-10-27,Max Verstappen,Red Bull Racing,15,0
+Mexico City Grand Prix,2024-10-27,Logan Sargeant,Williams,16,0
+Mexico City Grand Prix,2024-10-27,Pierre Gasly,Alpine,17,0
+Mexico City Grand Prix,2024-10-27,Zhou Guanyu,Kick Sauber,18,0
+Mexico City Grand Prix,2024-10-27,Alexander Albon,Williams,19,0
+São Paulo Grand Prix,2024-11-03,George Russell,Mercedes,1,25
+São Paulo Grand Prix,2024-11-03,Pierre Gasly,Alpine,2,24
+São Paulo Grand Prix,2024-11-03,Nico Hulkenberg,Haas,3,23
+São Paulo Grand Prix,2024-11-03,Max Verstappen,Red Bull Racing,4,22
+São Paulo Grand Prix,2024-11-03,Alexander Albon,Williams,5,21
+São Paulo Grand Prix,2024-11-03,Lance Stroll,Aston Martin,6,20
+São Paulo Grand Prix,2024-11-03,Yuki Tsunoda,RB,7,19
+São Paulo Grand Prix,2024-11-03,Oscar Piastri,McLaren,8,18
+São Paulo Grand Prix,2024-11-03,Fernando Alonso,Aston Martin,9,17
+São Paulo Grand Prix,2024-11-03,Kevin Magnussen,Haas,10,16
+São Paulo Grand Prix,2024-11-03,Lando Norris,McLaren,11,0
+São Paulo Grand Prix,2024-11-03,Esteban Ocon,Alpine,12,0
+São Paulo Grand Prix,2024-11-03,Zhou Guanyu,Kick Sauber,13,0
+São Paulo Grand Prix,2024-11-03,Carlos Sainz,Ferrari,14,0
+São Paulo Grand Prix,2024-11-03,Logan Sargeant,Williams,15,0
+São Paulo Grand Prix,2024-11-03,Lewis Hamilton,Mercedes,16,0
+São Paulo Grand Prix,2024-11-03,Daniel Ricciardo,RB,17,0
+São Paulo Grand Prix,2024-11-03,Valtteri Bottas,Kick Sauber,18,0
+São Paulo Grand Prix,2024-11-03,Charles Leclerc,Ferrari,19,0
+Las Vegas Grand Prix,2024-11-23,Oscar Piastri,McLaren,1,25
+Las Vegas Grand Prix,2024-11-23,Zhou Guanyu,Kick Sauber,2,24
+Las Vegas Grand Prix,2024-11-23,Max Verstappen,Red Bull Racing,3,23
+Las Vegas Grand Prix,2024-11-23,Logan Sargeant,Williams,4,22
+Las Vegas Grand Prix,2024-11-23,Carlos Sainz,Ferrari,5,21
+Las Vegas Grand Prix,2024-11-23,Daniel Ricciardo,RB,6,20
+Las Vegas Grand Prix,2024-11-23,Nico Hulkenberg,Haas,7,19
+Las Vegas Grand Prix,2024-11-23,Lando Norris,McLaren,8,18
+Las Vegas Grand Prix,2024-11-23,Valtteri Bottas,Kick Sauber,9,17
+Las Vegas Grand Prix,2024-11-23,Lance Stroll,Aston Martin,10,16
+Las Vegas Grand Prix,2024-11-23,Pierre Gasly,Alpine,11,0
+Las Vegas Grand Prix,2024-11-23,Yuki Tsunoda,RB,12,0
+Las Vegas Grand Prix,2024-11-23,Kevin Magnussen,Haas,13,0
+Las Vegas Grand Prix,2024-11-23,George Russell,Mercedes,14,0
+Las Vegas Grand Prix,2024-11-23,Alexander Albon,Williams,15,0
+Las Vegas Grand Prix,2024-11-23,Esteban Ocon,Alpine,16,0
+Las Vegas Grand Prix,2024-11-23,Fernando Alonso,Aston Martin,17,0
+Las Vegas Grand Prix,2024-11-23,Charles Leclerc,Ferrari,18,0
+Las Vegas Grand Prix,2024-11-23,Lewis Hamilton,Mercedes,19,0
+Abu Dhabi Grand Prix,2024-12-01,Alexander Albon,Williams,1,25
+Abu Dhabi Grand Prix,2024-12-01,Valtteri Bottas,Kick Sauber,2,24
+Abu Dhabi Grand Prix,2024-12-01,Nico Hulkenberg,Haas,3,23
+Abu Dhabi Grand Prix,2024-12-01,Yuki Tsunoda,RB,4,22
+Abu Dhabi Grand Prix,2024-12-01,Logan Sargeant,Williams,5,21
+Abu Dhabi Grand Prix,2024-12-01,Pierre Gasly,Alpine,6,20
+Abu Dhabi Grand Prix,2024-12-01,Lewis Hamilton,Mercedes,7,19
+Abu Dhabi Grand Prix,2024-12-01,Lando Norris,McLaren,8,18
+Abu Dhabi Grand Prix,2024-12-01,Daniel Ricciardo,RB,9,17
+Abu Dhabi Grand Prix,2024-12-01,Max Verstappen,Red Bull Racing,10,16
+Abu Dhabi Grand Prix,2024-12-01,Oscar Piastri,McLaren,11,0
+Abu Dhabi Grand Prix,2024-12-01,Kevin Magnussen,Haas,12,0
+Abu Dhabi Grand Prix,2024-12-01,Carlos Sainz,Ferrari,13,0
+Abu Dhabi Grand Prix,2024-12-01,Lance Stroll,Aston Martin,14,0
+Abu Dhabi Grand Prix,2024-12-01,Fernando Alonso,Aston Martin,15,0
+Abu Dhabi Grand Prix,2024-12-01,Zhou Guanyu,Kick Sauber,16,0
+Abu Dhabi Grand Prix,2024-12-01,Esteban Ocon,Alpine,17,0
+Abu Dhabi Grand Prix,2024-12-01,George Russell,Mercedes,18,0
+Abu Dhabi Grand Prix,2024-12-01,Charles Leclerc,Ferrari,19,0

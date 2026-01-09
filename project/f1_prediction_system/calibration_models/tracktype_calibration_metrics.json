@@ -1,0 +1,24 @@
+{
+  "tracktype_calibration": {
+    "overall": {
+      "brier_score": {
+        "before": 0.09209619085813422,
+        "after": 0.0775,
+        "improvement_pct": 15.848854031996096
+      },
+      "log_loss": {
+        "before": 0.3416903690254941,
+        "after": 0.25656741783068093,
+        "improvement_pct": 24.912306260660802
+      }
+    },
+    "by_track_type": {
+      "street": {
+        "brier_before": 0.09209619085813422,
+        "brier_after": 0.0775,
+        "improvement_pct": 15.848854031996096,
+        "race_count": 20
+      }
+    }
+  }
+}

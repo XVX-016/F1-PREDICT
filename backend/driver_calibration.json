@@ -1,0 +1,208 @@
+{
+  "version": "2025-v1.0",
+  "driver_calibration": {
+    "PIA": {
+      "tier": 1,
+      "weight": 1.40,
+      "name": "Oscar Piastri",
+      "team": "McLaren-Mercedes",
+      "description": "Super Elite - Top performer"
+    },
+    "NOR": {
+      "tier": 1,
+      "weight": 1.35,
+      "name": "Lando Norris",
+      "team": "McLaren-Mercedes",
+      "description": "Super Elite - Top performer"
+    },
+    "VER": {
+      "tier": 1,
+      "weight": 1.20,
+      "name": "Max Verstappen",
+      "team": "Red Bull Racing-Honda RBPT",
+      "description": "Super Elite - Champion"
+    },
+    "RUS": {
+      "tier": 2,
+      "weight": 1.10,
+      "name": "George Russell",
+      "team": "Mercedes",
+      "description": "Elite - Strong performer"
+    },
+    "LEC": {
+      "tier": 2,
+      "weight": 1.05,
+      "name": "Charles Leclerc",
+      "team": "Ferrari",
+      "description": "Elite - Strong performer"
+    },
+    "HAM": {
+      "tier": 2,
+      "weight": 1.00,
+      "name": "Lewis Hamilton",
+      "team": "Ferrari",
+      "description": "Elite - Legend"
+    },
+    "ANT": {
+      "tier": 3,
+      "weight": 0.95,
+      "name": "Andrea Kimi Antonelli",
+      "team": "Mercedes",
+      "description": "Strong - Developing"
+    },
+    "ALB": {
+      "tier": 3,
+      "weight": 0.90,
+      "name": "Alexander Albon",
+      "team": "Williams-Mercedes",
+      "description": "Strong - Consistent"
+    },
+    "HAD": {
+      "tier": 3,
+      "weight": 0.90,
+      "name": "Oliver Bearman",
+      "team": "Racing Bulls-Honda RBPT",
+      "description": "Strong - Developing"
+    },
+    "TSU": {
+      "tier": 4,
+      "weight": 0.85,
+      "name": "Yuki Tsunoda",
+      "team": "Red Bull Racing-Honda RBPT",
+      "description": "Midfield - Consistent"
+    },
+    "STR": {
+      "tier": 4,
+      "weight": 0.80,
+      "name": "Lance Stroll",
+      "team": "Aston Martin-Mercedes",
+      "description": "Midfield - Experienced"
+    },
+    "ALO": {
+      "tier": 4,
+      "weight": 0.80,
+      "name": "Fernando Alonso",
+      "team": "Aston Martin-Mercedes",
+      "description": "Midfield - Experienced"
+    },
+    "GAS": {
+      "tier": 4,
+      "weight": 0.80,
+      "name": "Pierre Gasly",
+      "team": "Alpine-Renault",
+      "description": "Midfield - Experienced"
+    },
+    "COL": {
+      "tier": 5,
+      "weight": 0.75,
+      "name": "Franco Colapinto",
+      "team": "Williams-Mercedes",
+      "description": "Developing - Rookie"
+    },
+    "BEA": {
+      "tier": 5,
+      "weight": 0.70,
+      "name": "Oliver Bearman",
+      "team": "Haas-Ferrari",
+      "description": "Developing - Rookie"
+    },
+    "OCO": {
+      "tier": 5,
+      "weight": 0.70,
+      "name": "Esteban Ocon",
+      "team": "Haas-Ferrari",
+      "description": "Developing - Experienced"
+    },
+    "HUL": {
+      "tier": 4,
+      "weight": 0.75,
+      "name": "Nico Hulkenberg",
+      "team": "Kick Sauber-Ferrari",
+      "description": "Midfield - Experienced"
+    },
+    "BOR": {
+      "tier": 5,
+      "weight": 0.70,
+      "name": "Valtteri Bottas",
+      "team": "Kick Sauber-Ferrari",
+      "description": "Developing - Experienced"
+    },
+    "LAW": {
+      "tier": 4,
+      "weight": 0.80,
+      "name": "Liam Lawson",
+      "team": "Racing Bulls-Honda RBPT",
+      "description": "Midfield - Developing"
+    },
+    "SAI": {
+      "tier": 4,
+      "weight": 0.75,
+      "name": "Carlos Sainz",
+      "team": "Williams-Mercedes",
+      "description": "Midfield - Experienced"
+    }
+  },
+  "calibration_factors": {
+    "Oscar Piastri": {"factor": 1.40},
+    "Lando Norris": {"factor": 1.35},
+    "Max Verstappen": {"factor": 1.20},
+    "George Russell": {"factor": 1.10},
+    "Charles Leclerc": {"factor": 1.05},
+    "Lewis Hamilton": {"factor": 1.00},
+    "Andrea Kimi Antonelli": {"factor": 0.95},
+    "Alexander Albon": {"factor": 0.90},
+    "Oliver Bearman": {"factor": 0.90},
+    "Yuki Tsunoda": {"factor": 0.85},
+    "Lance Stroll": {"factor": 0.80},
+    "Fernando Alonso": {"factor": 0.80},
+    "Pierre Gasly": {"factor": 0.80},
+    "Franco Colapinto": {"factor": 0.75},
+    "Esteban Ocon": {"factor": 0.70},
+    "Nico Hulkenberg": {"factor": 0.75},
+    "Valtteri Bottas": {"factor": 0.70},
+    "Liam Lawson": {"factor": 0.80},
+    "Carlos Sainz": {"factor": 0.75}
+  },
+  "team_calibration": {
+    "McLaren-Mercedes": {
+      "weight": 1.35,
+      "description": "Strong performance - Most dominant"
+    },
+    "Red Bull Racing-Honda RBPT": {
+      "weight": 1.20,
+      "description": "Dominant team"
+    },
+    "Ferrari": {
+      "weight": 1.15,
+      "description": "Competitive"
+    },
+    "Mercedes": {
+      "weight": 1.10,
+      "description": "Improving"
+    },
+    "Aston Martin-Mercedes": {
+      "weight": 0.95,
+      "description": "Baseline"
+    },
+    "Racing Bulls-Honda RBPT": {
+      "weight": 0.90,
+      "description": "Midfield"
+    },
+    "Williams-Mercedes": {
+      "weight": 0.90,
+      "description": "Midfield"
+    },
+    "Haas-Ferrari": {
+      "weight": 0.80,
+      "description": "Struggling"
+    },
+    "Alpine-Renault": {
+      "weight": 0.80,
+      "description": "Slightly below baseline"
+    },
+    "Kick Sauber-Ferrari": {
+      "weight": 0.75,
+      "description": "Struggling"
+    }
+  }
+}

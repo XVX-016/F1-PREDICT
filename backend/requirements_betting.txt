@@ -1,0 +1,20 @@
+# F1 Betting Lifecycle Management Dependencies
+# Add these to your main requirements.txt
+
+# APScheduler for automatic task scheduling
+APScheduler==3.10.4
+
+# Additional dependencies for betting system
+uuid  # Built-in Python module
+statistics  # Built-in Python module
+pathlib  # Built-in Python module
+
+# Existing dependencies (ensure these are in your main requirements.txt)
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+requests>=2.31.0
+numpy>=1.24.0
+pandas>=2.0.0
+python-dateutil>=2.8.0
+

@@ -1,0 +1,38 @@
+{
+  "temperature": 0.55,
+  "logistic_slope": 6.063542319320187,
+  "logistic_intercept": -3.4323975147437498,
+  "qualifying": {
+    "team_factors": {
+      "McLaren": 0.97,
+      "Red Bull Racing": 1.02,
+      "Ferrari": 1.05,
+      "Mercedes": 1.02
+    },
+    "driver_factors": {
+      "Max Verstappen": 1.05,
+      "Lando Norris": 0.98,
+      "Charles Leclerc": 1.08,
+      "Lewis Hamilton": 1.04
+    }
+  },
+  "race": {
+    "team_factors": {
+      "McLaren": 1.5,
+      "Red Bull Racing": 0.9,
+      "Ferrari": 1.05,
+      "Mercedes": 0.95
+    },
+    "driver_factors": {
+      "Max Verstappen": 0.95,
+      "Lando Norris": 1.1,
+      "Charles Leclerc": 1.08,
+      "Lewis Hamilton": 1.0
+    }
+  },
+  "track_type_adjustments": {
+    "street_circuit": 1.15,
+    "permanent_circuit": 1.0,
+    "high_speed": 0.95
+  }
+}

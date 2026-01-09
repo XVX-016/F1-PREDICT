@@ -1,0 +1,298 @@
+{
+  "active_markets": {
+    "baku": {
+      "race_id": "baku",
+      "markets": [
+        {
+          "market_id": "baku_winner",
+          "market_type": "race_winner",
+          "name": "Race Winner",
+          "description": "Predict the race winner",
+          "options": [
+            {
+              "driver": "Oscar Piastri",
+              "team": "McLaren-Mercedes",
+              "odds": 6.6,
+              "probability": 0.15150062120174096
+            },
+            {
+              "driver": "Max Verstappen",
+              "team": "Red Bull Racing-Honda RBPT",
+              "odds": 7.01,
+              "probability": 0.14265587549637895
+            },
+            {
+              "driver": "Lando Norris",
+              "team": "McLaren-Mercedes",
+              "odds": 7.15,
+              "probability": 0.13978565882329258
+            },
+            {
+              "driver": "Charles Leclerc",
+              "team": "Ferrari",
+              "odds": 12.51,
+              "probability": 0.0799137080326938
+            },
+            {
+              "driver": "George Russell",
+              "team": "Mercedes",
+              "odds": 15.41,
+              "probability": 0.06488012830705393
+            },
+            {
+              "driver": "Lewis Hamilton",
+              "team": "Ferrari",
+              "odds": 22.27,
+              "probability": 0.04489661226222608
+            },
+            {
+              "driver": "Andrea Kimi Antonelli",
+              "team": "Mercedes",
+              "odds": 24.43,
+              "probability": 0.040938472642130574
+            },
+            {
+              "driver": "Alexander Albon",
+              "team": "Williams-Mercedes",
+              "odds": 24.43,
+              "probability": 0.040938472642130574
+            },
+            {
+              "driver": "Yuki Tsunoda",
+              "team": "Red Bull Racing-Honda RBPT",
+              "odds": 26.2,
+              "probability": 0.03816212042289216
+            },
+            {
+              "driver": "Fernando Alonso",
+              "team": "Aston Martin-Mercedes",
+              "odds": 33.67,
+              "probability": 0.029699617915127992
+            }
+          ]
+        },
+        {
+          "market_id": "baku_podium",
+          "market_type": "podium_finish",
+          "name": "Podium Finish",
+          "description": "Predict if driver will finish on the podium",
+          "options": [
+            {
+              "driver": "Oscar Piastri",
+              "team": "McLaren-Mercedes",
+              "odds": 2.2,
+              "probability": 0.4545018636052229
+            },
+            {
+              "driver": "Max Verstappen",
+              "team": "Red Bull Racing-Honda RBPT",
+              "odds": 2.34,
+              "probability": 0.4279676264891369
+            },
+            {
+              "driver": "Lando Norris",
+              "team": "McLaren-Mercedes",
+              "odds": 2.38,
+              "probability": 0.41935697646987774
+            },
+            {
+              "driver": "Charles Leclerc",
+              "team": "Ferrari",
+              "odds": 4.17,
+              "probability": 0.2397411240980814
+            },
+            {
+              "driver": "George Russell",
+              "team": "Mercedes",
+              "odds": 5.14,
+              "probability": 0.1946403849211618
+            },
+            {
+              "driver": "Lewis Hamilton",
+              "team": "Ferrari",
+              "odds": 7.42,
+              "probability": 0.13468983678667823
+            },
+            {
+              "driver": "Andrea Kimi Antonelli",
+              "team": "Mercedes",
+              "odds": 8.14,
+              "probability": 0.12281541792639172
+            },
+            {
+              "driver": "Alexander Albon",
+              "team": "Williams-Mercedes",
+              "odds": 8.14,
+              "probability": 0.12281541792639172
+            },
+            {
+              "driver": "Yuki Tsunoda",
+              "team": "Red Bull Racing-Honda RBPT",
+              "odds": 8.73,
+              "probability": 0.11448636126867648
+            },
+            {
+              "driver": "Fernando Alonso",
+              "team": "Aston Martin-Mercedes",
+              "odds": 11.22,
+              "probability": 0.08909885374538398
+            },
+            {
+              "driver": "Oliver Bearman",
+              "team": "Racing Bulls-Honda RBPT",
+              "odds": 11.27,
+              "probability": 0.08875279925288419
+            },
+            {
+              "driver": "Carlos Sainz",
+              "team": "Williams-Mercedes",
+              "odds": 11.81,
+              "probability": 0.08464391105811477
+            },
+            {
+              "driver": "Valtteri Bottas",
+              "team": "Kick Sauber-Ferrari",
+              "odds": 12.75,
+              "probability": 0.07841187677112611
+            },
+            {
+              "driver": "Lance Stroll",
+              "team": "Aston Martin-Mercedes",
+              "odds": 13.2,
+              "probability": 0.07573402568357637
+            },
+            {
+              "driver": "Franco Colapinto",
+              "team": "Williams-Mercedes",
+              "odds": 14.03,
+              "probability": 0.07127908299630717
+            }
+          ]
+        },
+        {
+          "market_id": "baku_fastest_lap",
+          "market_type": "fastest_lap",
+          "name": "Fastest Lap",
+          "description": "Predict who will set the fastest lap",
+          "options": [
+            {
+              "driver": "Oscar Piastri",
+              "team": "McLaren-Mercedes",
+              "odds": 22.0,
+              "probability": 0.04545018636052229
+            },
+            {
+              "driver": "Max Verstappen",
+              "team": "Red Bull Racing-Honda RBPT",
+              "odds": 23.37,
+              "probability": 0.04279676264891368
+            },
+            {
+              "driver": "Lando Norris",
+              "team": "McLaren-Mercedes",
+              "odds": 23.85,
+              "probability": 0.04193569764698777
+            },
+            {
+              "driver": "Charles Leclerc",
+              "team": "Ferrari",
+              "odds": 41.71,
+              "probability": 0.02397411240980814
+            },
+            {
+              "driver": "George Russell",
+              "team": "Mercedes",
+              "odds": 51.38,
+              "probability": 0.01946403849211618
+            },
+            {
+              "driver": "Lewis Hamilton",
+              "team": "Ferrari",
+              "odds": 74.24,
+              "probability": 0.013468983678667822
+            },
+            {
+              "driver": "Andrea Kimi Antonelli",
+              "team": "Mercedes",
+              "odds": 81.42,
+              "probability": 0.012281541792639171
+            },
+            {
+              "driver": "Alexander Albon",
+              "team": "Williams-Mercedes",
+              "odds": 81.42,
+              "probability": 0.012281541792639171
+            }
+          ]
+        },
+        {
+          "market_id": "baku_constructor_points",
+          "market_type": "constructor_points",
+          "name": "Constructor Points",
+          "description": "Predict which constructor will score the most points",
+          "options": [
+            {
+              "team": "McLaren-Mercedes",
+              "odds": 6.87,
+              "probability": 0.14564314001251677
+            },
+            {
+              "team": "Red Bull Racing-Honda RBPT",
+              "odds": 11.06,
+              "probability": 0.09040899795963556
+            },
+            {
+              "team": "Ferrari",
+              "odds": 16.02,
+              "probability": 0.06240516014745994
+            },
+            {
+              "team": "Mercedes",
+              "odds": 18.9,
+              "probability": 0.052909300474592254
+            },
+            {
+              "team": "Williams-Mercedes",
+              "odds": 21.53,
+              "probability": 0.046456401996802274
+            },
+            {
+              "team": "Aston Martin-Mercedes",
+              "odds": 36.4,
+              "probability": 0.02747214657149339
+            },
+            {
+              "team": "Racing Bulls-Honda RBPT",
+              "odds": 46.82,
+              "probability": 0.021358517203997316
+            },
+            {
+              "team": "Kick Sauber-Ferrari",
+              "odds": 41.36,
+              "probability": 0.024176995337763886
+            },
+            {
+              "team": "Haas-Ferrari",
+              "odds": 45.01,
+              "probability": 0.022216698418485732
+            },
+            {
+              "team": "Alpine-Renault",
+              "odds": 143.83,
+              "probability": 0.00695264187725289
+            }
+          ]
+        }
+      ],
+      "created_at": "2025-09-07T17:02:34.322510+00:00",
+      "status": "active",
+      "total_bets": 0,
+      "total_stake": 0.0
+    }
+  },
+  "closed_markets": {},
+  "metadata": {
+    "last_updated": "2025-09-07T17:02:34.322718+00:00",
+    "total_markets_created": 2
+  }
+}

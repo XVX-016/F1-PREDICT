@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+tensorflow
+firebase-admin
+pydantic
+fastf1
+numpy
+pandas
+requests
+xgboost
+python-multipart 
