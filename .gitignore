@@ -46,3 +46,57 @@ coverage/
 *.tmp
 *.temp
 node_modules
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# FastF1 cache
+cache/
+*.ff1pkl
+fastf1_http_cache.sqlite
+
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+Frontend/.env.local
+Frontend/.env.production
+
+# Documentation (keep docs folder but ignore generated docs)
+# docs/archive/
+
+# Model files (keep structure, ignore large files)
+*.pkl
+*.joblib
+!backend/models/*.pkl
+!backend/models/*.joblib
+backend/models/isotonic_calibrator.pkl
+backend/models/pace_model.txt
+
+# Temporary and cache
+*.tmp
+*.temp
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
