@@ -15,8 +15,17 @@ services:
       - JOLPICA_API_KEY=${JOLPICA_API_KEY}
       - FASTF1_CACHE_DIR=/app/cache
     volumes:
+      - ./backend:/app/backend
       - ./backend/cache:/app/cache
-      - ./.env:/app/.env
+      - backend-data:/app/data
+    working_dir: /app/backend
+    command: >
+      sh -c "
+        echo 'Waiting for setup to complete...' &&
+        python setup.py &&
+        echo 'Starting FastAPI server...' &&
+        uvicorn main:app --host 0.0.0.0 --port 8000
+      "
     networks:
       - f1-network
     restart: unless-stopped
@@ -25,7 +34,10 @@ services:
       interval: 30s
       timeout: 3s
       retries: 3
-      start_period: 5s
+      start_period: 60s
+
+volumes:
+  backend-data:
 
 networks:
   f1-network:

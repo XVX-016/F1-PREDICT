@@ -1,119 +1,109 @@
-# F1 Predict Docker Makefile
+# F1 Prediction Platform - Makefile
+# One-command setup and deployment
 
-.PHONY: help build build-dev build-prod up up-dev up-prod down down-dev down-prod clean logs logs-dev logs-prod shell shell-backend shell-frontend shell-ml test test-dev test-prod
+.PHONY: help setup install test clean docker-build docker-up docker-down
 
 # Default target
 help:
-	@echo "F1 Predict Docker Commands:"
+	@echo "F1 Prediction Platform - Available Commands:"
 	@echo ""
-	@echo "Development:"
-	@echo "  make build-dev    - Build development images"
-	@echo "  make up-dev       - Start development environment"
-	@echo "  make down-dev     - Stop development environment"
-	@echo "  make logs-dev     - View development logs"
+	@echo "  make setup          - Run full automated setup (Jolpica + FastF1 + ML + Simulation)"
+	@echo "  make install        - Install backend dependencies"
+	@echo "  make test           - Run all tests"
+	@echo "  make test-unit       - Run unit tests"
+	@echo "  make test-integration - Run integration tests"
+	@echo "  make test-validation - Run validation tests"
+	@echo "  make clean          - Clean cache and temporary files"
+	@echo "  make docker-build   - Build Docker image"
+	@echo "  make docker-up      - Start Docker containers"
+	@echo "  make docker-down    - Stop Docker containers"
+	@echo "  make docker-logs    - View Docker logs"
+	@echo "  make dev            - Start development server"
+	@echo "  make lint           - Run linter"
 	@echo ""
-	@echo "Production:"
-	@echo "  make build-prod   - Build production images"
-	@echo "  make up-prod      - Start production environment"
-	@echo "  make down-prod    - Stop production environment"
-	@echo "  make logs-prod    - View production logs"
-	@echo ""
-	@echo "General:"
-	@echo "  make build        - Build all images"
-	@echo "  make up           - Start default environment"
-	@echo "  make down         - Stop default environment"
-	@echo "  make clean        - Remove all containers, images, and volumes"
-	@echo "  make shell-backend - Access backend container shell"
-	@echo "  make shell-frontend - Access frontend container shell"
-	@echo "  make shell-ml     - Access ML service container shell"
 
-# Build targets
-build:
+# Full setup
+setup:
+	@echo "Running full automated setup..."
+	cd backend && python setup.py
+
+# Install dependencies
+install:
+	@echo "Installing backend dependencies..."
+	cd backend && pip install -r requirements.txt
+
+# Run all tests
+test:
+	@echo "Running all tests..."
+	cd backend && python -m pytest tests/ -v
+
+# Unit tests
+test-unit:
+	@echo "Running unit tests..."
+	cd backend && python -m pytest tests/unit/ -v
+
+# Integration tests
+test-integration:
+	@echo "Running integration tests..."
+	cd backend && python -m pytest tests/integration/ -v
+
+# Validation tests
+test-validation:
+	@echo "Running validation tests..."
+	cd backend && python -m pytest tests/validation/ -v
+
+# Clean cache and temporary files
+clean:
+	@echo "Cleaning cache and temporary files..."
+	rm -rf backend/cache/*
+	rm -rf backend/__pycache__
+	rm -rf backend/**/__pycache__
+	find backend -name "*.pyc" -delete
+	find backend -name "*.pyo" -delete
+	@echo "Clean complete"
+
+# Docker commands
+docker-build:
+	@echo "Building Docker image..."
 	docker-compose build
 
-build-dev:
-	docker-compose -f docker-compose.dev.yml build
-
-build-prod:
-	docker-compose -f docker-compose.prod.yml build
-
-# Start targets
-up:
+docker-up:
+	@echo "Starting Docker containers..."
 	docker-compose up -d
 
-up-dev:
-	docker-compose -f docker-compose.dev.yml up -d
-
-up-prod:
-	docker-compose -f docker-compose.prod.yml up -d
-
-# Stop targets
-down:
+docker-down:
+	@echo "Stopping Docker containers..."
 	docker-compose down
 
-down-dev:
-	docker-compose -f docker-compose.dev.yml down
+docker-logs:
+	@echo "Viewing Docker logs..."
+	docker-compose logs -f backend
 
-down-prod:
-	docker-compose -f docker-compose.prod.yml down
+docker-restart:
+	@echo "Restarting Docker containers..."
+	docker-compose restart
 
-# Logs targets
-logs:
-	docker-compose logs -f
+# Development server
+dev:
+	@echo "Starting development server..."
+	cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-logs-dev:
-	docker-compose -f docker-compose.dev.yml logs -f
+# Linting
+lint:
+	@echo "Running linter..."
+	cd backend && python -m flake8 . --exclude=__pycache__,cache,venv,env
+	cd backend && python -m pylint **/*.py --ignore=__pycache__,cache,venv,env || true
 
-logs-prod:
-	docker-compose -f docker-compose.prod.yml logs -f
+# Environment setup
+env-check:
+	@echo "Checking environment variables..."
+	@cd backend && python -c "import os; from dotenv import load_dotenv; load_dotenv(); required = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'FASTF1_CACHE_DIR', 'JOLPICA_API_KEY']; missing = [v for v in required if not os.getenv(v)]; exit(0 if not missing else print(f'Missing: {missing}') or 1)"
 
-# Shell access targets
-shell-backend:
-	docker-compose exec backend sh
+# Database migrations
+migrate:
+	@echo "Running database migrations..."
+	@echo "Note: Run migrations manually on your Supabase instance:"
+	@echo "  psql <supabase-connection> -f backend/database/migrations/001_initial_schema.sql"
 
-shell-frontend:
-	docker-compose exec frontend sh
-
-shell-ml:
-	docker-compose exec ml-service bash
-
-# Clean target
-clean:
-	docker-compose down -v --rmi all
-	docker system prune -f
-	docker volume prune -f
-
-# Test targets
-test:
-	docker-compose exec backend npm test
-
-test-dev:
-	docker-compose -f docker-compose.dev.yml exec backend-dev npm test
-
-test-prod:
-	docker-compose -f docker-compose.prod.yml exec backend npm test
-
-# Database targets
-db-reset:
-	docker-compose exec postgres psql -U postgres -d f1_prediction_market -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-	docker-compose exec postgres psql -U postgres -d f1_prediction_market -f /docker-entrypoint-initdb.d/schema.sql
-
-db-seed:
-	docker-compose exec backend npm run seed:f1
-
-# Monitoring targets
-status:
-	docker-compose ps
-
-status-dev:
-	docker-compose -f docker-compose.dev.yml ps
-
-status-prod:
-	docker-compose -f docker-compose.prod.yml ps
-
-# Backup targets
-backup-db:
-	docker-compose exec postgres pg_dump -U postgres f1_prediction_market > backup_$(shell date +%Y%m%d_%H%M%S).sql
-
-restore-db:
-	docker-compose exec -T postgres psql -U postgres -d f1_prediction_market < $(file)
+# Quick start (setup + dev server)
+quickstart: install env-check setup dev
