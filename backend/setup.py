@@ -205,9 +205,14 @@ def main():
     logger.info("Next steps:")
     logger.info("1. Verify Supabase tables are populated")
     logger.info("2. Start the backend API: uvicorn main:app --reload")
-    logger.info("3. Test endpoints: GET /health, GET /api/races/{id}/probabilities")
-    logger.info("4. Update frontend API endpoints to use new architecture")
-    logger.info("5. Deploy to production")
+    logger.info("   Or use Makefile: make dev")
+    logger.info("3. Test endpoints:")
+    logger.info("   - GET /health")
+    logger.info("   - GET /api/races/{id}/probabilities")
+    logger.info("   - GET /api/races/{id}/markets")
+    logger.info("4. Run tests: make test")
+    logger.info("5. Update frontend API endpoints to use new architecture")
+    logger.info("6. Deploy to production")
 
 if __name__ == "__main__":
     main()
