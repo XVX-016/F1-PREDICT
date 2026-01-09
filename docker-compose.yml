@@ -1,115 +1,31 @@
 version: '3.8'
 
 services:
-  # Frontend service
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-      - ml-service
-    networks:
-      - f1-network
-    restart: unless-stopped
-
-  # Backend API service
+  # Backend API service (Python FastAPI)
   backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
     ports:
-      - "3001:3001"
-      - "3002:3002"
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-      - WS_PORT=3002
-      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-here}
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=f1_prediction_market
-      - DB_USER=postgres
-      - DB_PASSWORD=${DB_PASSWORD:-postgres}
-      - REDIS_URL=redis://redis:6379
-      - FRONTEND_URL=http://localhost
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - f1-network
-    restart: unless-stopped
-    volumes:
-      - backend-data:/app/data
-
-  # ML Model service
-  ml-service:
-    build:
-      context: .
-      dockerfile: Dockerfile.ml-service
-    ports:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
-      - PREDICTIONS_DIR=/data/final_predictions
-      - CALIBRATION_METRICS_FILE=/data/calibration_models/overall_metrics.json
-      - PORT=8000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - JOLPICA_API_KEY=${JOLPICA_API_KEY}
+      - FASTF1_CACHE_DIR=/app/cache
+    volumes:
+      - ./backend/cache:/app/cache
+      - ./.env:/app/.env
     networks:
       - f1-network
     restart: unless-stopped
-    volumes:
-      - ./project/f1_prediction_system/final_predictions:/data/final_predictions:ro
-      - ./project/f1_prediction_system/calibration_models:/data/calibration_models:ro
-
-  # PostgreSQL database
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=f1_prediction_market
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./project/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-    networks:
-      - f1-network
-    restart: unless-stopped
-
-  # Redis for caching and rate limiting
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes
-    volumes:
-      - redis-data:/data
-    networks:
-      - f1-network
-    restart: unless-stopped
-
-  # Nginx reverse proxy (optional, for production)
-  nginx-proxy:
-    image: nginx:alpine
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx-proxy.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - frontend
-      - backend
-      - ml-service
-    networks:
-      - f1-network
-    restart: unless-stopped
-
-volumes:
-  postgres-data:
-  redis-data:
-  backend-data:
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
 networks:
   f1-network:
