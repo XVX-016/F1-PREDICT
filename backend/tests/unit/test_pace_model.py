@@ -2,18 +2,23 @@
 Unit tests for the Pace Delta ML Model
 """
 import unittest
+from unittest.mock import MagicMock, patch
 import pandas as pd
 import numpy as np
 import os
 import shutil
-from models.pace_model import PaceModel
+
+# Mock before importing the model that uses get_db
+with patch('database.supabase_client.get_db') as mock_get_db:
+    from models.pace_model import PaceModel
 
 class TestPaceModel(unittest.TestCase):
     def setUp(self):
         self.model_path = "models/test_model.joblib"
-        self.model = PaceModel(model_path=self.model_path)
+        # Mock get_db for the instance
+        with patch('database.supabase_client.get_db') as mock_db:
+            self.model = PaceModel(model_path=self.model_path)
         
-        # Create dummy data
         self.features = [
             "avg_long_run_pace_ms",
             "tire_deg_rate",
@@ -45,9 +50,11 @@ class TestPaceModel(unittest.TestCase):
         self.assertEqual(self.model.model_path, self.model_path)
         self.assertIsNone(self.model.model)
 
-    def test_prediction_without_training_fails(self):
-        with self.assertRaises(Exception): # Assuming it logs error and returns empty DF or raises
-            self.model.predict_for_race("test_race")
+    @patch('database.supabase_client.get_db')
+    def test_prediction_without_training_fails(self, mock_db):
+        # Should log error and return empty DF/none when model is missing
+        res = self.model.predict_for_race("test_race")
+        self.assertTrue(res.empty)
 
 if __name__ == '__main__':
     unittest.main()

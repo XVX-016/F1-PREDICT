@@ -1,40 +1,33 @@
 version: '3.8'
 
 services:
-  # Backend API service (Python FastAPI)
   backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
     ports:
       - "8000:8000"
+    env_file: .env
     environment:
-      - PYTHONUNBUFFERED=1
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
-      - JOLPICA_API_KEY=${JOLPICA_API_KEY}
       - FASTF1_CACHE_DIR=/app/cache
     volumes:
-      - ./backend:/app/backend
       - ./backend/cache:/app/cache
       - backend-data:/app/data
-    working_dir: /app/backend
     command: >
       sh -c "
-        echo 'Waiting for setup to complete...' &&
+        echo '🚀 Initializing Data Pipeline...' &&
         python setup.py &&
-        echo 'Starting FastAPI server...' &&
+        echo '✅ Pipeline Ready. Starting Server...' &&
         uvicorn main:app --host 0.0.0.0 --port 8000
       "
-    networks:
-      - f1-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
-      timeout: 3s
+      timeout: 5s
       retries: 3
-      start_period: 60s
+    networks:
+      - f1-network
 
 volumes:
   backend-data:
