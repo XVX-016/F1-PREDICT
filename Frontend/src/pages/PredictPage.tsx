@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Race, RacePrediction } from '../types/predictions';
-// import { sampleRaces } from '../data/sampleRaces'; // Removed
 import { useRaces, Race as ApiRace } from '../hooks/useApi';
 import F1CarCarousel from '../components/F1CarCarousel';
 import { motion } from 'framer-motion';
-import ModelStatistics from '../components/ModelStatistics';
-import ZoneFeatures from '../components/ZoneFeatures';
 import PastRaceResultsCard from '../components/PastRaceResultsCard';
 import GlassWrapper from '../components/GlassWrapper';
 import PodiumSection from '../components/PodiumSection';
 import DriverList from '../components/DriverList';
-import TrackFeatureCard from '../components/TrackFeatureCard';
 import { api } from '../services/api';
 
 // Enhanced F1 Font Styles
@@ -317,202 +313,7 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
 
 
 
-  // Model statistics: use static data that doesn't change with race selection
-  const modelStats = staticModelStats || {
-    overallAccuracy: 87.5,
-    polePositionAccuracy: 82.3,
-    podiumAccuracy: 89.1,
-    trackTypePerformance: {
-      street: 85.2,
-      highSpeed: 88.7,
-      technical: 86.4,
-      hybrid: 87.9
-    }
-  };
 
-  // Circuit information for current race
-  const getCircuitInfo = (raceName: string) => {
-    const circuitMap: Record<string, { name: string; laps: number; length: number; prediction: string; keyFactors: string[] }> = {
-      'Australian GP': {
-        name: 'Albert Park Circuit',
-        laps: 58,
-        length: 5.278,
-        prediction: 'Technical circuit with multiple overtaking opportunities. Weather can significantly impact tire strategy.',
-        keyFactors: ['Weather', 'Overtaking', 'Tire Strategy', 'Technical']
-      },
-      'Chinese GP': {
-        name: 'Shanghai International Circuit',
-        laps: 56,
-        length: 5.451,
-        prediction: 'Technical circuit with long straights and challenging corners. Tire degradation and strategy will be crucial.',
-        keyFactors: ['Tire Wear', 'Strategy', 'Technical Corners', 'Straight Speed']
-      },
-      'Japanese GP': {
-        name: 'Suzuka International Racing Course',
-        laps: 53,
-        length: 5.807,
-        prediction: 'High-speed technical circuit with the famous 130R corner. Weather and tire strategy will be key factors.',
-        keyFactors: ['High Speed', 'Technical', 'Weather', 'Tire Strategy']
-      },
-      'Bahrain GP': {
-        name: 'Bahrain International Circuit',
-        laps: 57,
-        length: 5.412,
-        prediction: 'Our model predicts overtaking opportunities will be limited with tire degradation playing a crucial role in race strategy.',
-        keyFactors: ['Tire Wear', 'Braking', 'Top Speed', 'Corners']
-      },
-      'Saudi Arabian GP': {
-        name: 'Jeddah Corniche Circuit',
-        laps: 50,
-        length: 6.175,
-        prediction: 'High-speed street circuit with multiple DRS zones. Safety car probability is elevated due to tight barriers.',
-        keyFactors: ['Speed', 'DRS Zones', 'Safety Car', 'Barriers']
-      },
-      'Miami GP': {
-        name: 'Miami International Autodrome',
-        laps: 57,
-        length: 5.412,
-        prediction: 'Street circuit with multiple overtaking opportunities. Tire strategy and track evolution will be crucial.',
-        keyFactors: ['Street Circuit', 'Overtaking', 'Tire Strategy', 'Track Evolution']
-      },
-      'Emilia Romagna GP': {
-        name: 'Autodromo Enzo e Dino Ferrari',
-        laps: 63,
-        length: 4.909,
-        prediction: 'Technical circuit with elevation changes and challenging corners. Tire degradation and strategy will be key.',
-        keyFactors: ['Elevation', 'Technical', 'Tire Wear', 'Strategy']
-      },
-      'Monaco GP': {
-        name: 'Circuit de Monaco',
-        laps: 78,
-        length: 3.337,
-        prediction: 'Ultimate test of precision and concentration. Overtaking is extremely difficult, making qualifying crucial.',
-        keyFactors: ['Precision', 'Qualifying', 'Concentration', 'Strategy']
-      },
-      'Spanish GP': {
-        name: 'Circuit de Barcelona-Catalunya',
-        laps: 66,
-        length: 4.675,
-        prediction: 'Technical circuit with high tire degradation. Strategy and tire management will be crucial for success.',
-        keyFactors: ['Tire Degradation', 'Strategy', 'Technical', 'Endurance']
-      },
-      'Canadian GP': {
-        name: 'Circuit Gilles Villeneuve',
-        laps: 70,
-        length: 4.361,
-        prediction: 'High-speed circuit with multiple overtaking opportunities. Weather and safety cars can change the race.',
-        keyFactors: ['Speed', 'Overtaking', 'Weather', 'Safety Cars']
-      },
-      'Austrian GP': {
-        name: 'Red Bull Ring',
-        laps: 71,
-        length: 4.318,
-        prediction: 'Short, fast circuit with multiple DRS zones. Tire strategy and track position will be crucial.',
-        keyFactors: ['Speed', 'DRS Zones', 'Tire Strategy', 'Track Position']
-      },
-      'British GP': {
-        name: 'Silverstone Circuit',
-        laps: 52,
-        length: 5.891,
-        prediction: 'High-speed circuit with challenging corners. Weather and tire strategy will play a major role.',
-        keyFactors: ['High Speed', 'Weather', 'Tire Strategy', 'Technical']
-      },
-      'Belgian GP': {
-        name: 'Circuit de Spa-Francorchamps',
-        laps: 44,
-        length: 7.004,
-        prediction: 'Longest circuit on the calendar with high speeds and elevation changes. Weather is always a factor.',
-        keyFactors: ['High Speed', 'Elevation', 'Weather', 'Endurance']
-      },
-      'Hungarian GP': {
-        name: 'Hungaroring',
-        laps: 70,
-        length: 4.381,
-        prediction: 'Technical circuit with limited overtaking opportunities. Qualifying position and strategy will be crucial.',
-        keyFactors: ['Technical', 'Qualifying', 'Strategy', 'Overtaking']
-      },
-      'Dutch GP': {
-        name: 'Circuit Zandvoort',
-        laps: 72,
-        length: 4.259,
-        prediction: 'High-speed circuit with banking. Tire degradation and weather changes can create strategic opportunities.',
-        keyFactors: ['Banking', 'Weather', 'Tire Wear', 'Speed']
-      },
-      'Italian GP': {
-        name: 'Autodromo Nazionale di Monza',
-        laps: 53,
-        length: 5.793,
-        prediction: 'Temple of Speed with long straights and high speeds. Engine power and slipstreaming will be crucial.',
-        keyFactors: ['Speed', 'Engine Power', 'Slipstreaming', 'Strategy']
-      },
-      'Azerbaijan GP': {
-        name: 'Baku City Circuit',
-        laps: 51,
-        length: 6.003,
-        prediction: 'Street circuit with long straights and tight corners. Safety cars and strategy will be key factors.',
-        keyFactors: ['Street Circuit', 'Safety Cars', 'Strategy', 'Speed']
-      },
-      'Singapore GP': {
-        name: 'Marina Bay Street Circuit',
-        laps: 61,
-        length: 5.063,
-        prediction: 'Night race on a street circuit with high humidity. Tire degradation and strategy will be crucial.',
-        keyFactors: ['Night Race', 'Humidity', 'Tire Wear', 'Strategy']
-      },
-      'United States GP': {
-        name: 'Circuit of the Americas',
-        laps: 56,
-        length: 5.513,
-        prediction: 'Technical circuit with elevation changes and multiple overtaking opportunities.',
-        keyFactors: ['Elevation', 'Technical', 'Overtaking', 'Strategy']
-      },
-      'Mexican GP': {
-        name: 'Autódromo Hermanos Rodríguez',
-        laps: 71,
-        length: 4.304,
-        prediction: 'High altitude circuit affecting engine performance. Tire strategy and track position will be crucial.',
-        keyFactors: ['Altitude', 'Engine Performance', 'Tire Strategy', 'Track Position']
-      },
-      'Brazilian GP': {
-        name: 'Autódromo José Carlos Pace',
-        laps: 71,
-        length: 4.309,
-        prediction: 'Technical circuit with elevation changes. Weather and tire strategy will play a major role.',
-        keyFactors: ['Elevation', 'Weather', 'Tire Strategy', 'Technical']
-      },
-      'Las Vegas GP': {
-        name: 'Las Vegas Strip Circuit',
-        laps: 50,
-        length: 6.201,
-        prediction: 'Street circuit with long straights and tight corners. Night race conditions will add complexity.',
-        keyFactors: ['Street Circuit', 'Night Race', 'Speed', 'Strategy']
-      },
-      'Qatar GP': {
-        name: 'Lusail International Circuit',
-        laps: 57,
-        length: 5.419,
-        prediction: 'High-speed circuit with challenging corners. Tire degradation and strategy will be key factors.',
-        keyFactors: ['High Speed', 'Tire Wear', 'Strategy', 'Technical']
-      },
-      'Abu Dhabi GP': {
-        name: 'Yas Marina Circuit',
-        laps: 58,
-        length: 5.281,
-        prediction: 'Season finale with day-to-night transition. Strategy and tire management will be crucial.',
-        keyFactors: ['Day-to-Night', 'Strategy', 'Tire Management', 'Technical']
-      }
-    };
-
-    return circuitMap[raceName] || {
-      name: 'Circuit Information',
-      laps: 50,
-      length: 5.0,
-      prediction: 'AI-powered predictions based on historical data and current form.',
-      keyFactors: ['Performance', 'Strategy', 'Conditions', 'History']
-    };
-  };
-
-  const circuitInfo = getCircuitInfo(currentRace.name);
 
 
 
@@ -601,25 +402,7 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
           <div className="space-y-10">
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {(() => {
-                const circuitInfo = getCircuitInfo(currentRace.name);
-                const circuitFeatures = {
-                  track: circuitInfo.name,
-                  number_of_laps: circuitInfo.laps,
-                  circuit_length_km: circuitInfo.length,
-                  features: circuitInfo.keyFactors.map(f => `${f}: High impact`)
-                };
 
-                return (
-                  <TrackFeatureCard
-                    raceName={currentRace.name}
-                    circuitName={circuitFeatures.track}
-                    laps={circuitFeatures.number_of_laps}
-                    lengthKm={circuitFeatures.circuit_length_km}
-                    features={circuitFeatures.features}
-                  />
-                );
-              })()}
 
               {/* Predicted Podium */}
               <div className="mb-12">
@@ -648,15 +431,7 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
                 </GlassWrapper>
               )}
 
-              <GlassWrapper className="p-8 mb-12">
-                {modelStats ? (
-                  <ModelStatistics stats={modelStats} />
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-400">Loading model statistics...</p>
-                  </div>
-                )}
-              </GlassWrapper>
+
 
               {/* Past Race Results Card */}
               <PastRaceResultsCard className="mb-12" />
@@ -670,10 +445,7 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
           </GlassWrapper>
         )}
 
-        {/* Zone Features at bottom */}
-        <div className="mt-8">
-          <ZoneFeatures />
-        </div>
+
       </div>
     </div>
   );

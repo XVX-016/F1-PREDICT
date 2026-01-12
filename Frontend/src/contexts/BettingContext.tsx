@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useContext,
   useEffect,
@@ -10,8 +10,7 @@ import {
   UserAccount,
   BettingMarket,
   UserBet,
-  Transaction,
-  MarketFilters
+  Transaction
 } from '../types/betting';
 
 import { bettingApi } from '../services/bettingApi';
@@ -51,7 +50,7 @@ export const useBetting = () => {
 };
 
 export const BettingProvider = ({ children }: { children: ReactNode }) => {
-  const { user: authUser, token } = useAuth(); // Adapted to existing AuthContext structure
+  const { user: authUser, session } = useAuth(); // Adapted to existing AuthContext structure
   const [user, setUser] = useState<UserAccount | null>(null);
   const [bets, setBets] = useState<UserBet[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -61,8 +60,8 @@ export const BettingProvider = ({ children }: { children: ReactNode }) => {
 
   // ---- Fetch Everything Needed for Betting UI ----
   const refreshAll = async () => {
-    // Rely on token/authUser presence
-    if (!token || !authUser) {
+    // Rely on session/authUser presence
+    if (!session || !authUser) {
       setUser(null);
       setBets([]);
       setTransactions([]);
@@ -114,7 +113,7 @@ export const BettingProvider = ({ children }: { children: ReactNode }) => {
     optionId: string,
     amount: number
   ) => {
-    if (!token) {
+    if (!session) {
       throw new Error('Not authenticated');
     }
 
@@ -140,17 +139,17 @@ export const BettingProvider = ({ children }: { children: ReactNode }) => {
   // ---- Auto Refresh On Login / Logout ----
   useEffect(() => {
     refreshAll();
-  }, [token]);
+  }, [session]);
 
   // ---- Poll Markets (Optional) ----
   useEffect(() => {
     const id = setInterval(() => {
-      if (token) {
+      if (session) {
         bettingApi.getMarkets().then(setMarkets).catch(() => { });
       }
     }, 5 * 60 * 1000); // 5 min
     return () => clearInterval(id);
-  }, [token]);
+  }, [session]);
 
   const activeMarkets = markets.filter(m => m.status === 'open' || m.status === 'locked');
   const settledMarkets = markets.filter(m => m.status === 'settled');

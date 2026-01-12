@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, 
-  Target, 
+import {
+  TrendingUp,
+  Target,
   Trophy,
   AlertCircle,
-  CheckCircle,
   XCircle,
   Search,
-  Zap,
   Shield
 } from 'lucide-react';
 import { useBetting } from '../contexts/BettingContext';
@@ -34,15 +32,15 @@ interface BettingPageProps {
 
 export default function BettingPage({ onPageChange }: BettingPageProps) {
   const {
-    currentUser,
+    user,
     markets,
     activeMarkets,
     settledMarkets,
-    marketsLoading,
+    loading,
     error,
     clearError
   } = useBetting();
-  
+
   const { isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
 
@@ -70,29 +68,25 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
 
     // Apply category filter
     if (selectedCategory !== 'ALL') {
-      filtered = filtered.filter(market => market.category === selectedCategory);
+      filtered = filtered.filter(market => market.market_type === selectedCategory.toLowerCase());
     }
 
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(market =>
-        market.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        market.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        market.raceName.toLowerCase().includes(searchTerm.toLowerCase())
+        (market.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (market.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        market.race_id.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Apply other filters
-    if (filters.isActive !== undefined) {
-      filtered = filtered.filter(market => market.isActive === filters.isActive);
+    if (filters.activeOnly) {
+      filtered = filtered.filter(market => market.status === 'open');
     }
 
-    if (filters.isSettled !== undefined) {
-      filtered = filtered.filter(market => market.isSettled === filters.isSettled);
-    }
-
-    if (filters.minVolume) {
-      filtered = filtered.filter(market => market.totalVolume >= filters.minVolume!);
+    if (filters.category && filters.category !== 'ALL') {
+      filtered = filtered.filter(market => market.market_type === filters.category!.toLowerCase());
     }
 
     setFilteredMarkets(filtered);
@@ -106,7 +100,7 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
       }
       return;
     }
-    
+
     setSelectedMarket(market);
     setShowBetModal(true);
   };
@@ -143,14 +137,10 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
     { value: 'ALL', label: 'All Markets', icon: Target },
     { value: MarketCategory.RACE_WINNER, label: 'Race Winners', icon: Trophy },
     { value: MarketCategory.PODIUM_FINISH, label: 'Podium Finishes', icon: TrendingUp },
-    { value: MarketCategory.SAFETY_CAR, label: 'Safety Car', icon: AlertCircle },
-    { value: MarketCategory.DNF_COUNT, label: 'DNF Count', icon: XCircle },
-    { value: MarketCategory.POLE_POSITION, label: 'Pole Position', icon: CheckCircle },
-    { value: MarketCategory.FASTEST_LAP, label: 'Fastest Lap', icon: Zap },
-    { value: MarketCategory.TEAM_PODIUM, label: 'Team Podium', icon: Shield }
+    { value: MarketCategory.DRIVER_HEAD_TO_HEAD, label: 'Driver H2H', icon: Shield }
   ];
 
-  if (marketsLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen relative">
         <F1CarCarousel />
@@ -168,7 +158,7 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
     <div className="min-h-screen relative">
       {/* F1 Car Carousel Background */}
       <F1CarCarousel />
-      
+
       {/* Content */}
       <div className="relative z-10 pt-24">
         {/* Hero Section - simplified (no large card) */}
@@ -181,7 +171,7 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
               <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
                 Bet with 1Predic Coins. Settle after the chequered flag.
               </p>
-              
+
               {/* Removed countdown banner per request */}
 
               {/* CTA Button */}
@@ -310,11 +300,10 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setSelectedCategory(category.value as MarketCategory | 'ALL')}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 backdrop-blur-md ${
-                        selectedCategory === category.value
-                          ? 'bg-white/10 text-white shadow-lg shadow-red-500/25 border border-white/20'
-                          : 'bg-white/5 text-gray-300 hover:bg-white/15 hover:text-white border border-white/10 hover:border-white/20'
-                      }`}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 backdrop-blur-md ${selectedCategory === category.value
+                        ? 'bg-white/10 text-white shadow-lg shadow-red-500/25 border border-white/20'
+                        : 'bg-white/5 text-gray-300 hover:bg-white/15 hover:text-white border border-white/10 hover:border-white/20'
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       <span>{category.label}</span>
@@ -343,18 +332,17 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
                     {activeMarkets.length} markets
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-stretch content-stretch">
                   {filteredMarkets
                     .filter(market => market.isActive)
                     .map((market) => (
-                      <div className="min-w-0 h-full flex">
+                      <div key={market.id} className="min-w-0 h-full flex">
                         <MarketCard
-                        key={market.id}
-                        market={market}
-                        onClick={() => handleMarketClick(market)}
-                        onAddToBetslip={handleAddToBetslip}
-                        userBets={currentUser ? [] : []} // TODO: Add user bets
+                          market={market}
+                          onClick={() => handleMarketClick(market)}
+                          onAddToBetslip={handleAddToBetslip}
+                          userBets={user ? [] : []} // TODO: Add user bets
                         />
                       </div>
                     ))}
@@ -372,18 +360,17 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
                     {settledMarkets.length} markets
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-stretch content-stretch">
                   {filteredMarkets
                     .filter(market => market.isSettled)
                     .map((market) => (
-                      <div className="min-w-0 h-full flex">
+                      <div key={market.id} className="min-w-0 h-full flex">
                         <MarketCard
-                        key={market.id}
-                        market={market}
-                        onClick={() => handleMarketClick(market)}
-                        onAddToBetslip={handleAddToBetslip}
-                        userBets={currentUser ? [] : []} // TODO: Add user bets
+                          market={market}
+                          onClick={() => handleMarketClick(market)}
+                          onAddToBetslip={handleAddToBetslip}
+                          userBets={user ? [] : []} // TODO: Add user bets
                         />
                       </div>
                     ))}
@@ -392,7 +379,7 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
             )}
 
             {/* No Markets */}
-            {filteredMarkets.length === 0 && !marketsLoading && (
+            {filteredMarkets.length === 0 && !loading && (
               <div className="text-center py-12">
                 <Target className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-400 mb-2">No markets found</h3>
