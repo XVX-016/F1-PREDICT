@@ -2,7 +2,7 @@ import React, { useState, lazy, Suspense, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import F1CarCarousel from './components/F1CarCarousel';
 import LoadingSpinner from './components/LoadingSpinner';
-import { AuthProvider } from './contexts/AuthContext';
+
 import { BettingProvider } from './contexts/BettingContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { initializeJolpicaApi } from './api/jolpica';
@@ -53,7 +53,7 @@ const lazyWithTimeout = (importFn: () => Promise<any>, timeout = 10000) => {
   return lazy(() => {
     return Promise.race([
       importFn(),
-      new Promise((_, reject) => 
+      new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Page loading timeout')), timeout)
       )
     ]);
@@ -160,19 +160,17 @@ function App() {
   };
 
   return (
-    <AuthProvider>
-      <BettingProvider>
-        <NotificationProvider>
-          {/* Fixed background car carousel, always behind all content except on driver and teams pages */}
-          {currentPage !== 'driver' && currentPage !== 'teams' && <F1CarCarousel />}
-          {/* TODO: Implement navbar auto-hide on scroll */}
-          <div className="min-h-screen text-white relative z-50">
-            <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-            {renderPage()}
-          </div>
-        </NotificationProvider>
-      </BettingProvider>
-    </AuthProvider>
+    <BettingProvider>
+      <NotificationProvider>
+        {/* Fixed background car carousel, always behind all content except on driver and teams pages */}
+        {currentPage !== 'driver' && currentPage !== 'teams' && <F1CarCarousel />}
+        {/* TODO: Implement navbar auto-hide on scroll */}
+        <div className="min-h-screen text-white relative z-50">
+          <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+          {renderPage()}
+        </div>
+      </NotificationProvider>
+    </BettingProvider>
   );
 }
 

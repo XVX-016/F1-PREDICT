@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from api.races import router as races_router
 from api.drivers import router as drivers_router
+from api.constructors import router as constructors_router
 from api.live import router as live_router
 
 # Configure logging
@@ -33,7 +34,11 @@ app.add_middleware(
 # Include routers
 app.include_router(races_router)
 app.include_router(drivers_router)
+app.include_router(constructors_router)
 app.include_router(live_router)
+
+app.include_router(markets_router)
+app.include_router(user_router)
 
 @app.get("/health")
 async def health_check():

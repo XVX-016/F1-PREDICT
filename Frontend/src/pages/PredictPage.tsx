@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Race, RacePrediction } from '../types/predictions';
-import { sampleRaces } from '../data/sampleRaces';
+// import { sampleRaces } from '../data/sampleRaces'; // Removed
+import { useRaces, Race as ApiRace } from '../hooks/useApi';
 import F1CarCarousel from '../components/F1CarCarousel';
 import { motion } from 'framer-motion';
 import ModelStatistics from '../components/ModelStatistics';
@@ -10,9 +11,7 @@ import GlassWrapper from '../components/GlassWrapper';
 import PodiumSection from '../components/PodiumSection';
 import DriverList from '../components/DriverList';
 import TrackFeatureCard from '../components/TrackFeatureCard';
-import { enhancedCalibrationService } from '../services/enhancedCalibration';
 import { api } from '../services/api';
-import ResultsService from '../services/ResultsService';
 
 // Enhanced F1 Font Styles
 const f1FontStyle = {
@@ -28,10 +27,6 @@ const f1FontStyleLight = {
   letterSpacing: '0.05em',
   textTransform: 'uppercase' as const
 };
-
-
-
-
 
 interface PredictPageProps {
   raceData?: {
@@ -50,9 +45,10 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    initializePage();
+  // Use API hook
+  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2025);
 
+  useEffect(() => {
     // Add body class to prevent scrollbars
     document.body.classList.add('predict-page-active');
 
@@ -62,24 +58,22 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (apiLoading) return;
+    if (apiError) {
+      setError(apiError);
+      setLoading(false);
+      return;
+    }
 
+    initializePage();
+  }, [apiRaces, apiLoading, apiError]);
 
+  // Debug: Log driver count when prediction changes
   // Debug: Log driver count when prediction changes
   useEffect(() => {
     if (prediction?.all) {
       console.log(`🔍 Driver count: ${prediction.all.length}/20 drivers`);
-
-      // Check for missing 2025 drivers
-      const all2025Drivers = enhancedCalibrationService.get2025Drivers();
-      const missingDrivers = all2025Drivers.filter(driver =>
-        !prediction.all.some(d => d.driverName === driver)
-      );
-
-      if (missingDrivers.length > 0) {
-        console.log(`⚠️ Missing drivers:`, missingDrivers);
-      } else {
-        console.log(`✅ All 20 drivers present`);
-      }
     }
   }, [prediction]);
 
@@ -101,14 +95,28 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
         }
       });
 
-      console.log('📅 Using 2025 F1 calendar...');
-      const now = new Date();
-      const allRacesSorted = sampleRaces
-        .slice()
+      console.log('📅 Using 2025 F1 calendar from API...');
+
+      const mappedRaces: Race[] = apiRaces.map((r: ApiRace) => ({
+        id: r.id,
+        round: r.round,
+        name: r.name,
+        circuit: r.circuit,
+        city: r.city,
+        country: r.country,
+        startDate: r.race_date, // Using race_date directly
+        endDate: r.race_date,
+        timezone: "UTC", // Default to UTC as API returns UTC
+        has_sprint: !!r.sprint_time,
+        status: "upcoming" // TODO: proper status calculation if needed
+      }));
+
+      const allRacesSorted = mappedRaces
         .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
       setAvailableRaces(allRacesSorted);
 
+      const now = new Date();
       let selectedRace = allRacesSorted.find(race => new Date(race.startDate) > now) || allRacesSorted[0];
 
       if (raceData?.raceName) {
@@ -120,14 +128,19 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
         if (requestedRace) selectedRace = requestedRace;
       }
 
-      setCurrentRace(selectedRace);
-      await loadPredictions(selectedRace);
+      if (selectedRace) {
+        setCurrentRace(selectedRace);
+        await loadPredictions(selectedRace);
+      } else {
+        // Handle case where no races are found?
+        // Keep loading false
+      }
 
     } catch (err) {
       console.error('Error initializing page:', err);
       setError('Failed to initialize page');
     } finally {
-      setLoading(false);
+      if (apiRaces.length > 0) setLoading(false);
     }
   };
 
@@ -164,7 +177,7 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
         return {
           driverId,
           driverName,
-          team: enhancedCalibrationService.getDriverTeam(driverName),
+          team: 'F1 Team', // TODO: Fetch from backend
           winProbPct: probs.win_prob * 100,
           podiumProbPct: probs.podium_prob * 100,
           odds: marketEntry?.odds,
@@ -196,7 +209,7 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
       console.log('✅ Predictions loaded and mapped successfully');
 
       // Fire and forget: warm last race results
-      ResultsService.getLastRaceResult().catch(() => { });
+      // (ResultsService removed)
 
     } catch (err) {
       console.error('Error loading predictions:', err);
