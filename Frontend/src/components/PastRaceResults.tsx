@@ -18,6 +18,14 @@ export default function PastRaceResults({ className = '' }: PastRaceResultsProps
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const nextRace = () => {
+    setCurrentIndex((prev) => (prev + 1) % raceResults.length);
+  };
+
+  const prevRace = () => {
+    setCurrentIndex((prev) => (prev - 1 + raceResults.length) % raceResults.length);
+  };
+
   console.log('🔍 PastRaceResults: Component rendered, loading:', loading, 'raceResults:', raceResults.length);
 
   useEffect(() => {
@@ -215,7 +223,7 @@ export default function PastRaceResults({ className = '' }: PastRaceResultsProps
                 </h4>
 
                 <div className="space-y-3">
-                  {currentRace.podiumDriverIds.map((driverId, index) => {
+                  {currentRace.podiumDriverIds.map((driverId: string, index: number) => {
                     if (!driverId) return null;
 
                     const position = index + 1;

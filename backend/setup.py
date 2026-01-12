@@ -134,9 +134,9 @@ def apply_calibration():
     """Apply offline probability calibration"""
     try:
         logger.info("Applying offline probability calibration...")
-        from models.calibration import ProbabilityCalibrator
+        from calibration.apply_isotonic import IsotonicCalibrator
         
-        calibrator = ProbabilityCalibrator()
+        calibrator = IsotonicCalibrator()
         # Calibration is applied offline after each race
         # This is a placeholder for the calibration process
         
