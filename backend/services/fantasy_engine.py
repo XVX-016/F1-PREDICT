@@ -1,84 +1,46 @@
 """
-Fantasy Scoring Engine
-Lower probability → higher fantasy points reward
+Fantasy Engine - Phase 5
+Calculates fantasy points for race outcomes.
+Includes probability-weighted multipliers to reward picking underdogs.
 """
-from typing import Dict, Optional
 import logging
+from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
 class FantasyEngine:
-    """Fantasy points calculation engine"""
-    
-    # Base points for finishing positions
-    BASE_POINTS = {
-        1: 100,
-        2: 75,
-        3: 60,
-        4: 50,
-        5: 40,
-        6: 30,
-        7: 25,
-        8: 20,
-        9: 15,
-        10: 10
-    }
-    
-    def calculate_fantasy_points(
-        self,
-        probability: float,
-        finish_position: int
-    ) -> float:
+    def __init__(self):
+        # Base points for finishing positions
+        self.base_points = {
+            1: 100,
+            2: 75,
+            3: 60,
+            4: 50,
+            5: 45,
+            6: 40,
+            7: 35,
+            8: 30,
+            9: 25,
+            10: 20
+        }
+        self.default_points = 10
+
+    def calculate_points(self, position: int, win_prob: float) -> float:
         """
-        Calculate fantasy points based on probability and finish position
+        Calculate points awarded for a specific finishing position.
         
-        Args:
-            probability: Win probability (0-1)
-            finish_position: Actual finishing position (1-20)
-        
-        Returns:
-            Fantasy points (rounded to 2 decimals)
+        Multiplier: max(1, 1/prob) - rewards low-probability outcomes.
         """
-        # Base reward for position
-        base_reward = self.BASE_POINTS.get(finish_position, 5)
+        base = self.base_points.get(position, self.default_points)
         
-        # Multiplier based on probability (lower prob = higher reward)
-        # Cap probability at 0.01 to avoid division by zero
-        prob = max(probability, 0.01)
-        multiplier = max(1.0, (1 / prob))
+        # Avoid division by zero and cap multiplier for saner leaderboard
+        safe_prob = max(win_prob, 0.01)
+        multiplier = max(1.0, 1.0 / safe_prob)
+        multiplier = min(multiplier, 20.0) # Cap at 20x
         
-        # Calculate total points
-        total_points = base_reward * multiplier
+        total_points = base * multiplier
         
         return round(total_points, 2)
-    
-    def calculate_race_points(
-        self,
-        probabilities: Dict[str, float],
-        results: Dict[str, int]
-    ) -> Dict[str, float]:
-        """
-        Calculate fantasy points for all drivers in a race
-        
-        Args:
-            probabilities: Dict mapping driver_id to win_prob
-            results: Dict mapping driver_id to finish_position
-        
-        Returns:
-            Dict mapping driver_id to fantasy_points
-        """
-        points = {}
-        
-        for driver_id, prob in probabilities.items():
-            position = results.get(driver_id, 20)  # Default to last if not found
-            points[driver_id] = self.calculate_fantasy_points(prob, position)
-        
-        return points
 
 # Global instance
 fantasy_engine = FantasyEngine()
-
-
-
-
-

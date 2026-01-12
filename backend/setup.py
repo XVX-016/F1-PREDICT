@@ -23,8 +23,7 @@ def check_env_vars():
     required = [
         "SUPABASE_URL",
         "SUPABASE_SERVICE_KEY",
-        "FASTF1_CACHE_DIR",
-        "JOLPICA_API_KEY"
+        "FASTF1_CACHE_DIR"
     ]
     missing = [var for var in required if not os.getenv(var)]
     if missing:
@@ -33,7 +32,6 @@ def check_env_vars():
         logger.error("  SUPABASE_URL=<your-supabase-url>")
         logger.error("  SUPABASE_SERVICE_KEY=<supabase-service-key>")
         logger.error("  FASTF1_CACHE_DIR=./cache")
-        logger.error("  JOLPICA_API_KEY=<jolpica-key>")
         sys.exit(1)
     logger.info("All required environment variables are set")
 
@@ -47,16 +45,14 @@ def fetch_jolpica_data():
     """Fetch structured F1 data from Jolpica API"""
     try:
         logger.info("Fetching Jolpica structured data...")
-        from data.jolpica_client import JolpicaClient
-        
-        client = JolpicaClient()
+        from data.jolpica_client import jolpica_client
         
         # Fetch calendar
-        calendar = client.fetch_calendar()
+        calendar = jolpica_client.get_calendar()
         logger.info(f"Fetched {len(calendar)} races from calendar")
         
         # Fetch drivers
-        drivers = client.fetch_drivers()
+        drivers = jolpica_client.get_drivers()
         logger.info(f"Fetched {len(drivers)} drivers")
         
         logger.info("Jolpica data fetch complete")
@@ -69,18 +65,17 @@ def build_telemetry_features():
     """Extract aggregated telemetry features from FastF1"""
     try:
         logger.info("Building FastF1 telemetry features (FP2 preferred, FP3 fallback)...")
-        from features.build_telemetry_features import extract_telemetry_features
-        from data.jolpica_client import JolpicaClient
+        from features.fastf1_features import extract_features
+        from data.jolpica_client import jolpica_client
         
-        client = JolpicaClient()
-        calendar = client.fetch_calendar()
+        calendar = jolpica_client.get_calendar()
         
         # Extract features for upcoming races
         for race in calendar[:3]:  # Process first 3 races
             season = race.get("season", 2025)
             round_num = race.get("round", 1)
             logger.info(f"Extracting features for {season} round {round_num}")
-            extract_telemetry_features(season, round_num)
+            extract_features(season, round_num)
         
         logger.info("Telemetry feature extraction complete")
         return True
@@ -95,34 +90,39 @@ def train_pace_model():
         from models.pace_model import PaceModel
         
         model = PaceModel()
-        model.train()
+        model.train_on_history()
         
         logger.info("ML pace-delta model training complete")
         return True
     except Exception as e:
         logger.error(f"Error training pace model: {e}")
-        logger.warning("Continuing without trained model - you can train later")
         return False
 
 def run_monte_carlo_simulations():
     """Run Monte Carlo simulations for upcoming races"""
     try:
         logger.info("Running Monte Carlo simulations for upcoming races...")
-        from simulation.monte_carlo import MonteCarloEngine
-        from data.jolpica_client import JolpicaClient
-        from services.probability_engine import probability_engine
+        from simulation.monte_carlo import run_monte_carlo
+        from data.jolpica_client import jolpica_client
         
-        client = JolpicaClient()
-        calendar = client.fetch_calendar()
+        calendar = jolpica_client.get_calendar()
         
         # Run simulations for first 3 upcoming races
         for race in calendar[:3]:
-            race_id = race.get("id") or race.get("circuit_id")
-            logger.info(f"Running simulations for race: {race_id}")
+            # Use season and round to find race_id if needed, 
+            # or use internal circuit_id
+            season = race.get("season", 2025)
+            round_num = race.get("round", 1)
             
-            # Generate probabilities using probability engine
-            probabilities = probability_engine.generate_probabilities(race_id)
-            logger.info(f"Generated probabilities for {len(probabilities)} drivers")
+            # Fetch race_id from DB
+            from database.supabase_client import get_db
+            db = get_db()
+            res = db.table("races").select("id").match({"season": season, "round": round_num}).execute()
+            
+            if res.data:
+                race_id = res.data[0]["id"]
+                logger.info(f"Running simulations for race: {race_id} ({season} R{round_num})")
+                run_monte_carlo(race_id)
         
         logger.info("Monte Carlo simulations complete")
         return True

@@ -28,9 +28,9 @@ class JolpicaClient:
             logger.warning("Jolpica API key not found")
     
     def _get_headers(self) -> Dict[str, str]:
-        """Get authorization headers"""
+        """Get authorization headers if key is available"""
         if not self.api_key:
-            raise ValueError("Jolpica API key not configured")
+            return {}
         return {"Authorization": f"Bearer {self.api_key}"}
     
     def get_calendar(self, season: int = 2025) -> List[Dict[str, Any]]:

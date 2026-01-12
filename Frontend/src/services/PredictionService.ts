@@ -116,7 +116,7 @@ class PredictionService {
 
   private async getRaceById(raceId: string): Promise<Race | null> {
     try {
-      // Use sample data instead of Firebase
+      // Use sample data from local source
       const race = sampleRaces.find(r => r.id === raceId);
       return race || null;
     } catch (error) {

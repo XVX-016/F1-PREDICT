@@ -1,109 +1,89 @@
 """
-Isotonic Calibration - Inference Only
-Loads pre-trained isotonic calibrator and applies to model probabilities.
-No fitting. Inference only.
-Fails gracefully if calibrator missing.
+Probability Calibration - Phase 4
+Fits and applies isotonic regression to simulation probabilities.
+Ensures Win/Podium/Top10 probabilities are statistically reliable.
 """
-import pickle
 import numpy as np
-from typing import Dict, List, Optional
-from pathlib import Path
+import pandas as pd
 import logging
+import joblib
+import os
+from sklearn.isotonic import IsotonicRegression
+from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)
 
-class IsotonicCalibrator:
-    """
-    Loads and applies isotonic regression calibrator.
-    Inference only - no training logic.
-    """
-    
-    def __init__(self, calibrator_path: Optional[str] = None):
+class ProbabilityCalibrator:
+    def __init__(self, model_dir: str = "models/calibration"):
+        self.model_dir = model_dir
+        self.db = get_db()
+        self.calibrators = {} # type -> IsotonicRegression
+        os.makedirs(self.model_dir, exist_ok=True)
+
+    def fit_from_history(self):
         """
-        Initialize calibrator
-        
-        Args:
-            calibrator_path: Path to saved isotonic calibrator pickle file
+        Fit isotonic regression using historical data.
+        Compares win_prob vs actual win (binary), podium_prob vs podium (binary), etc.
         """
-        self.calibrator_path = Path(calibrator_path) if calibrator_path else Path("models/isotonic_calibrator.pkl")
-        self.calibrator = None
-        self.load_calibrator()
-    
-    def load_calibrator(self) -> bool:
-        """
-        Load isotonic calibrator from file.
-        Fails gracefully if file not found.
-        
-        Returns:
-            True if loaded successfully, False otherwise
-        """
-        try:
-            if not self.calibrator_path.exists():
-                logger.warning(f"Calibrator not found at {self.calibrator_path}. Calibration will be skipped.")
-                return False
-            
-            with open(self.calibrator_path, 'rb') as f:
-                self.calibrator = pickle.load(f)
-            
-            logger.info(f"Isotonic calibrator loaded from {self.calibrator_path}")
-            return True
-            
-        except Exception as e:
-            logger.warning(f"Failed to load calibrator: {e}. Calibration will be skipped.")
-            return False
-    
-    def apply(
-        self,
-        probabilities: np.ndarray
-    ) -> np.ndarray:
-        """
-        Apply isotonic calibration to probabilities.
-        Returns original probabilities if calibrator not loaded.
-        
-        Args:
-            probabilities: Array of predicted probabilities (shape: [n_samples] or [n_samples, n_classes])
-            
-        Returns:
-            Calibrated probabilities with same shape as input
-        """
-        if self.calibrator is None:
-            logger.debug("No calibrator loaded. Returning original probabilities.")
-            return probabilities
+        logger.info("📈 Fitting probability calibrators from history...")
         
         try:
-            # Ensure probabilities are in correct format
-            probs = np.asarray(probabilities)
-            original_shape = probs.shape
+            # 1. Fetch historical probabilities and actual results
+            # This join assumes we have a way to match probabilities to outcomes
+            # For this rehaul, we'll fetch from outcome_probabilities
+            res = self.db.table("outcome_probabilities").select("*").execute()
+            if not res.data:
+                logger.warning("No historical probabilities found for calibration")
+                return
+                
+            df = pd.DataFrame(res.data)
             
-            # Flatten if needed for calibration
-            if probs.ndim > 1:
-                probs_flat = probs.flatten()
-            else:
-                probs_flat = probs.copy()
+            # TODO: Fetch actual outcomes from a 'race_results' table or Jolpica
+            # For now, we'll use a placeholder logic for training
+            # In a real scenario, we'd have 'actual_win' (0/1), 'actual_podium' (0/1), etc.
+            if "actual_win" not in df.columns:
+                logger.warning("Actual outcomes missing in database. Calibration fit skipped.")
+                # We'll create dummy data for the sake of the script structure if needed, 
+                # but better to fail gracefully.
+                return
+
+            for prob_type in ["win_prob", "podium_prob", "top10_prob"]:
+                target = f"actual_{prob_type.replace('_prob', '')}"
+                
+                ir = IsotonicRegression(out_of_bounds='clip')
+                ir.fit(df[prob_type], df[target])
+                
+                self.calibrators[prob_type] = ir
+                joblib.dump(ir, os.path.join(self.model_dir, f"{prob_type}_calibrator.joblib"))
             
-            # Clip probabilities to valid range
-            probs_flat = np.clip(probs_flat, 0.0, 1.0)
-            
-            # Apply calibration
-            calibrated = self.calibrator.predict(probs_flat)
-            
-            # Ensure output is in valid range
-            calibrated = np.clip(calibrated, 0.0, 1.0)
-            
-            # Reshape to original shape
-            if original_shape != calibrated.shape:
-                calibrated = calibrated.reshape(original_shape)
-            
-            return calibrated
+            logger.info("✅ Calibration models fitted and saved")
             
         except Exception as e:
-            logger.error(f"Error applying calibration: {e}. Returning original probabilities.")
-            return probabilities
-    
-    def is_available(self) -> bool:
-        """Check if calibrator is loaded and available"""
-        return self.calibrator is not None
+            logger.error(f"❌ Calibration fit failed: {e}")
 
-# Global instance
-isotonic_calibrator = IsotonicCalibrator()
+    def apply_calibration(self, results: List[Dict]) -> List[Dict]:
+        """
+        Apply loaded calibrators to a list of simulation results.
+        """
+        logger.info("🧪 Applying calibration to simulation results...")
+        
+        calibrated_results = []
+        for res in results:
+            new_res = res.copy()
+            for prob_type in ["win_prob", "podium_prob", "top10_prob"]:
+                model_path = os.path.join(self.model_dir, f"{prob_type}_calibrator.joblib")
+                if os.path.exists(model_path):
+                    ir = joblib.load(model_path)
+                    # Apply calibration
+                    prob = np.array([res[prob_type]])
+                    calibrated_prob = float(ir.transform(prob)[0])
+                    new_res[prob_type] = calibrated_prob
+                    
+            calibrated_results.append(new_res)
+            
+        return calibrated_results
 
+# Global wrapper
+def calibrate_probabilities(results: List[Dict]) -> List[Dict]:
+    calibrator = ProbabilityCalibrator()
+    return calibrator.apply_calibration(results)
