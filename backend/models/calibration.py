@@ -6,7 +6,7 @@ Run after each race completes (before next event)
 """
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 import logging
 
 logger = logging.getLogger(__name__)

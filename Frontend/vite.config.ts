@@ -26,7 +26,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/ml': {
-        target: 'http://localhost:8000',
+        target: process.env.BACKEND_URL || 'http://localhost:8000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/ml/, '')
       },
@@ -38,7 +38,7 @@ export default defineConfig({
       },
       // Proxy local Fast-F1 service
       '/fastf1': {
-        target: 'http://localhost:8000',
+        target: process.env.BACKEND_URL || 'http://localhost:8000',
         changeOrigin: true,
         secure: false
       }

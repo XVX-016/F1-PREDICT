@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Trophy, Calendar, MapPin } from 'lucide-react';
-import RaceResults2025Service, { RaceResult2025 } from '../services/2025RaceResultsService';
+import { getArchiveResults } from '../api/jolpica';
 
 interface PastRaceResultsProps {
   className?: string;
 }
 
+// Placeholder interface
+interface RaceResult2025 {
+  [key: string]: any;
+}
 
 
 export default function PastRaceResults({ className = '' }: PastRaceResultsProps) {
@@ -20,176 +24,30 @@ export default function PastRaceResults({ className = '' }: PastRaceResultsProps
     const fetchRecentResults = async () => {
       try {
         setLoading(true);
-        console.log('🔍 PastRaceResults: Starting to fetch 2025 race results...');
-        
-        const service = RaceResults2025Service.getInstance();
-        const results = await service.get2025RaceResults();
-        
-        console.log('🔍 PastRaceResults: Received results:', results);
-        console.log('🔍 PastRaceResults: Results count:', results.length);
-        
-        // Take all available races (up to 15 races)
-        const recentResults = results.slice(0, 15);
-        console.log('🔍 PastRaceResults: Recent results:', recentResults);
-        setRaceResults(recentResults);
+        console.log('🔍 PastRaceResults: Fetching 2025 results from Jolpica...');
+
+        // Fetch 2025 results
+        const response = await getArchiveResults(2025);
+        const races = response?.MRData?.RaceTable?.Races || [];
+
+        const mappedResults: RaceResult2025[] = races.slice(0, 15).map((race: any) => ({
+          round: parseInt(race.round),
+          season: race.season,
+          raceName: race.raceName,
+          date: race.date,
+          // Jolpica/Ergast structure for results
+          poleDriverId: race.Results?.[0]?.grid === "1" ? race.Results[0].Driver.driverId : undefined, // Approximation if grid data missing
+          podiumDriverIds: race.Results?.slice(0, 3).map((r: any) => r.Driver.driverId) || [],
+          circuitName: race.Circuit.circuitName,
+          country: race.Circuit.Location.country
+        })).reverse(); // Show most recent first
+
+        console.log(`🔍 PastRaceResults: Mapped ${mappedResults.length} races`);
+        setRaceResults(mappedResults);
+
       } catch (error) {
-        console.warn('Failed to fetch 2025 race results:', error);
-        
-        // Fallback to sample data for 2025 season
-        const sampleResults: RaceResult2025[] = [
-          {
-            round: 1,
-            season: '2025',
-            raceName: 'Australian Grand Prix',
-            date: '2025-03-16',
-            poleDriverId: 'landonorris',
-            podiumDriverIds: ['landonorris', 'maxverstappen', 'georgerussell'],
-            circuitName: 'Albert Park Circuit',
-            country: 'Australia'
-          },
-          {
-            round: 2,
-            season: '2025',
-            raceName: 'Chinese Grand Prix',
-            date: '2025-03-23',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'landonorris', 'georgerussell'],
-            circuitName: 'Shanghai International Circuit',
-            country: 'China'
-          },
-          {
-            round: 3,
-            season: '2025',
-            raceName: 'Japanese Grand Prix',
-            date: '2025-04-06',
-            poleDriverId: 'maxverstappen',
-            podiumDriverIds: ['maxverstappen', 'landonorris', 'oscarpiastri'],
-            circuitName: 'Suzuka International Racing Course',
-            country: 'Japan'
-          },
-          {
-            round: 4,
-            season: '2025',
-            raceName: 'Bahrain Grand Prix',
-            date: '2025-03-02',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'georgerussell', 'landonorris'],
-            circuitName: 'Bahrain International Circuit',
-            country: 'Bahrain'
-          },
-          {
-            round: 5,
-            season: '2025',
-            raceName: 'Saudi Arabian Grand Prix',
-            date: '2025-03-09',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'maxverstappen', 'charlesleclerc'],
-            circuitName: 'Jeddah Corniche Circuit',
-            country: 'Saudi Arabia'
-          },
-          {
-            round: 6,
-            season: '2025',
-            raceName: 'Miami Grand Prix',
-            date: '2025-05-04',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'landonorris', 'georgerussell'],
-            circuitName: 'Miami International Autodrome',
-            country: 'USA'
-          },
-          {
-            round: 7,
-            season: '2025',
-            raceName: 'Emilia Romagna Grand Prix',
-            date: '2025-05-18',
-            poleDriverId: 'maxverstappen',
-            podiumDriverIds: ['maxverstappen', 'landonorris', 'oscarpiastri'],
-            circuitName: 'Autodromo Enzo e Dino Ferrari',
-            country: 'Italy'
-          },
-          {
-            round: 8,
-            season: '2025',
-            raceName: 'Monaco Grand Prix',
-            date: '2025-05-25',
-            poleDriverId: 'landonorris',
-            podiumDriverIds: ['landonorris', 'charlesleclerc', 'oscarpiastri'],
-            circuitName: 'Circuit de Monaco',
-            country: 'Monaco'
-          },
-          {
-            round: 9,
-            season: '2025',
-            raceName: 'Spanish Grand Prix',
-            date: '2025-06-01',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'landonorris', 'charlesleclerc'],
-            circuitName: 'Circuit de Barcelona-Catalunya',
-            country: 'Spain'
-          },
-          {
-            round: 10,
-            season: '2025',
-            raceName: 'Canadian Grand Prix',
-            date: '2025-06-15',
-            poleDriverId: 'georgerussell',
-            podiumDriverIds: ['georgerussell', 'maxverstappen', 'andreakimiantonelli'],
-            circuitName: 'Circuit Gilles Villeneuve',
-            country: 'Canada'
-          },
-          {
-            round: 11,
-            season: '2025',
-            raceName: 'Austrian Grand Prix',
-            date: '2025-06-29',
-            poleDriverId: 'landonorris',
-            podiumDriverIds: ['landonorris', 'oscarpiastri', 'charlesleclerc'],
-            circuitName: 'Red Bull Ring',
-            country: 'Austria'
-          },
-          {
-            round: 12,
-            season: '2025',
-            raceName: 'British Grand Prix',
-            date: '2025-07-13',
-            poleDriverId: 'landonorris',
-            podiumDriverIds: ['landonorris', 'oscarpiastri', 'nicohulkenberg'],
-            circuitName: 'Silverstone Circuit',
-            country: 'United Kingdom'
-          },
-          {
-            round: 13,
-            season: '2025',
-            raceName: 'Belgian Grand Prix',
-            date: '2025-08-03',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'landonorris', 'charlesleclerc'],
-            circuitName: 'Circuit de Spa-Francorchamps',
-            country: 'Belgium'
-          },
-          {
-            round: 14,
-            season: '2025',
-            raceName: 'Hungarian Grand Prix',
-            date: '2025-07-27',
-            poleDriverId: 'landonorris',
-            podiumDriverIds: ['landonorris', 'oscarpiastri', 'georgerussell'],
-            circuitName: 'Hungaroring',
-            country: 'Hungary'
-          },
-          {
-            round: 15,
-            season: '2025',
-            raceName: 'Dutch Grand Prix',
-            date: '2025-08-24',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'maxverstappen', 'isackhadjar'],
-            circuitName: 'Circuit Zandvoort',
-            country: 'Netherlands'
-          }
-        ];
-        
-        setRaceResults(sampleResults);
+        console.error('Failed to fetch 2025 race results:', error);
+        setRaceResults([]); // Fail gracefully to empty
       } finally {
         setLoading(false);
       }
@@ -198,207 +56,39 @@ export default function PastRaceResults({ className = '' }: PastRaceResultsProps
     fetchRecentResults();
   }, []);
 
-  // Ensure we always have some data to display
-  useEffect(() => {
-    if (!loading && raceResults.length === 0) {
-      console.log('🔍 PastRaceResults: No data available, using fallback sample data');
-      const fallbackResults: RaceResult2025[] = [
-        {
-          round: 1,
-          season: '2025',
-          raceName: 'Australian Grand Prix',
-          date: '2025-03-16',
-          poleDriverId: 'landonorris',
-          podiumDriverIds: ['landonorris', 'maxverstappen', 'georgerussell'],
-          circuitName: 'Albert Park Circuit',
-          country: 'Australia'
-        },
-        {
-          round: 2,
-          season: '2025',
-          raceName: 'Chinese Grand Prix',
-          date: '2025-03-23',
-          poleDriverId: 'oscarpiastri',
-          podiumDriverIds: ['oscarpiastri', 'landonorris', 'georgerussell'],
-          circuitName: 'Shanghai International Circuit',
-          country: 'China'
-        },
-        {
-          round: 3,
-          season: '2025',
-          raceName: 'Japanese Grand Prix',
-          date: '2025-04-06',
-          poleDriverId: 'maxverstappen',
-          podiumDriverIds: ['maxverstappen', 'landonorris', 'oscarpiastri'],
-          circuitName: 'Suzuka International Racing Course',
-          country: 'Japan'
-        },
-        {
-          round: 4,
-          season: '2025',
-          raceName: 'Bahrain Grand Prix',
-          date: '2025-03-02',
-          poleDriverId: 'oscarpiastri',
-          podiumDriverIds: ['oscarpiastri', 'georgerussell', 'landonorris'],
-          circuitName: 'Bahrain International Circuit',
-          country: 'Bahrain'
-        },
-        {
-          round: 5,
-          season: '2025',
-          raceName: 'Saudi Arabian Grand Prix',
-          date: '2025-03-09',
-          poleDriverId: 'oscarpiastri',
-          podiumDriverIds: ['oscarpiastri', 'maxverstappen', 'charlesleclerc'],
-          circuitName: 'Jeddah Corniche Circuit',
-          country: 'Saudi Arabia'
-        },
-        {
-          round: 6,
-          season: '2025',
-          raceName: 'Miami Grand Prix',
-          date: '2025-05-04',
-          poleDriverId: 'oscarpiastri',
-          podiumDriverIds: ['oscarpiastri', 'landonorris', 'georgerussell'],
-          circuitName: 'Miami International Autodrome',
-          country: 'USA'
-        },
-        {
-          round: 7,
-          season: '2025',
-          raceName: 'Emilia Romagna Grand Prix',
-          date: '2025-05-18',
-          poleDriverId: 'maxverstappen',
-          podiumDriverIds: ['maxverstappen', 'landonorris', 'oscarpiastri'],
-          circuitName: 'Autodromo Enzo e Dino Ferrari',
-          country: 'Italy'
-        },
-        {
-          round: 8,
-          season: '2025',
-          raceName: 'Monaco Grand Prix',
-          date: '2025-05-25',
-          poleDriverId: 'landonorris',
-          podiumDriverIds: ['landonorris', 'charlesleclerc', 'oscarpiastri'],
-          circuitName: 'Circuit de Monaco',
-          country: 'Monaco'
-        },
-        {
-          round: 9,
-          season: '2025',
-          raceName: 'Spanish Grand Prix',
-          date: '2025-06-01',
-          poleDriverId: 'oscarpiastri',
-          podiumDriverIds: ['oscarpiastri', 'landonorris', 'charlesleclerc'],
-          circuitName: 'Circuit de Barcelona-Catalunya',
-          country: 'Spain'
-        },
-        {
-          round: 10,
-          season: '2025',
-          raceName: 'Canadian Grand Prix',
-          date: '2025-06-15',
-          poleDriverId: 'georgerussell',
-          podiumDriverIds: ['georgerussell', 'maxverstappen', 'andreakimiantonelli'],
-          circuitName: 'Circuit Gilles Villeneuve',
-          country: 'Canada'
-        },
-        {
-          round: 11,
-          season: '2025',
-          raceName: 'Austrian Grand Prix',
-          date: '2025-06-29',
-          poleDriverId: 'landonorris',
-          podiumDriverIds: ['landonorris', 'oscarpiastri', 'charlesleclerc'],
-          circuitName: 'Red Bull Ring',
-          country: 'Austria'
-        },
-        {
-          round: 12,
-          season: '2025',
-          raceName: 'British Grand Prix',
-          date: '2025-07-13',
-          poleDriverId: 'landonorris',
-          podiumDriverIds: ['landonorris', 'oscarpiastri', 'nicohulkenberg'],
-          circuitName: 'Silverstone Circuit',
-          country: 'United Kingdom'
-        },
-        {
-          round: 13,
-          season: '2025',
-          raceName: 'Belgian Grand Prix',
-          date: '2025-08-03',
-          poleDriverId: 'oscarpiastri',
-          podiumDriverIds: ['oscarpiastri', 'landonorris', 'charlesleclerc'],
-          circuitName: 'Circuit de Spa-Francorchamps',
-          country: 'Belgium'
-        },
-        {
-          round: 14,
-          season: '2025',
-          raceName: 'Hungarian Grand Prix',
-          date: '2025-07-27',
-          poleDriverId: 'landonorris',
-          podiumDriverIds: ['landonorris', 'oscarpiastri', 'georgerussell'],
-          circuitName: 'Hungaroring',
-          country: 'Hungary'
-        },
-                  {
-            round: 15,
-            season: '2025',
-            raceName: 'Dutch Grand Prix',
-            date: '2025-08-24',
-            poleDriverId: 'oscarpiastri',
-            podiumDriverIds: ['oscarpiastri', 'maxverstappen', 'isackhadjar'],
-            circuitName: 'Circuit Zandvoort',
-            country: 'Netherlands'
-          }
-      ];
-      setRaceResults(fallbackResults);
-    }
-  }, [loading, raceResults.length]);
-
-  const nextRace = () => {
-    setCurrentIndex((prev) => (prev + 1) % raceResults.length);
-  };
-
-  const prevRace = () => {
-    setCurrentIndex((prev) => (prev - 1 + raceResults.length) % raceResults.length);
-  };
-
+  // Helper to normalize driver names if needed, or use the map
   const getDriverName = (driverId: string) => {
+    // Basic normalization or lookup
     const driverMap: Record<string, string> = {
-      'maxverstappen': 'Max Verstappen',
-      'charlesleclerc': 'Charles Leclerc',
-      'lewishamilton': 'Lewis Hamilton',
-      'landonorris': 'Lando Norris',
-      'oscarpiastri': 'Oscar Piastri',
-      'georgerussell': 'George Russell',
-      'carlossainz': 'Carlos Sainz',
-      'fernandoalonso': 'Fernando Alonso',
-      'pierregasly': 'Pierre Gasly',
-      'estebanocon': 'Esteban Ocon',
-      'yukitsunoda': 'Yuki Tsunoda',
-      'lancestroll': 'Lance Stroll',
-      'alexanderalbon': 'Alexander Albon',
-      'nicohulkenberg': 'Nico Hulkenberg',
-      'valtteribottas': 'Valtteri Bottas',
-      'guanyuzhou': 'Guanyu Zhou',
-      'kevinmagnussen': 'Kevin Magnussen',
-      'danielricciardo': 'Daniel Ricciardo',
-      'andreakimiantonelli': 'Andrea Kimi Antonelli',
-      'kimiantonelli': 'Kimi Antonelli',
-      'francocolapinto': 'Franco Colapinto',
-      'gabrielbortoleto': 'Gabriel Bortoleto',
-      'jackdoohan': 'Jack Doohan',
-      'isackhadjar': 'Isack Hadjar',
-      'liamlawson': 'Liam Lawson',
-      'oliverbearman': 'Oliver Bearman'
+      'max_verstappen': 'Max Verstappen',
+      'verstappen': 'Max Verstappen',
+      'leclerc': 'Charles Leclerc',
+      'hamilton': 'Lewis Hamilton',
+      'norris': 'Lando Norris',
+      'piastri': 'Oscar Piastri',
+      'russell': 'George Russell',
+      'sainz': 'Carlos Sainz',
+      'alonso': 'Fernando Alonso',
+      'gasly': 'Pierre Gasly',
+      'ocon': 'Esteban Ocon',
+      'tsunoda': 'Yuki Tsunoda',
+      'stroll': 'Lance Stroll',
+      'albon': 'Alexander Albon',
+      'hulkenberg': 'Nico Hulkenberg',
+      'bottas': 'Valtteri Bottas',
+      'zhou': 'Guanyu Zhou',
+      'magnussen': 'Kevin Magnussen',
+      'ricciardo': 'Daniel Ricciardo',
+      'lawson': 'Liam Lawson',
+      'bearman': 'Oliver Bearman',
+      'colapinto': 'Franco Colapinto',
+      'hadjar': 'Isack Hadjar',
+      'antonelli': 'Kimi Antonelli'
     };
-    return driverMap[driverId] || driverId;
+    return driverMap[driverId] || driverId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   };
 
-  
+
 
   if (loading) {
     return (
@@ -456,7 +146,7 @@ export default function PastRaceResults({ className = '' }: PastRaceResultsProps
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          
+
           <button
             onClick={nextRace}
             className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white p-3 rounded-full border border-white/30 transition-all duration-200 hover:scale-110 hover:border-white/50 shadow-lg"
@@ -523,15 +213,15 @@ export default function PastRaceResults({ className = '' }: PastRaceResultsProps
                 <h4 className="text-xl font-bold text-white mb-4" style={{ fontFamily: '"Orbitron", "Formula1", "Arial Black", sans-serif' }}>
                   PODIUM FINISHERS
                 </h4>
-                
+
                 <div className="space-y-3">
                   {currentRace.podiumDriverIds.map((driverId, index) => {
                     if (!driverId) return null;
-                    
+
                     const position = index + 1;
                     const positionColors = ['from-yellow-500 to-yellow-600', 'from-gray-400 to-gray-500', 'from-orange-600 to-orange-700'];
                     const positionIcons = ['🥇', '🥈', '🥉'];
-                    
+
                     return (
                       <motion.div
                         key={driverId}
@@ -568,11 +258,10 @@ export default function PastRaceResults({ className = '' }: PastRaceResultsProps
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-200 backdrop-blur-sm border ${
-                  index === currentIndex 
-                    ? 'bg-red-500 scale-125 border-red-400/50 shadow-lg shadow-red-500/30' 
-                    : 'bg-gray-600/60 hover:bg-gray-500/80 border-gray-500/30 hover:border-gray-400/50'
-                }`}
+                className={`w-3 h-3 rounded-full transition-all duration-200 backdrop-blur-sm border ${index === currentIndex
+                  ? 'bg-red-500 scale-125 border-red-400/50 shadow-lg shadow-red-500/30'
+                  : 'bg-gray-600/60 hover:bg-gray-500/80 border-gray-500/30 hover:border-gray-400/50'
+                  }`}
               />
             ))}
           </div>

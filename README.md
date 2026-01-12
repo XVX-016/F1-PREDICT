@@ -2,13 +2,13 @@
 
 A simulation-first, ML-assisted F1 race prediction platform.
 
-## 🏎️ Key Features
+## Key Features
 - **Simulation-First**: Outcomes are determined by physics-based Monte Carlo simulations, not raw ML classes.
 - **ML-Assisted**: LightGBM models predict pure driver pace deltas (relative speed) to feed the simulation.
 - **Production-Ready**: "Thin Client" frontend communicates with a robust FastAPI backend.
 - **Auditable**: Full tracking of every model run and simulation instance in Supabase.
 
-## 🚀 Quick Start (Docker)
+## Quick Start (Docker)
 
 The fastest way to get the platform running is using Docker Compose.
 
@@ -22,27 +22,27 @@ docker-compose up --build
 ```
 The backend will automatically run `setup.py` on first start to initialize the pipeline.
 
-## 🛠️ Local Development
+## Local Development
 
 For manual setup and detailed developer instructions:
-👉 See [**Development Guide**](docs/DEVELOPMENT.md)
+See [**Development Guide**](docs/DEVELOPMENT.md)
 
-## 🏗️ Architecture
+## Architecture
 
 - **Backend**: Python (FastAPI, FastF1, LightGBM, Scikit-Learn)
 - **Frontend**: React (TypeScript, Vite)
 - **Database**: Supabase (PostgreSQL)
 
 For a deep dive into how it works:
-👉 See [**Architecture Deep Dive**](docs/ARCHITECTURE.md)
+See [**Architecture Deep Dive**](docs/ARCHITECTURE.md)
 
-## 📡 API Endpoints
+## API Endpoints
 
 - `GET /health` - API status
 - `GET /api/races/{id}/probabilities` - Calibrated win/podium/top10 probabilities
 - `GET /api/races/{id}/markets` - Fantasy odds and market data
 
-## 🚢 Deployment
+## Deployment
 
 Detailed instructions for Railway, Vercel, and Render:
-👉 See [**Deployment Guide**](docs/DEPLOYMENT.md)
+See [**Deployment Guide**](docs/DEPLOYMENT.md)

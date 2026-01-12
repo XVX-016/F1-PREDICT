@@ -12,7 +12,7 @@ from simulation.race_simulator import RaceSimulator
 logger = logging.getLogger(__name__)
 
 class MonteCarloEngine:
-    def __init__(self, n_simulations: int = 5000):
+    def __init__(self, n_simulations: int = 20000):
         self.n_simulations = n_simulations
         self.simulator = RaceSimulator()
         self.db = get_db()
@@ -88,6 +88,6 @@ class MonteCarloEngine:
                 logger.error(f"Failed to store probability for {res['driver_id']}: {e}")
 
 # Global wrapper
-def run_monte_carlo(race_id: str, n_simulations: int = 5000):
+def run_monte_carlo(race_id: str, n_simulations: int = 20000):
     engine = MonteCarloEngine(n_simulations)
     return engine.run_monte_carlo(race_id)
