@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Trophy, 
-  Target, 
-  TrendingUp, 
+import {
+  User,
+  Mail,
+  Calendar,
+  Trophy,
+  Target,
+  TrendingUp,
   Wallet,
   Award,
   Clock,
@@ -17,19 +17,19 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useBetting } from '../contexts/BettingContext';
-import { UserBet, Transaction, TransactionType } from '../types/betting';
+import { TransactionType } from '../types/betting';
 import F1CarCarousel from '../components/F1CarCarousel';
 
 export default function ProfilePage() {
-  const { user, signOut } = useAuth();
-  const { userBets, userTransactions, refreshUserData } = useBetting();
+  const { user, logout } = useAuth();
+  const { bets, transactions, refreshAll } = useBetting();
   const [activeTab, setActiveTab] = useState<'overview' | 'bets' | 'transactions'>('overview');
 
   useEffect(() => {
     if (user) {
-      refreshUserData();
+      refreshAll();
     }
-  }, [user, refreshUserData]);
+  }, [user, refreshAll]);
 
   const getTransactionIcon = (type: TransactionType) => {
     switch (type) {
@@ -64,31 +64,34 @@ export default function ProfilePage() {
   };
 
   const getBetStatusColor = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
+    switch (status.toLowerCase()) {
+      case 'open':
+      case 'active':
         return 'text-blue-400';
-      case 'SETTLED':
+      case 'won':
+      case 'settled':
         return 'text-green-400';
-      case 'CANCELLED':
+      case 'lost':
         return 'text-red-400';
-      case 'EXPIRED':
+      case 'cancelled':
+        return 'text-red-400';
+      case 'expired':
         return 'text-gray-400';
       default:
         return 'text-gray-400';
     }
   };
 
-  const totalBets = userBets.length;
-  const wonBets = userBets.filter(bet => bet.status === 'SETTLED' && bet.payoutAmount && bet.payoutAmount > 0).length;
+  const totalBets = bets.length;
+  const wonBets = bets.filter(bet => bet.status === 'won' || (bet.status === 'settled' && (bet.payout || 0) > 0)).length;
   const accuracy = totalBets > 0 ? Math.round((wonBets / totalBets) * 100) : 0;
-  const totalWinnings = userBets.reduce((sum, bet) => sum + (bet.payoutAmount || 0), 0);
-  const totalStaked = userBets.reduce((sum, bet) => sum + bet.amount, 0);
+  const totalWinnings = bets.reduce((sum, bet) => sum + (bet.payout || 0), 0);
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden pt-32 relative">
       {/* F1 Car Carousel Background */}
       <F1CarCarousel />
-      
+
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -109,7 +112,7 @@ export default function ProfilePage() {
             <div className="w-32 h-32 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-6xl shadow-2xl">
               👤
             </div>
-            
+
             {/* User Info */}
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-3xl font-bold text-white mb-2">
@@ -129,7 +132,7 @@ export default function ProfilePage() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={signOut}
+              onClick={logout}
               className="bg-red-600/80 hover:bg-red-700/80 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 backdrop-blur-sm border border-red-500/30"
             >
               Sign Out
@@ -149,11 +152,10 @@ export default function ProfilePage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-red-600/80 text-white shadow-lg shadow-red-500/25'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
+                className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${activeTab === tab.id
+                  ? 'bg-red-600/80 text-white shadow-lg shadow-red-500/25'
+                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 {tab.label}
@@ -202,7 +204,7 @@ export default function ProfilePage() {
                   Recent Activity
                 </h3>
                 <div className="space-y-3">
-                  {userTransactions.slice(0, 5).map((transaction) => (
+                  {transactions.slice(0, 5).map((transaction) => (
                     <div key={transaction.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg bg-white/10 ${getTransactionColor(transaction.type)}`}>
@@ -232,25 +234,24 @@ export default function ProfilePage() {
                 All Bets ({totalBets})
               </h3>
               <div className="space-y-3">
-                {userBets.length === 0 ? (
+                {bets.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No bets placed yet</p>
                   </div>
                 ) : (
-                  userBets.map((bet) => (
+                  bets.map((bet) => (
                     <div key={bet.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
                       <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-lg ${
-                          bet.status === 'SETTLED' && bet.payoutAmount && bet.payoutAmount > 0
-                            ? 'bg-green-500/20 text-green-400'
-                            : bet.status === 'SETTLED'
+                        <div className={`p-2 rounded-lg ${(bet.status === 'won' || (bet.status === 'settled' && (bet.payout || 0) > 0))
+                          ? 'bg-green-500/20 text-green-400'
+                          : (bet.status === 'lost' || bet.status === 'settled')
                             ? 'bg-red-500/20 text-red-400'
                             : 'bg-blue-500/20 text-blue-400'
-                        }`}>
-                          {bet.status === 'SETTLED' && bet.payoutAmount && bet.payoutAmount > 0 ? (
+                          }`}>
+                          {(bet.status === 'won' || (bet.status === 'settled' && (bet.payout || 0) > 0)) ? (
                             <CheckCircle className="w-4 h-4" />
-                          ) : bet.status === 'SETTLED' ? (
+                          ) : (bet.status === 'lost' || bet.status === 'settled') ? (
                             <XCircle className="w-4 h-4" />
                           ) : (
                             <Clock className="w-4 h-4" />
@@ -259,18 +260,18 @@ export default function ProfilePage() {
                         <div>
                           <div className="text-white font-medium">Bet #{bet.id.slice(-8)}</div>
                           <div className="text-gray-400 text-sm">
-                            Placed {new Date(bet.placedAt).toLocaleString()}
+                            Placed {new Date(bet.created_at).toLocaleString()}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-white font-semibold">{bet.amount.toLocaleString()} PC</div>
+                        <div className="text-white font-semibold">{bet.stake.toLocaleString()} PC</div>
                         <div className={`text-sm ${getBetStatusColor(bet.status)}`}>
                           {bet.status}
                         </div>
-                        {bet.payoutAmount && bet.payoutAmount > 0 && (
+                        {bet.payout > 0 && (
                           <div className="text-green-400 text-sm">
-                            +{bet.payoutAmount.toLocaleString()} PC
+                            +{bet.payout.toLocaleString()} PC
                           </div>
                         )}
                       </div>
@@ -285,16 +286,16 @@ export default function ProfilePage() {
             <div className="bg-black/20 backdrop-blur-2xl border border-white/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Wallet className="w-5 h-5" />
-                All Transactions ({userTransactions.length})
+                All Transactions ({transactions.length})
               </h3>
               <div className="space-y-3">
-                {userTransactions.length === 0 ? (
+                {transactions.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No transactions yet</p>
                   </div>
                 ) : (
-                  userTransactions.map((transaction) => (
+                  transactions.map((transaction) => (
                     <div key={transaction.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className={`p-2 rounded-lg bg-white/10 ${getTransactionColor(transaction.type)}`}>

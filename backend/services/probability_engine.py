@@ -5,7 +5,7 @@ Combines simulation and calibration into production-ready probabilities.
 import logging
 from typing import Dict, List, Any, Optional
 from simulation.monte_carlo import MonteCarloEngine
-from calibration.apply_isotonic import calibrate_probabilities
+from calibration.apply_isotonic import calibrate_probabilities, IsotonicCalibrator
 from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)

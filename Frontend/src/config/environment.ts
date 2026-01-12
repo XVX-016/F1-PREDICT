@@ -5,17 +5,17 @@ export const ENV_CONFIG = {
   // ML Service Configuration
   ML_SERVICE_URL: (import.meta as any).env?.VITE_MODEL_SERVICE_URL || 'http://localhost:8000',
   ML_SERVICE_PROXY: (import.meta as any).env?.VITE_MODEL_SERVICE_PROXY || '/ml',
-  
+
   // Backend Configuration
   BACKEND_URL: (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3001',
-  
+
   // API Configuration
   API_BASE_URL: (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8000',
-  
+
   // Weather API
   WEATHER_API_KEY: (import.meta as any).env?.VITE_WEATHER_API_KEY || '',
   OPENWEATHER_API_KEY: (import.meta as any).env?.VITE_OPENWEATHER_API_KEY || '',
-  
+
   // Firebase Configuration (placeholders)
   FIREBASE_API_KEY: (import.meta as any).env?.VITE_FIREBASE_API_KEY || 'your_api_key_here',
   FIREBASE_AUTH_DOMAIN: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || 'your_project.firebaseapp.com',
@@ -24,20 +24,20 @@ export const ENV_CONFIG = {
   FIREBASE_MESSAGING_SENDER_ID: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || 'your_sender_id',
   FIREBASE_APP_ID: (import.meta as any).env?.VITE_FIREBASE_APP_ID || 'your_app_id',
   FIREBASE_MEASUREMENT_ID: (import.meta as any).env?.VITE_FIREBASE_MEASUREMENT_ID || 'your_measurement_id',
-  
+
   // Local API Configuration (replaces external Jolpica API)
-  JOLPICA_BASE_URL: (import.meta as any).env?.VITE_JOLPICA_BASE_URL || 'http://localhost:5000/ergast/f1',
+  JOLPICA_BASE_URL: (import.meta as any).env?.VITE_JOLPICA_BASE_URL || '/ergast/f1',
   FAST_F1_BASE_URL: (import.meta as any).env?.VITE_FAST_F1_BASE_URL || 'http://localhost:8000',
-  
+
   // Feature Flags
   LIVE_DATA_ENABLED: (import.meta as any).env?.VITE_LIVE_DATA_ENABLED === 'true' ? true : false,
   USE_SAMPLE_PREDICTIONS: (import.meta as any).env?.VITE_USE_SAMPLE_PREDICTIONS === 'true', // default false - use XGBoost model
   USE_LOCAL_ONLY: true,
-  
+
   // ML Model Configuration
   ML_MODEL_ENABLED: (import.meta as any).env?.VITE_ML_MODEL_ENABLED !== 'false', // default true
   ML_MODEL_UPDATE_INTERVAL: parseInt((import.meta as any).env?.VITE_ML_MODEL_UPDATE_INTERVAL || '300000'),
-  
+
   // WebSocket Configuration
   WEBSOCKET_URL: (import.meta as any).env?.VITE_WEBSOCKET_URL || 'ws://localhost:8000/ws/live',
   WEBSOCKET_RECONNECT_ATTEMPTS: parseInt((import.meta as any).env?.VITE_WEBSOCKET_RECONNECT_ATTEMPTS || '5'),

@@ -4,7 +4,11 @@ Supabase database client with connection pooling
 import os
 from typing import Optional
 from supabase import create_client, Client
+from dotenv import load_dotenv
 import logging
+
+# Load environment variables
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

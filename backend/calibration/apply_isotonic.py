@@ -13,7 +13,7 @@ from sklearn.isotonic import IsotonicRegression
 from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)
-class ProbabilityCalibrator:
+class IsotonicCalibrator:
     def __init__(self, model_dir: str = "models/calibration"):
         self.model_dir = model_dir
         self.db = get_db()
@@ -85,5 +85,5 @@ class ProbabilityCalibrator:
 
 # Global wrapper
 def calibrate_probabilities(results: List[Dict]) -> List[Dict]:
-    calibrator = ProbabilityCalibrator()
+    calibrator = IsotonicCalibrator()
     return calibrator.apply_calibration(results)

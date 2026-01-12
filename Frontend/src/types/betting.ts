@@ -38,16 +38,26 @@ export interface UserBet {
   option_id: string;
   stake: number;
   payout: number;
-  status: 'open' | 'won' | 'lost';
+  status: 'open' | 'won' | 'lost' | 'settled';
   created_at: string;
+}
+
+export enum TransactionType {
+  BET_PLACED = 'bet_placed',
+  BET_WON = 'bet_won',
+  BET_LOST = 'bet_lost',
+  DAILY_REWARD = 'daily_reward',
+  SIGNUP_BONUS = 'signup_bonus'
 }
 
 export interface Transaction {
   id: string;
   user_id: string;
   amount: number;
-  reason: string;
-  created_at: string;
+  type: TransactionType;
+  description: string;
+  timestamp: string;
+  created_at?: string; // Optional for backward compatibility
 }
 
 // Keep legacy enums if UI components import them, but might be unused.

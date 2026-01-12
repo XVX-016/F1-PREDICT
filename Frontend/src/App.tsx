@@ -71,6 +71,7 @@ const ProfilePage = lazyWithTimeout(() => import('./pages/ProfilePage'));
 const BettingPage = lazyWithTimeout(() => import('./pages/BettingPage'));
 const SignUpPage = lazyWithTimeout(() => import('./pages/SignUpPage'));
 const SignInPage = lazyWithTimeout(() => import('./pages/SignInPage'));
+const AuthCallback = lazyWithTimeout(() => import('./pages/AuthCallback'));
 
 function App() {
   // Get initial page from hash
@@ -132,6 +133,8 @@ function App() {
                   return <SignUpPage onPageChange={setCurrentPage} />;
                 case 'signin':
                   return <SignInPage onPageChange={setCurrentPage} />;
+                case 'auth-callback':
+                  return <AuthCallback onComplete={setCurrentPage} />;
                 default:
                   return <HomePage setCurrentPage={setCurrentPage} />;
               }

@@ -3,7 +3,7 @@ Live updates API - WebSocket and Server-Sent Events (SSE)
 Uses WebSocket for real-time updates, SSE as fallback
 """
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from fastapi.responses import EventSourceResponse
+from fastapi.responses import StreamingResponse
 from live_services.live_session import live_session_manager
 import json
 import time
@@ -53,5 +53,5 @@ async def live_updates_sse(race_id: str):
                 yield f"event: error\ndata: {json.dumps({'error': str(e)})}\n\n"
                 break
     
-    return EventSourceResponse(stream())
+    return StreamingResponse(stream(), media_type="text/event-stream")
 
