@@ -1,165 +1,127 @@
 """
 Pace Delta ML Model - LightGBM regression
 Target: pace_delta_ms = driver_avg_lap - session_mean_lap
-NO winner/position prediction - only relative pace
+Predicts relative pace deltas for use in Monte Carlo simulations.
 """
 import lightgbm as lgb
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Any, Optional
 import logging
 import os
-import json
-from datetime import datetime
+import joblib
+from typing import Dict, List, Any, Optional
+from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)
 
 class PaceModel:
-    """
-    ML model that predicts ONLY relative pace deltas
-    Never predicts winners or positions
-    """
-    
-    def __init__(self, model_path: Optional[str] = None):
+    def __init__(self, model_path: str = "models/pace_model.joblib"):
         self.model = None
-        self.model_path = model_path or "models/pace_model.txt"
+        self.model_path = model_path
+        self.db = get_db()
         self.features = [
-            "qualifying_delta_to_pole",
             "avg_long_run_pace_ms",
             "tire_deg_rate",
             "sector_consistency",
+            "clean_air_delta",
             "recent_form_ewma",
-            "track_downforce_index"
+            "grid_position"  # Grid position is a strong proxy for pace
         ]
-        self.model_version = "1.0.0"
-        
-    def train(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-        validation_split: float = 0.2
-    ) -> Dict[str, Any]:
+
+    def train_on_history(self, races_count: int = 20):
         """
-        Train the pace delta model
-        
-        Args:
-            X: Feature dataframe
-            y: Target series (pace_delta_ms)
-            validation_split: Validation split ratio
-        
-        Returns:
-            Training metrics
+        Phase 2: Train on recent historical data from Supabase.
         """
-        from sklearn.model_selection import train_test_split
+        logger.info(f"🚂 Training pace model on last {races_count} races...")
         
-        # Ensure we have the right features
-        X = X[self.features]
+        # 1. Fetch data from Supabase
+        # We need telemetry_features joined with some target (e.g. actual race lap times)
+        # For simplicity in this rehaul, we'll use the telemetry pace itself as a baseline
+        # and calculate deltas relative to session mean.
         
-        # Split data
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=validation_split, shuffle=False  # Time series split
-        )
-        
-        # Create LightGBM dataset
-        train_data = lgb.Dataset(X_train, label=y_train)
-        val_data = lgb.Dataset(X_val, label=y_val, reference=train_data)
-        
-        # Model parameters
-        params = {
-            "objective": "regression_l1",  # L1 loss (Huber)
-            "metric": "mae",
-            "boosting_type": "gbdt",
-            "num_leaves": 31,
-            "learning_rate": 0.03,
-            "feature_fraction": 0.8,
-            "bagging_fraction": 0.8,
-            "bagging_freq": 5,
-            "verbose": -1
-        }
-        
-        # Train model
-        self.model = lgb.train(
-            params,
-            train_data,
-            valid_sets=[val_data],
-            num_boost_round=500,
-            callbacks=[lgb.early_stopping(50), lgb.log_evaluation(100)]
-        )
-        
-        # Evaluate
-        train_pred = self.model.predict(X_train)
-        val_pred = self.model.predict(X_val)
-        
-        train_mae = np.mean(np.abs(train_pred - y_train))
-        val_mae = np.mean(np.abs(val_pred - y_val))
-        
-        metrics = {
-            "train_mae": float(train_mae),
-            "val_mae": float(val_mae),
-            "model_version": self.model_version
-        }
-        
-        logger.info(f"Model trained - Train MAE: {train_mae:.2f}ms, Val MAE: {val_mae:.2f}ms")
-        
-        # Save model
-        self.save()
-        
-        return metrics
-    
-    def predict(self, X: pd.DataFrame) -> np.ndarray:
+        try:
+            res = self.db.table("telemetry_features")\
+                .select("*, races(season, round)")\
+                .order("created_at", desc=True)\
+                .limit(races_count * 20)\
+                .execute()
+            
+            if not res.data:
+                logger.warning("No data found for training")
+                return
+                
+            df = pd.DataFrame(res.data)
+            
+            # Calculate target: pace_delta_ms = avg_pace - session_mean_pace
+            df["session_mean"] = df.groupby("race_id")["avg_long_run_pace_ms"].transform("mean")
+            df["pace_delta_ms"] = df["avg_long_run_pace_ms"] - df["session_mean"]
+            
+            # 2. Train LightGBM
+            X = df[self.features]
+            y = df["pace_delta_ms"]
+            
+            train_data = lgb.Dataset(X, label=y)
+            params = {
+                "objective": "regression",
+                "metric": "rmse",
+                "boosting_type": "gbdt",
+                "learning_rate": 0.05,
+                "num_leaves": 15,
+                "verbose": -1
+            }
+            
+            self.model = lgb.train(params, train_data, num_boost_round=100)
+            
+            # 3. Save model
+            os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+            joblib.dump(self.model, self.model_path)
+            logger.info(f"✅ Model trained and saved to {self.model_path}")
+            
+        except Exception as e:
+            logger.error(f"❌ Training failed: {e}")
+
+    def predict_for_race(self, race_id: str) -> pd.DataFrame:
         """
-        Predict pace deltas
-        
-        Args:
-            X: Feature dataframe
-        
-        Returns:
-            Array of pace_delta_ms predictions
+        Predict pace deltas for a specific race and store in Supabase.
         """
-        if self.model is None:
-            raise ValueError("Model not trained or loaded")
-        
-        # Ensure we have the right features
-        X = X[self.features]
-        
-        predictions = self.model.predict(X)
-        return predictions
-    
-    def save(self, path: Optional[str] = None):
-        """Save model to file"""
-        if self.model is None:
-            raise ValueError("No model to save")
-        
-        save_path = path or self.model_path
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        
-        self.model.save_model(save_path)
-        logger.info(f"Model saved to {save_path}")
-    
-    def load(self, path: Optional[str] = None):
-        """Load model from file"""
-        load_path = path or self.model_path
-        
-        if not os.path.exists(load_path):
-            raise FileNotFoundError(f"Model file not found: {load_path}")
-        
-        self.model = lgb.Booster(model_file=load_path)
-        logger.info(f"Model loaded from {load_path}")
-    
-    def get_feature_importance(self) -> Dict[str, float]:
-        """Get feature importance"""
-        if self.model is None:
-            raise ValueError("Model not loaded")
-        
-        importance = self.model.feature_importance(importance_type='gain')
-        feature_importance = dict(zip(self.features, importance))
-        
-        return feature_importance
+        if not self.model:
+            if os.path.exists(self.model_path):
+                self.model = joblib.load(self.model_path)
+            else:
+                logger.error("No model found. Train first.")
+                return pd.DataFrame()
 
-# Global instance
-pace_model = PaceModel()
+        # Fetch features for this race
+        res = self.db.table("telemetry_features").select("*").eq("race_id", race_id).execute()
+        if not res.data:
+            return pd.DataFrame()
+            
+        df = pd.DataFrame(res.data)
+        
+        # Ensure all features exist (handle missing recent_form)
+        for f in self.features:
+            if f not in df.columns:
+                df[f] = 0.0 if "ewma" in f else 10.0 # Default grid pos 10
+                
+        df["predicted_pace_delta_ms"] = self.model.predict(df[self.features])
+        
+        # Store in pace_deltas table
+        self._store_predictions(race_id, df)
+        
+        return df
 
+    def _store_predictions(self, race_id: str, df: pd.DataFrame):
+        for _, row in df.iterrows():
+            try:
+                self.db.table("pace_deltas").upsert({
+                    "race_id": race_id,
+                    "driver_id": row["driver_id"],
+                    "pace_delta_ms": row["predicted_pace_delta_ms"]
+                }).execute()
+            except Exception as e:
+                logger.error(f"Failed to store pace delta for {row['driver_id']}: {e}")
 
-
-
-
+# Global wrapper
+def predict_pace(race_id: str) -> pd.DataFrame:
+    model = PaceModel()
+    return model.predict_for_race(race_id)
