@@ -1,401 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, Flag, Bell, Target, MapPin, Trophy, X } from 'lucide-react';
-import { F1_2025_RESULTS } from '../data/f1-2025-results';
-import { F1_2025_CALENDAR } from '../data/f1-2025-calendar';
+import { useRaces, Race as ApiRace } from '../hooks/useApi';
 
-// Derive status using UTC like homepage banner
-const CALENDAR = F1_2025_CALENDAR.map(r => ({
-  ...r,
-  startISO: `${r.date}T${r.time}:00Z`
-}));
-
-// Legacy literal removed; we now use shared calendar
-/* const F1_2025_CALENDAR = [
-  {
-    round: 1,
-    raceName: "Australian GP",
-    circuitName: "Albert Park Circuit",
-    country: "Australia",
-    city: "Melbourne",
-    date: "2025-03-16",
-    time: "09:30",
-    fp1: { date: "2025-03-14", time: "01:30" },
-    fp2: { date: "2025-03-14", time: "05:00" },
-    fp3: { date: null, time: null },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-03-15", time: "05:00" },
-    status: "upcoming"
-  },
-  {
-    round: 2,
-    raceName: "Chinese GP",
-    circuitName: "Shanghai International Circuit",
-    country: "China",
-    city: "Shanghai",
-    date: "2025-03-23",
-    time: "12:30",
-    fp1: { date: "2025-03-21", time: "03:30" },
-    fp2: { date: null, time: null },
-    fp3: { date: null, time: null },
-    sprintQualifying: { date: "2025-03-21", time: "07:30" },
-    sprint: { date: "2025-03-22", time: "03:00" },
-    qualifying: { date: "2025-03-22", time: "07:00" },
-    status: "upcoming"
-  },
-  {
-    round: 3,
-    raceName: "Japanese GP",
-    circuitName: "Suzuka International Racing Course",
-    country: "Japan",
-    city: "Suzuka",
-    date: "2025-04-06",
-    time: "10:30",
-    fp1: { date: "2025-04-04", time: "03:30" },
-    fp2: { date: "2025-04-04", time: "07:00" },
-    fp3: { date: "2025-04-05", time: "03:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-04-05", time: "07:00" },
-    status: "upcoming"
-  },
-  {
-    round: 4,
-    raceName: "Bahrain GP",
-    circuitName: "Bahrain International Circuit",
-    country: "Bahrain",
-    city: "Sakhir",
-    date: "2025-04-13",
-    time: "20:30",
-    fp1: { date: "2025-04-11", time: "12:30" },
-    fp2: { date: "2025-04-11", time: "16:00" },
-    fp3: { date: "2025-04-12", time: "13:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-04-12", time: "17:00" },
-    status: "upcoming"
-  },
-  {
-    round: 5,
-    raceName: "Saudi Arabian GP",
-    circuitName: "Jeddah Corniche Circuit",
-    country: "Saudi Arabia",
-    city: "Jeddah",
-    date: "2025-04-20",
-    time: "22:30",
-    fp1: { date: "2025-04-18", time: "14:30" },
-    fp2: { date: "2025-04-18", time: "18:00" },
-    fp3: { date: "2025-04-19", time: "14:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-04-19", time: "18:00" },
-    status: "upcoming"
-  },
-  {
-    round: 6,
-    raceName: "Miami GP",
-    circuitName: "Miami International Autodrome",
-    country: "USA",
-    city: "Miami",
-    date: "2025-05-05",
-    time: "01:30",
-    fp1: { date: "2025-05-02", time: "17:30" },
-    fp2: { date: null, time: null },
-    fp3: { date: null, time: null },
-    sprintQualifying: { date: "2025-05-02", time: "21:30" },
-    sprint: { date: "2025-05-03", time: "17:00" },
-    qualifying: { date: "2025-05-03", time: "21:00" },
-    status: "upcoming"
-  },
-  {
-    round: 7,
-    raceName: "Emilia Romagna GP",
-    circuitName: "Autodromo Enzo e Dino Ferrari",
-    country: "Italy",
-    city: "Imola",
-    date: "2025-05-18",
-    time: "18:30",
-    fp1: { date: "2025-05-16", time: "12:30" },
-    fp2: { date: "2025-05-16", time: "16:00" },
-    fp3: { date: "2025-05-17", time: "11:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-05-17", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 8,
-    raceName: "Monaco GP",
-    circuitName: "Circuit de Monaco",
-    country: "Monaco",
-    city: "Monte Carlo",
-    date: "2025-05-25",
-    time: "18:30",
-    fp1: { date: "2025-05-23", time: "12:30" },
-    fp2: { date: "2025-05-23", time: "16:00" },
-    fp3: { date: "2025-05-24", time: "11:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-05-24", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 9,
-    raceName: "Spanish GP",
-    circuitName: "Circuit de Barcelona-Catalunya",
-    country: "Spain",
-    city: "Barcelona",
-    date: "2025-06-01",
-    time: "18:30",
-    fp1: { date: "2025-05-30", time: "12:30" },
-    fp2: { date: "2025-05-30", time: "16:00" },
-    fp3: { date: "2025-05-31", time: "11:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-05-31", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 10,
-    raceName: "Canadian GP",
-    circuitName: "Circuit Gilles Villeneuve",
-    country: "Canada",
-    city: "Montreal",
-    date: "2025-06-15",
-    time: "23:30",
-    fp1: { date: "2025-06-13", time: "18:30" },
-    fp2: { date: "2025-06-13", time: "22:00" },
-    fp3: { date: "2025-06-14", time: "17:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-06-14", time: "21:00" },
-    status: "upcoming"
-  },
-  {
-    round: 11,
-    raceName: "Austrian GP",
-    circuitName: "Red Bull Ring",
-    country: "Austria",
-    city: "Spielberg",
-    date: "2025-06-29",
-    time: "18:30",
-    fp1: { date: "2025-06-27", time: "12:30" },
-    fp2: { date: "2025-06-27", time: "16:00" },
-    fp3: { date: "2025-06-28", time: "11:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-06-28", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 12,
-    raceName: "British GP",
-    circuitName: "Silverstone Circuit",
-    country: "United Kingdom",
-    city: "Silverstone",
-    date: "2025-07-06",
-    time: "19:30",
-    fp1: { date: "2025-07-04", time: "12:30" },
-    fp2: { date: "2025-07-04", time: "16:00" },
-    fp3: { date: "2025-07-05", time: "11:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-07-05", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 13,
-    raceName: "Belgian GP",
-    circuitName: "Circuit de Spa-Francorchamps",
-    country: "Belgium",
-    city: "Spa",
-    date: "2025-07-27",
-    time: "18:30",
-    fp1: { date: "2025-07-25", time: "11:30" },
-    fp2: { date: null, time: null },
-    fp3: { date: null, time: null },
-    sprintQualifying: { date: "2025-07-25", time: "15:30" },
-    sprint: { date: "2025-07-26", time: "11:00" },
-    qualifying: { date: "2025-07-26", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 14,
-    raceName: "Hungarian GP",
-    circuitName: "Hungaroring",
-    country: "Hungary",
-    city: "Budapest",
-    date: "2025-08-03",
-    time: "18:30",
-    fp1: { date: "2025-08-01", time: "12:30" },
-    fp2: { date: "2025-08-01", time: "16:00" },
-    fp3: { date: "2025-08-02", time: "11:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-08-02", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 15,
-    raceName: "Dutch GP",
-    circuitName: "Circuit Zandvoort",
-    country: "Netherlands",
-    city: "Zandvoort",
-    date: "2025-08-31",
-    time: "18:30",
-    fp1: { date: "2025-08-29", time: "11:30" },
-    fp2: { date: "2025-08-29", time: "15:00" },
-    fp3: { date: "2025-08-30", time: "10:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-08-30", time: "14:00" },
-    status: "upcoming"
-  },
-  {
-    round: 16,
-    raceName: "Italian GP",
-    circuitName: "Autodromo Nazionale di Monza",
-    country: "Italy",
-    city: "Monza",
-    date: "2025-09-07",
-    time: "18:30",
-    fp1: { date: "2025-09-05", time: "12:30" },
-    fp2: { date: "2025-09-05", time: "16:00" },
-    fp3: { date: "2025-09-06", time: "11:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-09-06", time: "15:00" },
-    status: "upcoming"
-  },
-  {
-    round: 17,
-    raceName: "Azerbaijan GP",
-    circuitName: "Baku City Circuit",
-    country: "Azerbaijan",
-    city: "Baku",
-    date: "2025-09-21",
-    time: "16:30",
-    fp1: { date: "2025-09-19", time: "09:30" },
-    fp2: { date: "2025-09-19", time: "13:00" },
-    fp3: { date: "2025-09-20", time: "09:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-09-20", time: "13:00" },
-    status: "upcoming"
-  },
-  {
-    round: 18,
-    raceName: "Singapore GP",
-    circuitName: "Marina Bay Street Circuit",
-    country: "Singapore",
-    city: "Marina Bay",
-    date: "2025-10-05",
-    time: "18:30",
-    fp1: { date: "2025-10-03", time: "10:30" },
-    fp2: { date: "2025-10-03", time: "14:00" },
-    fp3: { date: "2025-10-04", time: "10:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-10-04", time: "14:00" },
-    status: "upcoming"
-  },
-  {
-    round: 19,
-    raceName: "United States GP",
-    circuitName: "Circuit of the Americas",
-    country: "USA",
-    city: "Austin",
-    date: "2025-10-20",
-    time: "00:30",
-    fp1: { date: "2025-10-17", time: "18:30" },
-    fp2: { date: null, time: null },
-    fp3: { date: null, time: null },
-    sprintQualifying: { date: "2025-10-17", time: "22:30" },
-    sprint: { date: "2025-10-18", time: "18:00" },
-    qualifying: { date: "2025-10-18", time: "22:00" },
-    status: "upcoming"
-  },
-  {
-    round: 20,
-    raceName: "Mexican GP",
-    circuitName: "Autódromo Hermanos Rodríguez",
-    country: "Mexico",
-    city: "Mexico City",
-    date: "2025-10-27",
-    time: "01:30",
-    fp1: { date: "2025-10-24", time: "19:30" },
-    fp2: { date: "2025-10-24", time: "23:00" },
-    fp3: { date: "2025-10-25", time: "18:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-10-25", time: "22:00" },
-    status: "upcoming"
-  },
-  {
-    round: 21,
-    raceName: "Brazilian GP",
-    circuitName: "Autódromo José Carlos Pace",
-    country: "Brazil",
-    city: "São Paulo",
-    date: "2025-11-09",
-    time: "22:30",
-    fp1: { date: "2025-11-07", time: "14:00" },
-    fp2: { date: null, time: null },
-    fp3: { date: null, time: null },
-    sprintQualifying: { date: "2025-11-07", time: "18:30" },
-    sprint: { date: "2025-11-08", time: "13:00" },
-    qualifying: { date: "2025-11-08", time: "17:00" },
-    status: "upcoming"
-  },
-  {
-    round: 22,
-    raceName: "Las Vegas GP",
-    circuitName: "Las Vegas Strip Circuit",
-    country: "USA",
-    city: "Las Vegas",
-    date: "2025-11-23",
-    time: "09:30",
-    fp1: { date: "2025-11-21", time: "00:30" },
-    fp2: { date: "2025-11-21", time: "04:00" },
-    fp3: { date: "2025-11-22", time: "00:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-11-22", time: "04:00" },
-    status: "upcoming"
-  },
-  {
-    round: 23,
-    raceName: "Qatar GP",
-    circuitName: "Lusail International Circuit",
-    country: "Qatar",
-    city: "Lusail",
-    date: "2025-11-30",
-    time: "21:30",
-    fp1: { date: "2025-11-28", time: "13:30" },
-    fp2: { date: null, time: null },
-    fp3: { date: null, time: null },
-    sprintQualifying: { date: "2025-11-28", time: "17:30" },
-    sprint: { date: "2025-11-29", time: "13:00" },
-    qualifying: { date: "2025-11-29", time: "18:00" },
-    status: "upcoming"
-  },
-  {
-    round: 24,
-    raceName: "Abu Dhabi GP",
-    circuitName: "Yas Marina Circuit",
-    country: "UAE",
-    city: "Abu Dhabi",
-    date: "2025-12-07",
-    time: "18:30",
-    fp1: { date: "2025-12-05", time: "09:30" },
-    fp2: { date: "2025-12-05", time: "13:00" },
-    fp3: { date: "2025-12-06", time: "10:30" },
-    sprintQualifying: { date: null, time: null },
-    sprint: { date: null, time: null },
-    qualifying: { date: "2025-12-06", time: "14:00" },
-    status: "upcoming"
-  }
-]; */
+// Removed CALENDAR import and static definition
 
 type RaceSession = { date: string | null; time: string | null };
 type RaceItem = {
@@ -413,6 +20,7 @@ type RaceItem = {
   sprint: RaceSession;
   qualifying: RaceSession;
   status: 'upcoming' | 'live' | 'completed';
+  startISO?: string; // Add optional if we use it
 };
 
 interface SchedulePageProps {
@@ -420,10 +28,14 @@ interface SchedulePageProps {
 }
 
 export default function SchedulePage({ onPageChange }: SchedulePageProps) {
-  const [selectedFilter, setSelectedFilter] = useState<'all'|'upcoming'|'live'|'completed'>('all');
-  const [selectedMonth, setSelectedMonth] = useState<'all'|string>('all');
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'live' | 'completed'>('all');
+  const [selectedMonth, setSelectedMonth] = useState<'all' | string>('all');
+
+  // Use API hook
+  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2025);
+
   const [races, setRaces] = useState<RaceItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedRace, setSelectedRace] = useState<RaceItem | null>(null);
   const [showRaceModal, setShowRaceModal] = useState(false);
@@ -431,22 +43,48 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
   const [loadingResults, setLoadingResults] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    // Use shared calendar and add proper status (UTC)
-    const racesWithStatus = CALENDAR.map(race => ({
-      ...race,
-      status: getRaceStatusUTC(race.startISO)
-    }));
-    setRaces(racesWithStatus);
+    if (apiLoading) {
+      setLoading(true);
+      return;
+    }
+    if (apiError) {
+      setError(apiError);
+      setLoading(false);
+      return;
+    }
+
+    // Map API races to UI model and calculate status
+    const mappedRaces: RaceItem[] = apiRaces.map((r: ApiRace) => {
+      const startISO = `${r.race_date}T${r.time || '00:00'}:00Z`; // Ensure proper format
+      return {
+        round: r.round,
+        raceName: r.name,
+        circuitName: r.circuit,
+        country: r.country,
+        city: r.city,
+        date: r.race_date,
+        time: r.time ? r.time.substring(0, 5) : 'TBD', // HH:mm
+        fp1: { date: r.fp1_time ? r.fp1_time.split('T')[0] : null, time: r.fp1_time ? r.fp1_time.split('T')[1].substring(0, 5) : null },
+        fp2: { date: r.fp2_time ? r.fp2_time.split('T')[0] : null, time: r.fp2_time ? r.fp2_time.split('T')[1].substring(0, 5) : null },
+        fp3: { date: r.fp3_time ? r.fp3_time.split('T')[0] : null, time: r.fp3_time ? r.fp3_time.split('T')[1].substring(0, 5) : null },
+        sprintQualifying: { date: null, time: null }, // TODO: Add to API if needed
+        sprint: { date: r.sprint_time ? r.sprint_time.split('T')[0] : null, time: r.sprint_time ? r.sprint_time.split('T')[1].substring(0, 5) : null },
+        qualifying: { date: r.qualifying_time ? r.qualifying_time.split('T')[0] : null, time: r.qualifying_time ? r.qualifying_time.split('T')[1].substring(0, 5) : null },
+        status: getRaceStatusUTC(startISO),
+        startISO: startISO
+      };
+    });
+
+    setRaces(mappedRaces);
     setLoading(false);
-  }, []);
+
+  }, [apiRaces, apiLoading, apiError]);
 
   const getRaceStatusUTC = (startISO: string) => {
     const raceDateTime = new Date(startISO);
     const now = new Date();
     const diff = raceDateTime.getTime() - now.getTime();
-    
+
     // If race is more than 2 hours in the future
     if (diff > 2 * 60 * 60 * 1000) {
       return 'upcoming';
@@ -461,7 +99,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
     }
   };
 
-  const getStatusColor = (status: 'upcoming'|'live'|'completed'|string) => {
+  const getStatusColor = (status: 'upcoming' | 'live' | 'completed' | string) => {
     switch (status) {
       case 'completed': return 'bg-gray-600 text-gray-300';
       case 'live': return 'bg-red-600 text-white animate-pulse';
@@ -566,15 +204,15 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
   };
 
   const getRaceResults = async (raceName: string) => {
-    // Support both "GP" and "Grand Prix" naming
-    const aliases = [
+    // TODO: Fetch results from backend
+    /* const aliases = [
       raceName,
       raceName.replace(/\bGP\b/, 'Grand Prix')
     ];
     for (const key of aliases) {
       const found = (F1_2025_RESULTS as any)[key];
       if (found) return found;
-    }
+    } */
     return null;
   };
 
@@ -582,7 +220,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
     setSelectedRace(race);
     setShowRaceModal(true);
     setRaceResults(null);
-    
+
     // Get real results for completed races
     if (race.status === 'completed') {
       setLoadingResults(true);
@@ -773,11 +411,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                 <button
                   key={filter.id}
                   onClick={() => setSelectedFilter(filter.id)}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                    selectedFilter === filter.id
-                      ? 'bg-red-600 text-white'
-                      : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${selectedFilter === filter.id
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-700 hover:bg-gray-600'
+                    }`}
                 >
                   {filter.label}
                 </button>
@@ -790,7 +427,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
               <Clock className="w-5 h-5 text-green-500" />
               Filter by Month
             </h3>
-            <select 
+            <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
@@ -818,8 +455,8 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
         ) : (
           <div className="space-y-4">
             {filteredRaces.map((race) => (
-              <div 
-                key={race.round} 
+              <div
+                key={race.round}
                 className="bg-gray-900/50 backdrop-blur-sm border border-red-600/20 rounded-xl p-6 hover:border-red-500/50 transition-all cursor-pointer"
                 onClick={() => openRaceDetails(race)}
               >
@@ -857,7 +494,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                   </div>
                   {/* Actions */}
                   <div className="flex flex-col gap-2">
-                    <button 
+                    <button
                       className="bg-gray-800 hover:bg-gray-700 border border-gray-600 hover:border-red-500 py-2 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -867,7 +504,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       <Bell className="w-4 h-4" />
                       Set Reminder
                     </button>
-                    <button 
+                    <button
                       className="bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -879,7 +516,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                     </button>
                   </div>
                 </div>
-                
+
                 {/* Detailed Schedule */}
                 <div className="mt-6 grid grid-cols-2 md:grid-cols-7 gap-4 text-sm">
                   <div className="bg-gray-800/50 rounded-lg p-3">
@@ -895,7 +532,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="bg-gray-800/50 rounded-lg p-3">
                     <div className="font-semibold text-green-400 mb-1">
                       {race.sprintQualifying.date ? 'Sprint Qual.' : 'FP2'}
@@ -916,7 +553,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="bg-gray-800/50 rounded-lg p-3">
                     <div className="font-semibold text-yellow-400 mb-1">
                       {race.sprint.date ? 'Sprint' : 'FP3'}
@@ -937,7 +574,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="bg-gray-800/50 rounded-lg p-3">
                     <div className="font-semibold text-purple-400 mb-1">Qualifying</div>
                     <div className="text-gray-300">
@@ -945,7 +582,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       <div className="text-red-400">{race.qualifying.time}</div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gray-800/50 rounded-lg p-3 col-span-2 md:col-span-1">
                     <div className="font-semibold text-red-400 mb-1">Race</div>
                     <div className="text-gray-300">
@@ -1003,11 +640,11 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                     <div className="flex justify-between">
                       <span className="text-gray-400">Date:</span>
                       <span className="font-semibold">
-                        {new Date(selectedRace.date).toLocaleDateString('en-US', { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
+                        {new Date(selectedRace.date).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
                         })}
                       </span>
                     </div>
@@ -1071,10 +708,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                         <div>
                           <div className="font-semibold text-blue-400">Free Practice 1</div>
                           <div className="text-sm text-gray-400">
-                            {new Date(selectedRace.fp1.date).toLocaleDateString('en-US', { 
-                              weekday: 'short', 
-                              month: 'short', 
-                              day: 'numeric' 
+                            {new Date(selectedRace.fp1.date).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
                             })}
                           </div>
                         </div>
@@ -1090,10 +727,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                         <div>
                           <div className="font-semibold text-green-400">Sprint Qualifying</div>
                           <div className="text-sm text-gray-400">
-                            {new Date(selectedRace.sprintQualifying.date).toLocaleDateString('en-US', { 
-                              weekday: 'short', 
-                              month: 'short', 
-                              day: 'numeric' 
+                            {new Date(selectedRace.sprintQualifying.date).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
                             })}
                           </div>
                         </div>
@@ -1107,10 +744,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                         <div>
                           <div className="font-semibold text-green-400">Free Practice 2</div>
                           <div className="text-sm text-gray-400">
-                            {new Date(selectedRace.fp2.date).toLocaleDateString('en-US', { 
-                              weekday: 'short', 
-                              month: 'short', 
-                              day: 'numeric' 
+                            {new Date(selectedRace.fp2.date).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
                             })}
                           </div>
                         </div>
@@ -1126,10 +763,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                         <div>
                           <div className="font-semibold text-yellow-400">Sprint Race</div>
                           <div className="text-sm text-gray-400">
-                            {new Date(selectedRace.sprint.date).toLocaleDateString('en-US', { 
-                              weekday: 'short', 
-                              month: 'short', 
-                              day: 'numeric' 
+                            {new Date(selectedRace.sprint.date).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
                             })}
                           </div>
                         </div>
@@ -1143,10 +780,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                         <div>
                           <div className="font-semibold text-yellow-400">Free Practice 3</div>
                           <div className="text-sm text-gray-400">
-                            {new Date(selectedRace.fp3.date).toLocaleDateString('en-US', { 
-                              weekday: 'short', 
-                              month: 'short', 
-                              day: 'numeric' 
+                            {new Date(selectedRace.fp3.date).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
                             })}
                           </div>
                         </div>
@@ -1161,10 +798,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       <div>
                         <div className="font-semibold text-purple-400">Qualifying</div>
                         <div className="text-sm text-gray-400">
-                          {new Date(selectedRace.qualifying.date).toLocaleDateString('en-US', { 
-                            weekday: 'short', 
-                            month: 'short', 
-                            day: 'numeric' 
+                          {new Date(selectedRace.qualifying.date).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric'
                           })}
                         </div>
                       </div>
@@ -1178,10 +815,10 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       <div>
                         <div className="font-semibold text-red-400">Race</div>
                         <div className="text-sm text-gray-400">
-                          {new Date(selectedRace.date).toLocaleDateString('en-US', { 
-                            weekday: 'short', 
-                            month: 'short', 
-                            day: 'numeric' 
+                          {new Date(selectedRace.date).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric'
                           })}
                         </div>
                       </div>
@@ -1196,7 +833,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
 
               {/* Action Buttons */}
               <div className="flex gap-4 mt-8">
-                <button 
+                <button
                   className="flex-1 bg-red-600 hover:bg-red-700 py-3 px-6 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
                   onClick={() => {
                     closeRaceModal();

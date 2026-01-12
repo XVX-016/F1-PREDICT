@@ -1,11 +1,11 @@
-import { 
-  UserAccount, 
-  BettingMarket, 
-  MarketOption, 
-  UserBet, 
-  Transaction, 
-  MarketCategory, 
-  BetStatus, 
+import {
+  UserAccount,
+  BettingMarket,
+  MarketOption,
+  UserBet,
+  Transaction,
+  MarketCategory,
+  BetStatus,
   TransactionType,
   BettingStats,
   MarketFilters
@@ -151,10 +151,10 @@ class BettingService {
 
     try {
       console.log(`🎯 Creating dynamic markets for ${next.name}`);
-      
+
       // Generate dynamic markets using ML predictions
       const dynamicMarkets = await this.predictionMarketService.generateDynamicMarkets(
-        next.name, 
+        next.name,
         next.date.toISOString()
       );
 
@@ -175,7 +175,7 @@ class BettingService {
 
       console.log(`✅ Created ${dynamicMarkets.length} dynamic markets for ${next.name}`);
       this.saveState();
-      
+
     } catch (error) {
       console.error(`❌ Error creating dynamic markets for ${next.name}:`, error);
       // Fallback to sample markets if dynamic generation fails
@@ -185,7 +185,7 @@ class BettingService {
 
   private createSampleMarketsFallback(race: any) {
     console.log(`🔄 Using fallback sample markets for ${race.name}`);
-    
+
     // Race Winner Markets
     this.createMarketInternal({
       id: `winner-${race.id}`,
@@ -316,7 +316,7 @@ class BettingService {
       ] as any[],
       expiresAt: new Date(race.date.getTime())
     });
-    
+
     this.saveState();
   }
 
@@ -434,7 +434,7 @@ class BettingService {
       });
 
       this.saveState();
-    } catch {}
+    } catch { }
   }
 
   // Lock any market whose race date or expiration is in the past
@@ -497,12 +497,12 @@ class BettingService {
         }
         // Remove from active markets map to ensure it no longer shows up
         this.markets.delete(m.id);
-      } catch {}
+      } catch { }
     }
     this.saveState();
   }
 
-  private getNextCalendarRace(): { id: string; name: string; date: Date; circuit: string } | null {
+  public getNextCalendarRace(): { id: string; name: string; date: Date; circuit: string } | null {
     const now = new Date();
     const upcoming = F1_2025_CALENDAR
       .map(r => ({
@@ -598,10 +598,10 @@ class BettingService {
     };
 
     this.users.set(user.id, user);
-    
+
     // Add signup bonus transaction
     this.addTransaction(user.id, TransactionType.SIGNUP_BONUS, 10000, 'Welcome bonus');
-    
+
     this.saveState();
     return user;
   }
@@ -623,7 +623,7 @@ class BettingService {
     };
 
     this.users.set(user.id, user);
-    
+
     // Add welcome bonus transaction
     this.addTransaction(user.id, TransactionType.SIGNUP_BONUS, 10000, 'Welcome bonus - 10,000 PC');
 
@@ -660,17 +660,17 @@ class BettingService {
       // Fetch from real API with enhanced error handling
       const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
       const queryParams = new URLSearchParams();
-      
+
       if (filters) {
         if (filters.category) queryParams.append('category', filters.category);
         if (filters.raceId) queryParams.append('race_id', filters.raceId);
         if (filters.isActive !== undefined) queryParams.append('status', filters.isActive ? 'open' : 'closed');
         if (filters.minVolume) queryParams.append('min_volume', filters.minVolume.toString());
       }
-      
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
+
       const response = await fetch(`${baseUrl}/api/v1/markets?${queryParams.toString()}`, {
         method: 'GET',
         headers: {
@@ -680,9 +680,9 @@ class BettingService {
         credentials: 'include',
         signal: controller.signal,
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           console.warn('Markets API endpoint not found, using sample data');
@@ -690,7 +690,7 @@ class BettingService {
         }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
 
       // Determine next race from shared calendar (UTC)
@@ -783,14 +783,14 @@ class BettingService {
       }
     } catch (error: any) {
       console.error('Error fetching markets from API:', error);
-      
+
       // Handle specific error types
       if (error && error.name === 'AbortError') {
         console.warn('Request timeout, using sample data');
       } else if (typeof error?.message === 'string' && error.message.includes('Failed to fetch')) {
         console.warn('Network error, using sample data');
       }
-      
+
       // Fallback to sample data if API fails
       const markets = await this.getSampleMarkets();
       this.enforcePastRaceLocks();
@@ -1007,7 +1007,7 @@ class BettingService {
 
   private recalculatePrices(market: BettingMarket) {
     const totalVolume = market.options.reduce((sum, opt) => sum + opt.totalVolume, 0);
-    
+
     market.options.forEach(option => {
       if (totalVolume > 0) {
         option.currentPrice = Math.round((option.totalVolume / totalVolume) * 100);
@@ -1042,7 +1042,7 @@ class BettingService {
 
     // Settle all bets for this market
     const marketBets = Array.from(this.bets.values()).filter(bet => bet.marketId === marketId);
-    
+
     for (const bet of marketBets) {
       await this.settleBet(bet.id, bet.optionId === winningOptionId);
     }
@@ -1173,7 +1173,7 @@ class BettingService {
 
   private async distributeCurrencyRewards() {
     const now = new Date();
-    
+
     for (const user of this.users.values()) {
       if (!user.isActive) continue;
 

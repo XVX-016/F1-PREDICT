@@ -4,7 +4,7 @@ Uses WebSocket for real-time updates, SSE as fallback
 """
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import EventSourceResponse
-from realtime.live_session import live_session_manager
+from live_services.live_session import live_session_manager
 import json
 import time
 import asyncio

@@ -8,11 +8,11 @@ import pandas as pd
 import logging
 import joblib
 import os
+from typing import List, Dict, Optional, Tuple, Any
 from sklearn.isotonic import IsotonicRegression
 from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)
-
 class ProbabilityCalibrator:
     def __init__(self, model_dir: str = "models/calibration"):
         self.model_dir = model_dir

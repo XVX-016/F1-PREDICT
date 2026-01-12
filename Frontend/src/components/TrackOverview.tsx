@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import GlassWrapper from './GlassWrapper';
-import CircuitFeaturesService from '../services/CircuitFeaturesService';
+
 
 interface TrackOverviewProps {
 	raceName: string;
@@ -63,15 +63,31 @@ const toCircuitImagePath = (raceName: string): string => {
 export default function TrackOverview({ raceName, circuitName, laps, lengthKm, features }: TrackOverviewProps) {
 	const [trackData, setTrackData] = useState<TrackFeatures | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	
+
 	console.log(`🔍 TrackOverview: Props received - raceName: ${raceName}, circuitName: ${circuitName}`);
 
 	useEffect(() => {
 		const loadTrackData = async () => {
 			setIsLoading(true);
 			console.log(`🔍 TrackOverview: Loading track data for race: ${raceName}`);
-			const service = CircuitFeaturesService.getInstance();
-			const data = service.findByRaceName(raceName);
+			const data: TrackFeatures = {
+				track: raceName,
+				first_grand_prix: 1950, // Dummy value
+				number_of_laps: laps,
+				circuit_length_km: lengthKm,
+				race_distance_km: laps * lengthKm,
+				lap_record: {
+					time: '1:20.000',
+					driver: 'Dummy Driver',
+					year: 2023
+				},
+				features: {
+					corners: 15, // Dummy value
+					drs_zones: 2, // Dummy value
+					max_speed_kmh: 320, // Dummy value
+					notable_layout: 'A challenging circuit with a mix of high-speed straights and technical corners.' // Dummy value
+				}
+			};
 			console.log(`🔍 TrackOverview: Track data result:`, data);
 			setTrackData(data);
 			setIsLoading(false);

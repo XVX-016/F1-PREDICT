@@ -1,6 +1,6 @@
 import React from 'react';
 import GlassWrapper from './GlassWrapper';
-import CircuitFeaturesService from '../services/CircuitFeaturesService';
+
 
 interface TrackFeatureCardProps {
   raceName: string;
@@ -32,12 +32,12 @@ interface TrackFeatures {
 const toCircuitImagePath = (raceName: string): string => {
   // Match both abbreviated GP names and full Grand Prix names
   const raceNameLower = raceName.toLowerCase();
-  
+
   // Handle Chinese GP first with explicit matching
   if (raceNameLower === 'chinese gp' || raceNameLower.includes('china') || raceNameLower.includes('shanghai') || raceNameLower.includes('chn')) {
     return '/f1_tracks/China_Shanghai_International.png';
   }
-  
+
   // Handle abbreviated names from sample data
   if (raceNameLower.includes('bahrain') || raceNameLower.includes('bhr')) return '/f1_tracks/Bahrain_Bahrain_International.png';
   if (raceNameLower.includes('saudi') || raceNameLower.includes('jeddah') || raceNameLower.includes('sau')) return '/f1_tracks/Saudi_Arabia_Jeddah_Corniche.png';
@@ -62,7 +62,7 @@ const toCircuitImagePath = (raceName: string): string => {
   if (raceNameLower.includes('las vegas') || raceNameLower.includes('lve')) return '/f1_tracks/USA_Las_Vegas_Strip.png';
   if (raceNameLower.includes('qatar') || raceNameLower.includes('lusail') || raceNameLower.includes('qat')) return '/f1_tracks/Qatar_Lusail_International.png';
   if (raceNameLower.includes('abu dhabi') || raceNameLower.includes('yas') || raceNameLower.includes('uae') || raceNameLower.includes('abu')) return '/f1_tracks/UAE_Abu_Dhabi_Yas_Marina.png';
-  
+
   // Fallback to simplified outline if specific not found
   return '/circuits/f1_2024_aus_outline.png';
 };
@@ -71,15 +71,33 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
   const [trackData, setTrackData] = React.useState<TrackFeatures | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [showImageModal, setShowImageModal] = React.useState(false);
-  
+
   console.log(`🔍 TrackFeatureCard: Props received - raceName: ${raceName}, circuitName: ${circuitName}`);
 
   React.useEffect(() => {
     const loadTrackData = async () => {
       setIsLoading(true);
       console.log(`🔍 TrackFeatureCard: Loading track data for race: ${raceName}`);
-      const service = CircuitFeaturesService.getInstance();
-      const data = service.findByRaceName(raceName);
+      // Placeholder for removed CircuitFeaturesService
+      const dummyData: TrackFeatures = {
+        track: raceName,
+        first_grand_prix: 1950, // Example dummy data
+        number_of_laps: laps,
+        circuit_length_km: lengthKm,
+        race_distance_km: laps * lengthKm,
+        lap_record: {
+          time: '1:20.000',
+          driver: 'Dummy Driver',
+          year: 2023,
+        },
+        features: {
+          corners: 15, // Example dummy data
+          drs_zones: 2, // Example dummy data
+          max_speed_kmh: 320, // Example dummy data
+          notable_layout: 'A challenging circuit with a mix of high-speed straights and technical corners.', // Example dummy data
+        },
+      };
+      const data = dummyData; // Assign dummy data directly
       console.log(`🔍 TrackFeatureCard: Track data result:`, data);
       setTrackData(data);
       setIsLoading(false);
@@ -95,7 +113,7 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
         <div className="flex items-center justify-center space-x-3 mb-5">
           <div className="p-2 bg-gray-800/20 rounded-lg border border-gray-600/30">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-blue-400">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
           </div>
           <h2 className="text-2xl" style={{ fontFamily: '"Orbitron", "Formula1", "Arial Black", sans-serif' }}>
@@ -111,9 +129,9 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
               alt={circuitName}
               className="w-full h-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
               style={{ maxHeight: '280px' }}
-              onError={(e) => { 
+              onError={(e) => {
                 console.warn(`Failed to load track image for ${raceName}: ${toCircuitImagePath(raceName)}`);
-                (e.target as HTMLImageElement).style.display = 'none'; 
+                (e.target as HTMLImageElement).style.display = 'none';
               }}
               onClick={() => setShowImageModal(true)}
             />
@@ -135,7 +153,7 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
             </div>
           </div>
         )}
-        
+
         {/* Track features - smaller 4x4 grid layout */}
         <div className="max-w-xl mx-auto">
           {isLoading ? (
@@ -147,33 +165,33 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
                 <div className="text-xs text-gray-400 mb-1">LAPS</div>
                 <div className="text-base font-bold text-white">{trackData.number_of_laps}</div>
               </div>
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">LENGTH</div>
                 <div className="text-base font-bold text-white">{trackData.circuit_length_km.toFixed(3)} km</div>
               </div>
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">DISTANCE</div>
                 <div className="text-base font-bold text-white">{trackData.race_distance_km.toFixed(0)} km</div>
               </div>
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">FIRST GP</div>
                 <div className="text-base font-bold text-white">{trackData.first_grand_prix}</div>
               </div>
-              
+
               {/* Row 2 */}
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">CORNERS</div>
                 <div className="text-base font-bold text-white">{trackData.features.corners}</div>
               </div>
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">DRS ZONES</div>
                 <div className="text-base font-bold text-white">{trackData.features.drs_zones}</div>
               </div>
-              
+
               {trackData.features.max_speed_kmh ? (
                 <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                   <div className="text-xs text-gray-400 mb-1">MAX SPEED</div>
@@ -185,7 +203,7 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
                   <div className="text-sm font-bold text-white">Street Circuit</div>
                 </div>
               )}
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">LAP RECORD</div>
                 <div className="text-xs font-bold text-yellow-300">{trackData.lap_record.time}</div>
@@ -200,12 +218,12 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
                 <div className="text-xs text-gray-400 mb-1">LAPS</div>
                 <div className="text-base font-bold text-white">{laps}</div>
               </div>
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">LENGTH</div>
                 <div className="text-base font-bold text-white">{lengthKm.toFixed(3)} km</div>
               </div>
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">FEATURES</div>
                 <div className="text-xs text-white">
@@ -214,7 +232,7 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
                   ))}
                 </div>
               </div>
-              
+
               <div className="text-center p-2 bg-black/20 rounded-lg border border-white/10">
                 <div className="text-xs text-gray-400 mb-1">TRACK</div>
                 <div className="text-xs text-white">{circuitName}</div>
@@ -228,7 +246,7 @@ export default function TrackFeatureCard({ raceName, circuitName, laps, lengthKm
       {showImageModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowImageModal(false)}>
           <div className="relative max-w-4xl max-h-[90vh] bg-black rounded-lg overflow-hidden">
-            <button 
+            <button
               className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 z-10"
               onClick={() => setShowImageModal(false)}
             >

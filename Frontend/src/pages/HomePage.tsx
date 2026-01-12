@@ -3,11 +3,10 @@ import { Calendar, Clock, Trophy, Flag, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import F1CarCarousel from '../components/F1CarCarousel';
 import CountdownTimer from '../components/betting/CountdownTimer';
-import { sampleRaces } from '../data/sampleRaces';
-import { F1_2025_CALENDAR } from '../data/f1-2025-calendar';
-import MLPredictionService from '../services/MLPredictionService';
-import { trackPredictionService } from '../services/TrackPredictionService';
-import DynamicPredictionService from '../services/DynamicPredictionService';
+// import { sampleRaces } from '../data/sampleRaces'; // Removed
+// import { F1_2025_CALENDAR } from '../data/f1-2025-calendar'; // Removed
+import { useRaces, Race as ApiRace } from '../hooks/useApi';
+import { api } from '../services/api';
 import { Race, RacePrediction } from '../types/predictions';
 
 
@@ -23,6 +22,9 @@ interface HomePageProps {
 export default function HomePage({ setCurrentPage }: HomePageProps) {
 
   const [upcomingRaces, setUpcomingRaces] = useState<Race[]>([]);
+
+  // Use API hook
+  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2025);
 
   const [loadingRaces, setLoadingRaces] = useState(true);
 
@@ -97,176 +99,102 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
 
 
   useEffect(() => {
-    const loadUpcomingRaces = async () => {
+    if (apiLoading) {
+      setLoadingRaces(true);
+      return;
+    }
+    if (apiError) {
+      setErrorRaces(apiError);
+      setLoadingRaces(false);
+      return;
+    }
+
+    const loadData = () => {
       try {
-        setLoadingRaces(true);
         const now = new Date();
-        const upcoming = sampleRaces
+        const mappedRaces: Race[] = apiRaces.map((r: ApiRace) => ({
+          id: r.id,
+          round: r.round,
+          name: r.name,
+          circuit: r.circuit,
+          city: r.city,
+          country: r.country,
+          startDate: r.race_date,
+          endDate: r.race_date,
+          timezone: "UTC",
+          has_sprint: !!r.sprint_time,
+          status: "upcoming"
+        }));
+
+        const sortedRaces = mappedRaces.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+        const upcoming = sortedRaces
           .filter(r => new Date(r.startDate) >= now)
-          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-          .slice(0, 3); // Limit to 3 upcoming races
-        setUpcomingRaces(upcoming as unknown as Race[]);
+          .slice(0, 3);
+        setUpcomingRaces(upcoming);
+
+        // Set next race data
+        const next = upcoming[0];
+        if (next) {
+          setNextRaceName(next.name);
+          setNextRaceDateISO(`${next.startDate}T${(next as any).time || '12:00'}:00Z`); // race_date is YYYY-MM-DD
+          setNextRace(next);
+
+          // Trigger predictions
+          loadNextRacePredictions(next);
+        }
+
       } catch (error) {
-        setErrorRaces('Failed to load upcoming races');
-        console.error('Error loading upcoming races:', error);
+        setErrorRaces('Failed to load races');
+        console.error('Error processing races:', error);
       } finally {
         setLoadingRaces(false);
       }
     };
 
-    // Load next race data for banner
-    const loadNextRaceData = () => {
-      const now = new Date();
-      const upcoming = F1_2025_CALENDAR
-        .map(r => ({
-          name: r.raceName,
-          startISO: `${r.date}T${r.time}:00Z`,
-        }))
-        .filter(r => new Date(r.startISO) > now)
-        .sort((a, b) => new Date(a.startISO).getTime() - new Date(b.startISO).getTime());
-      if (upcoming.length > 0) {
-        setNextRaceName(upcoming[0].name);
-        setNextRaceDateISO(upcoming[0].startISO);
-      }
-    };
+    loadData();
+  }, [apiRaces, apiLoading, apiError]);
 
-    loadUpcomingRaces();
-    loadNextRaceData();
-  }, []);
-
-  // Load dynamic predictions for the next race
+  // Load prediction for the next race
   useEffect(() => {
-    const loadDynamicPredictions = async () => {
-      if (!nextRaceName) return;
-      
+    const loadPredictions = async () => {
+      if (!nextRace) return;
+
       try {
         setLoadingDynamicPrediction(true);
-        const dynamicService = DynamicPredictionService.getInstance();
-        const prediction = await dynamicService.getRacePrediction(nextRaceName, 2025);
-        if (prediction) {
-          setDynamicPrediction(prediction);
+        // Use backend API
+        const response = await api.getProbabilities(nextRace.id);
+
+        // Transform to RacePrediction format expected by UI
+        if (response && response.probabilities) {
+          const top3 = Object.entries(response.probabilities)
+            .map(([driverId, p]) => ({
+              driverName: driverId, // We might need name mapping if ID is slug
+              winProbPct: p.win_prob * 100,
+              team: 'F1 Team' // Placeholder until we have driver metadata
+            }))
+            .sort((a, b) => b.winProbPct - a.winProbPct)
+            .slice(0, 3);
+
+          setDynamicPrediction({
+            top3,
+            all: []
+          } as any);
         }
       } catch (error) {
-        console.error('Error loading dynamic predictions:', error);
+        console.error('Error loading predictions:', error);
       } finally {
         setLoadingDynamicPrediction(false);
       }
     };
 
-    loadDynamicPredictions();
-  }, [nextRaceName]);
+    loadPredictions();
+  }, [nextRace]);
 
-
-
-  useEffect(() => {
-
-    const loadNextRacePredictions = async () => {
-
-      try {
-
-        setLoadingPrediction(true);
-
-        const now = new Date();
-
-        const upcoming = sampleRaces
-
-          .filter(r => new Date(r.startDate) >= now)
-
-          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-        const next = upcoming[0];
-
-        if (next) {
-
-          setNextRace(next as unknown as Race);
-
-          const raceDate = next.startDate.split('T')[0];
-
-          
-
-          // Use the TrackPredictionService for enhanced 2025 driver predictions
-
-          try {
-
-            const trackPrediction = await trackPredictionService.generateTrackPrediction(next.name);
-
-            const predictionData = trackPredictionService.convertToRacePrediction(trackPrediction);
-
-            
-
-            console.log('✅ Using TrackPredictionService for homepage:', next.name);
-
-            console.log('📊 2025 Driver predictions:', predictionData.top3?.map((d: any) => `${d.driverName}: ${d.winProbPct}%`));
-
-            setNextRacePrediction(predictionData);
-
-          } catch (error) {
-
-            console.warn('TrackPredictionService failed, falling back to MLPredictionService:', error);
-
-            
-
-            // Fallback to MLPredictionService
-
-            const mlService = MLPredictionService.getInstance();
-
-            
-
-            // Clear any cached predictions to ensure fresh data
-
-            const cacheKey = `${next.name}_${raceDate}`;
-
-            if (mlService['predictionCache'] && mlService['predictionCache'].has(cacheKey)) {
-
-              mlService['predictionCache'].delete(cacheKey);
-
-              console.log('🗑️ Cleared cached prediction for homepage:', next.name);
-
-            }
-
-            
-
-            // Get calibrated predictions with track-specific adjustments
-
-            const predictionData = await mlService.getCalibratedRacePrediction(next.name, raceDate);
-
-            
-
-            if (predictionData) {
-
-              console.log('✅ Using MLPredictionService fallback for homepage:', next.name);
-
-              console.log('📊 Prediction data:', predictionData.top3?.map((d: any) => `${d.driverName}: ${d.winProbPct}%`));
-
-              setNextRacePrediction(predictionData);
-
-            } else {
-
-              console.warn('No prediction data available for:', next.name);
-
-            }
-
-          }
-
-        }
-
-      } catch (error) {
-
-        console.error('Error loading next race predictions:', error);
-
-      } finally {
-
-        setLoadingPrediction(false);
-
-      }
-
-    };
-
-
-
-    loadNextRacePredictions();
-
-  }, []);
+  // Legacy function removed
+  const loadNextRacePredictions = async (next: Race) => {
+    // Replaced by new useEffect
+  };
 
 
 
@@ -292,7 +220,7 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black mb-4 sm:mb-6 bg-gradient-to-r from-white via-red-400 to-white bg-clip-text text-transparent">
 
-                     🏎️ Predict. Analyze. Win.
+            🏎️ Predict. Analyze. Win.
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-300 max-w-3xl mx-auto px-2">
@@ -336,10 +264,10 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
                 {nextRaceDateISO ? new Date(nextRaceDateISO).toLocaleDateString() : 'TBD'}
               </p>
             </div>
-            
+
             {/* Countdown Timer */}
             <div className="mb-6">
-              <CountdownTimer 
+              <CountdownTimer
                 targetDate={nextRaceDateISO ? new Date(nextRaceDateISO) : undefined}
                 title="Race Countdown"
                 subtitle={nextRaceName && nextRaceDateISO ? `${nextRaceName} - ${new Date(nextRaceDateISO).toLocaleDateString()}` : undefined}
@@ -365,7 +293,7 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
                 AI Powered
               </div>
             </div>
-            
+
             {loadingDynamicPrediction ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
@@ -381,18 +309,16 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.2 }}
-                      className={`w-full p-3 sm:p-4 lg:p-5 rounded-xl border ${
-                        index === 0 ? 'bg-gradient-to-br from-yellow-500 to-yellow-600 border-yellow-500 shadow-lg shadow-yellow-500/30' :
+                      className={`w-full p-3 sm:p-4 lg:p-5 rounded-xl border ${index === 0 ? 'bg-gradient-to-br from-yellow-500 to-yellow-600 border-yellow-500 shadow-lg shadow-yellow-500/30' :
                         index === 1 ? 'bg-gradient-to-br from-gray-500 to-gray-600 border-gray-500 shadow-lg shadow-gray-500/30' :
-                        'bg-gradient-to-br from-orange-500 to-orange-600 border-orange-500 shadow-lg shadow-orange-500/30'
-                      }`}
+                          'bg-gradient-to-br from-orange-500 to-orange-600 border-orange-500 shadow-lg shadow-orange-500/30'
+                        }`}
                     >
                       <div className="text-center">
-                        <div className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${
-                          index === 0 ? 'text-yellow-400' :
+                        <div className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${index === 0 ? 'text-yellow-400' :
                           index === 1 ? 'text-gray-300' :
-                          'text-orange-400'
-                        }`}>
+                            'text-orange-400'
+                          }`}>
                           #{index + 1}
                         </div>
                         <div className="font-bold text-sm sm:text-base lg:text-lg text-white mb-1">
@@ -419,7 +345,7 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
                 <p className="text-gray-500">Unable to load predictions for this race</p>
               </div>
             )}
-            
+
             <div className="text-center">
               <button
                 onClick={handleViewFullAnalysis}
@@ -453,8 +379,8 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
               {upcomingRaces.map((race: Race, index: number) => (
                 <div key={`${race.name}-${race.round}-${index}`} className="bg-black/60 border border-white/30 rounded-xl overflow-hidden group shadow-2xl">
                   <div className="h-24 sm:h-32 bg-black flex items-center justify-center">
-                    <img 
-                      src={toCircuitBannerImage(race.circuit, race.name)} 
+                    <img
+                      src={toCircuitBannerImage(race.circuit, race.name)}
                       alt={race.circuit}
                       className="w-full h-full object-contain p-2"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
