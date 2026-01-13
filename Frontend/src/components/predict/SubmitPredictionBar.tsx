@@ -62,9 +62,9 @@ export default function SubmitPredictionBar({
                         whileTap={canSubmit ? { scale: 0.95 } : {}}
                         onClick={onSubmit}
                         disabled={!canSubmit}
-                        className={`flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all min-w-[200px] ${canSubmit
-                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-red-500/50'
-                                : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-60'
+                        className={`flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all min-w-[200px] min-h-[56px] ${canSubmit
+                            ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-[0_0_30px_rgba(239,68,68,0.4)] hover:shadow-[0_0_50px_rgba(239,68,68,0.6)] border border-red-500/50'
+                            : 'bg-gray-600/20 backdrop-blur-md border border-white/10 text-gray-500 cursor-not-allowed opacity-60'
                             }`}
                     >
                         {isSubmitted ? (
