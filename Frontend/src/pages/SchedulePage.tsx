@@ -209,7 +209,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
     return nationalityMap[driverName] || 'Unknown';
   };
 
-  const getRaceResults = async (raceName: string) => {
+  const getRaceResults = async (_raceName: string) => {
     // TODO: Fetch results from backend
     /* const aliases = [
       raceName,
