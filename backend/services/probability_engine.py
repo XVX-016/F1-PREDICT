@@ -20,7 +20,7 @@ class ProbabilityEngine:
         """
         try:
             res = self.db.table("outcome_probabilities")\
-                .select("*, drivers(name, constructor)")\
+                .select("*, drivers(name, constructor_id)")\
                 .eq("race_id", race_id)\
                 .execute()
             
