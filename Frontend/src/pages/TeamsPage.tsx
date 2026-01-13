@@ -1,16 +1,16 @@
 import { useConstructors } from "../hooks/useApi";
 
 const TeamsPage = () => {
-  const { data: teams, loading, error } = useConstructors();
+  const { data: teams, isLoading, error } = useConstructors();
 
-  if (loading) return <div className="min-h-screen text-white pt-32 text-center">Loading teams...</div>;
-  if (error) return <div className="min-h-screen text-white pt-32 text-center text-red-500">Error: {error}</div>;
+  if (isLoading) return <div className="min-h-screen text-white pt-32 text-center">Loading teams...</div>;
+  if (error) return <div className="min-h-screen text-white pt-32 text-center text-red-500">Error: {(error as any)?.message || 'Failed to load teams'}</div>;
 
   return (
     <div className="min-h-screen text-white py-32">
       <h1 className="text-4xl font-bold mb-12 text-center">F1 Teams 2025</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[98vw] mx-auto px-2 md:px-6">
-        {teams.map((team) => (
+        {teams?.map((team) => (
           <div
             key={team.id}
             className="relative rounded-xl shadow-xl flex flex-col justify-between overflow-hidden min-h-[220px] h-[220px] md:h-[240px] w-full"

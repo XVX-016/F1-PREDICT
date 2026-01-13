@@ -322,6 +322,34 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
 
           {/* Markets Grid */}
           <div className="space-y-6">
+            {/* Featured Markets (Top 3 Active) */}
+            {activeMarkets.length > 0 && selectedCategory === 'ALL' && !searchTerm && (
+              <div className="mb-12">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-2 h-8 bg-yellow-500 rounded-full"></div>
+                  <h2 className="text-2xl font-bold text-white italic" style={{ fontFamily: '"Orbitron", sans-serif' }}>FEATURED MARKETS</h2>
+                  <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm border border-yellow-500/30">
+                    🔥 Trending
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {filteredMarkets
+                    .filter(market => market.isActive)
+                    .slice(0, 3)
+                    .map((market) => (
+                      <div key={`featured-${market.id}`} className="min-w-0 h-full flex transform hover:scale-[1.02] transition-transform duration-300">
+                        <MarketCard
+                          market={market}
+                          onClick={() => handleMarketClick(market)}
+                          onAddToBetslip={handleAddToBetslip}
+                          userBets={user ? [] : []}
+                        />
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
             {/* Active Markets */}
             {activeMarkets.length > 0 && (
               <div>

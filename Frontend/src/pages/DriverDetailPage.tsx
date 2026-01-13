@@ -1,88 +1,32 @@
-
-interface Driver {
-  id: string;
-  firstName: string;
-  lastName: string;
-  team: string;
-  nationality: string;
-  flag: string;
-  number: string;
-}
+import { useDrivers } from "../hooks/useApi";
 
 const TEAM_COLORS: Record<string, string> = {
-  "Red Bull Racing": "#1E2C5C",
-  "Ferrari": "#DC0000",
-  "Mercedes": "#00D2BE",
+  "Red Bull Racing": "#3671C6",
+  "Ferrari": "#F91536",
+  "Mercedes": "#6CD3BF",
   "McLaren": "#FF8700",
-  "Aston Martin": "#00665E",
+  "Aston Martin": "#358C75",
   "Alpine": "#2293D1",
-  "Williams": "#005AFF",
+  "Williams": "#37BEDD",
   "Kick Sauber": "#52E252",
   "Haas": "#B6BABD",
-  "Racing Bulls": "#6692FF",
+  "Racing Bulls": "#5E8FAA",
 };
 
-const drivers: Driver[] = [
-  { id: "piastri", firstName: "Oscar", lastName: "Piastri", team: "McLaren", nationality: "Australia", flag: "🇦🇺", number: "81" },
-  { id: "norris", firstName: "Lando", lastName: "Norris", team: "McLaren", nationality: "Great Britain", flag: "🇬🇧", number: "4" },
-  { id: "leclerc", firstName: "Charles", lastName: "Leclerc", team: "Ferrari", nationality: "Monaco", flag: "🇲🇨", number: "16" },
-  { id: "hamilton", firstName: "Lewis", lastName: "Hamilton", team: "Ferrari", nationality: "Great Britain", flag: "🇬🇧", number: "44" },
-  { id: "russell", firstName: "George", lastName: "Russell", team: "Mercedes", nationality: "Great Britain", flag: "🇬🇧", number: "63" },
-  { id: "antonelli", firstName: "Andrea Kimi", lastName: "Antonelli", team: "Mercedes", nationality: "Italy", flag: "🇮🇹", number: "21" },
-  { id: "verstappen", firstName: "Max", lastName: "Verstappen", team: "Red Bull Racing", nationality: "Netherlands", flag: "🇳🇱", number: "1" },
-  { id: "tsunoda", firstName: "Yuki", lastName: "Tsunoda", team: "Red Bull Racing", nationality: "Japan", flag: "🇯🇵", number: "22" },
-  { id: "albon", firstName: "Alexander", lastName: "Albon", team: "Williams", nationality: "Thailand", flag: "🇹🇭", number: "23" },
-  { id: "sainz", firstName: "Carlos", lastName: "Sainz", team: "Williams", nationality: "Spain", flag: "🇪🇸", number: "55" },
-  { id: "hulkenberg", firstName: "Nico", lastName: "Hulkenberg", team: "Kick Sauber", nationality: "Germany", flag: "🇩🇪", number: "27" },
-  { id: "bortoleto", firstName: "Gabriel", lastName: "Bortoleto", team: "Kick Sauber", nationality: "Brazil", flag: "🇧🇷", number: "10" },
-  { id: "lawson", firstName: "Liam", lastName: "Lawson", team: "Racing Bulls", nationality: "New Zealand", flag: "🇳🇿", number: "40" },
-  { id: "hadjar", firstName: "Isack", lastName: "Hadjar", team: "Racing Bulls", nationality: "France", flag: "🇫🇷", number: "20" },
-  { id: "stroll", firstName: "Lance", lastName: "Stroll", team: "Aston Martin", nationality: "Canada", flag: "🇨🇦", number: "18" },
-  { id: "alonso", firstName: "Fernando", lastName: "Alonso", team: "Aston Martin", nationality: "Spain", flag: "🇪🇸", number: "14" },
-  { id: "ocon", firstName: "Esteban", lastName: "Ocon", team: "Haas", nationality: "France", flag: "🇫🇷", number: "31" },
-  { id: "bearman", firstName: "Oliver", lastName: "Bearman", team: "Haas", nationality: "Great Britain", flag: "🇬🇧", number: "50" },
-  { id: "gasly", firstName: "Pierre", lastName: "Gasly", team: "Alpine", nationality: "France", flag: "🇫🇷", number: "10" },
-  { id: "colapinto", firstName: "Franco", lastName: "Colapinto", team: "Alpine", nationality: "Argentina", flag: "🇦🇷", number: "42" },
-];
-
-function getAvatarFilename(driver: Driver) {
-  // Use firstnamelastname all lowercase, no spaces
-  // Handle special cases for better avatar matching
-  const firstName = driver.firstName.toLowerCase().replace(/[^a-z]/g, '');
-  const lastName = driver.lastName.toLowerCase().replace(/[^a-z]/g, '');
-  
-  // Special cases for better avatar matching
-  if (driver.firstName === "Nico" && driver.lastName === "Hulkenberg") {
-    return `/avatars/nicohulkenberg.png`;
-  }
-  
-  if (driver.firstName === "Andrea Kimi" && driver.lastName === "Antonelli") {
-    return `/avatars/andreakimiantonelli.png`;
-  }
-  
-  if (driver.firstName === "Oliver" && driver.lastName === "Bearman") {
-    return `/avatars/oliverbearman.png`;
-  }
-  
-  if (driver.firstName === "Franco" && driver.lastName === "Colapinto") {
-    return `/avatars/francocolapinto.png`;
-  }
-  
-  if (driver.firstName === "Isack" && driver.lastName === "Hadjar") {
-    return `/avatars/isackhadjar.png`;
-  }
-  
-  return `/avatars/${firstName}${lastName}.png`;
+function getAvatarFilename(driver: any) {
+  const name = driver.name.toLowerCase().replace(/\s+/g, '');
+  return `/avatars/${name}.png`;
 }
 
-function DriverCard({ driver }: { driver: Driver }) {
-  const bg = TEAM_COLORS[driver.team] || "#222";
+function DriverCard({ driver }: { driver: any }) {
+  const teamName = driver.constructors?.name || "Unknown";
+  const bg = TEAM_COLORS[teamName] || driver.constructors?.color || "#222";
+
   return (
     <div
       className="relative rounded-2xl shadow-lg flex flex-row items-stretch overflow-hidden min-h-[180px] h-[200px] md:h-[240px] w-full transition-all duration-200 cursor-pointer group"
       style={{ backgroundColor: bg }}
     >
-      {/* Black halftone pixel pattern overlay (background) */}
       <div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
@@ -95,26 +39,22 @@ function DriverCard({ driver }: { driver: Driver }) {
           borderRadius: "inherit"
         }}
       />
-      {/* Info */}
       <div className="flex flex-col justify-between p-8 flex-1 z-10" style={{ fontFamily: 'Orbitron, sans-serif', color: '#fff' }}>
         <div>
           <div className="font-bold text-xl md:text-2xl mb-1">
-            <span className="block leading-tight font-light">{driver.firstName}</span>
-            <span className="block leading-tight font-black">{driver.lastName}</span>
+            <span className="block leading-tight font-black">{driver.name}</span>
           </div>
-          <div className="text-base font-semibold mb-1">{driver.team}</div>
+          <div className="text-base font-semibold mb-1">{teamName}</div>
           <div className="text-base md:text-lg font-extrabold mb-2">{driver.number}</div>
         </div>
-        {/* Bottom left: flag only */}
         <div className="absolute left-8 bottom-4 flex items-center gap-2 z-20">
-          <span className="text-2xl md:text-3xl">{driver.flag}</span>
+          <span className="text-2xl md:text-3xl text-white/60">{driver.country_code}</span>
         </div>
       </div>
-      {/* Driver image - cropped above the waist, slightly left of center, flush with bottom */}
       <div className="absolute bottom-0 left-[55%] -translate-x-1/4 h-[180px] md:h-[220px] w-[140px] md:w-[180px] overflow-hidden rounded-2xl flex items-end justify-center z-20">
         <img
-          src={getAvatarFilename(driver)}
-          alt={driver.firstName + ' ' + driver.lastName}
+          src={driver.image_url || getAvatarFilename(driver)}
+          alt={driver.name}
           className="w-full h-full object-cover object-top drop-shadow-xl transition-transform duration-200 group-hover:scale-105"
           onError={e => (e.currentTarget.src = '/avatars/default.png')}
         />
@@ -124,11 +64,16 @@ function DriverCard({ driver }: { driver: Driver }) {
 }
 
 export default function DriverPage() {
+  const { data: drivers, isLoading, error } = useDrivers();
+
+  if (isLoading) return <div className="min-h-screen text-white pt-32 text-center">Loading drivers...</div>;
+  if (error) return <div className="min-h-screen text-white pt-32 text-center text-red-500">Error: {(error as any)?.message || 'Failed to load drivers'}</div>;
+
   return (
     <div className="min-h-screen bg-black text-white py-32 px-2">
-      <h1 className="text-4xl font-bold mb-10 text-center">F1 Drivers 2025</h1>
+      <h1 className="text-4xl font-bold mb-10 text-center">F1 Drivers 2026</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[98vw] mx-auto px-2 md:px-6">
-        {drivers.map(driver => (
+        {drivers?.map(driver => (
           <DriverCard key={driver.id} driver={driver} />
         ))}
       </div>

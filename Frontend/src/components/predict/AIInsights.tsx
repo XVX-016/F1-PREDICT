@@ -1,0 +1,153 @@
+import { useState } from 'react';
+import { ChevronDown, ChevronUp, Brain, TrendingUp, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface AIPrediction {
+    driver: string;
+    probability: number;
+    confidence: 'high' | 'medium' | 'low';
+}
+
+interface AIInsightsProps {
+    predictions: AIPrediction[];
+    explanation?: string;
+    confidence?: 'high' | 'medium' | 'low';
+}
+
+export default function AIInsights({ predictions, explanation, confidence = 'medium' }: AIInsightsProps) {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const getConfidenceColor = (conf: string) => {
+        switch (conf) {
+            case 'high':
+                return 'text-green-400';
+            case 'medium':
+                return 'text-yellow-400';
+            case 'low':
+                return 'text-orange-400';
+            default:
+                return 'text-gray-400';
+        }
+    };
+
+    const getConfidenceLabel = (conf: string) => {
+        switch (conf) {
+            case 'high':
+                return 'High Confidence';
+            case 'medium':
+                return 'Medium Confidence';
+            case 'low':
+                return 'Low Confidence';
+            default:
+                return 'Unknown';
+        }
+    };
+
+    return (
+        <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-xl overflow-hidden">
+            {/* Header - Always Visible */}
+            <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+            >
+                <div className="flex items-center gap-3">
+                    <Brain className="w-5 h-5 text-purple-400" />
+                    <span className="font-bold text-white">🔍 AI Analysis (Optional)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">
+                        {isExpanded ? 'Hide' : 'Show'} insights
+                    </span>
+                    {isExpanded ? (
+                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                    ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                    )}
+                </div>
+            </button>
+
+            {/* Expanded Content */}
+            <AnimatePresence>
+                {isExpanded && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="border-t border-purple-500/30"
+                    >
+                        <div className="p-6 space-y-6">
+                            {/* Confidence Level */}
+                            <div className="flex items-center justify-between">
+                                <span className="text-gray-300 font-semibold">Model Confidence:</span>
+                                <span className={`font-bold ${getConfidenceColor(confidence)}`}>
+                                    {getConfidenceLabel(confidence)}
+                                </span>
+                            </div>
+
+                            {/* Top Predictions */}
+                            <div>
+                                <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4" />
+                                    Top 3 AI Predictions
+                                </h4>
+                                <div className="space-y-2">
+                                    {predictions.slice(0, 3).map((pred, index) => (
+                                        <div
+                                            key={index}
+                                            className="group flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded-lg hover:border-purple-500/30 transition-all"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]' :
+                                                    index === 1 ? 'bg-gray-400 text-black shadow-[0_0_10px_rgba(156,163,175,0.3)]' :
+                                                        'bg-orange-600/80 text-white shadow-[0_0_10px_rgba(234,88,12,0.3)]'
+                                                    }`}>
+                                                    {index + 1}
+                                                </div>
+                                                <span className="text-white font-semibold">{pred.driver}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-24 md:w-32 bg-gray-800 rounded-full h-2 overflow-hidden relative">
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${pred.probability}%` }}
+                                                        transition={{ duration: 1, delay: 0.2 + index * 0.1 }}
+                                                        className="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full relative"
+                                                    >
+                                                        <div className="absolute top-0 right-0 w-2 h-full bg-white opacity-30 shadow-[0_0_8px_#fff]"></div>
+                                                    </motion.div>
+                                                </div>
+                                                <span className="text-purple-400 font-bold w-10 text-right text-sm">
+                                                    {pred.probability}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Explanation */}
+                            {explanation && (
+                                <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                                    <h4 className="text-sm font-semibold text-blue-300 mb-2 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        Why?
+                                    </h4>
+                                    <p className="text-sm text-gray-300 leading-relaxed">
+                                        {explanation}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Disclaimer */}
+                            <div className="text-xs text-gray-500 italic border-t border-white/10 pt-4">
+                                ⚠️ AI predictions are based on historical data and current form. They should be used as guidance only.
+                                Your own analysis and intuition are valuable!
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
