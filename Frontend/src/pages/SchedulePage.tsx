@@ -23,7 +23,8 @@ type RaceItem = {
   sprint: RaceSession;
   qualifying: RaceSession;
   status: 'upcoming' | 'live' | 'completed';
-  startISO?: string; // Add optional if we use it
+  startISO?: string;
+  id: string;
 };
 
 interface SchedulePageProps {
@@ -36,7 +37,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
 
   // Use API hook - derive year from current date
   const currentYear = new Date().getFullYear();
-  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(currentYear);
+  const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(currentYear);
 
   const [races, setRaces] = useState<RaceItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,13 +53,13 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
       return;
     }
     if (apiError) {
-      setError(apiError);
+      setError(apiError.message);
       setLoading(false);
       return;
     }
 
     // Map API races to UI model and calculate status
-    const mappedRaces: RaceItem[] = apiRaces.map((r: ApiRace) => {
+    const mappedRaces: RaceItem[] = (apiRaces || []).map((r: ApiRace) => {
       const startISO = `${r.race_date}T${r.time || '00:00'}:00Z`; // Ensure proper format
       return {
         round: r.round,
@@ -75,7 +76,8 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
         sprint: { date: r.sprint_time ? r.sprint_time.split('T')[0] : null, time: r.sprint_time ? r.sprint_time.split('T')[1].substring(0, 5) : null },
         qualifying: { date: r.qualifying_time ? r.qualifying_time.split('T')[0] : null, time: r.qualifying_time ? r.qualifying_time.split('T')[1].substring(0, 5) : null },
         status: getRaceStatusUTC(startISO),
-        startISO: startISO
+        startISO: startISO,
+        id: r.id
       };
     });
 
@@ -765,7 +767,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                   className="flex-1 bg-red-600 hover:bg-red-700 py-3 px-6 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
                   onClick={() => {
                     closeRaceModal();
-                    onPageChange('predict', { raceName: selectedRace.raceName, raceId: selectedRace.raceName.toLowerCase().replace(/\s+/g, '-') });
+                    onPageChange('predict', { raceName: selectedRace.raceName, raceId: selectedRace.id });
                   }}
                 >
                   <Target className="w-5 h-5" />

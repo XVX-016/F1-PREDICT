@@ -140,14 +140,41 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
     { value: MarketCategory.DRIVER_HEAD_TO_HEAD, label: 'Driver H2H', icon: Shield }
   ];
 
-  if (loading) {
+  const MarketSkeleton = () => (
+    <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 h-[400px] animate-pulse">
+      <div className="flex items-center space-x-3 mb-4">
+        <div className="w-10 h-10 rounded-xl bg-white/10" />
+        <div className="flex-1 space-y-2">
+          <div className="h-4 bg-white/10 rounded w-3/4" />
+          <div className="h-3 bg-white/10 rounded w-1/2" />
+        </div>
+      </div>
+      <div className="h-4 bg-white/10 rounded w-full mb-6" />
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        {[1, 2, 3].map(i => <div key={i} className="h-10 bg-white/10 rounded" />)}
+      </div>
+      <div className="space-y-2">
+        {[1, 2, 3].map(i => <div key={i} className="h-8 bg-white/10 rounded" />)}
+      </div>
+    </div>
+  );
+
+  if (loading && markets.length === 0) {
     return (
       <div className="min-h-screen relative">
         <F1CarCarousel />
-        <div className="relative z-10 container mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-500 mx-auto"></div>
-            <p className="text-white mt-4 text-lg">Loading betting markets...</p>
+        <div className="relative z-10 pt-24">
+          <div className="text-center mb-8 px-4">
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 opacity-50" style={{ fontFamily: '"Orbitron", sans-serif' }}>
+              Pole to Podium
+            </h1>
+            <div className="h-1 bg-red-500/20 w-32 mx-auto rounded-full mt-4" />
+          </div>
+
+          <div className="container mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map(i => <MarketSkeleton key={i} />)}
+            </div>
           </div>
         </div>
       </div>

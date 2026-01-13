@@ -268,7 +268,7 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
                 </button>
               </div>
 
-              <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar no-scrollbar relative min-h-0">
+              <div className="flex-1 space-y-8 overflow-y-auto no-scrollbar drawer-mask relative min-h-0 pb-32">
                 <div className="mb-8">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 mb-4">Quick Access</p>
                   <div className="grid grid-cols-1 gap-2">
