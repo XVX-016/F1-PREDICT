@@ -29,9 +29,9 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/ml/, '')
       },
-      // Proxy local Jolpica (Django) Ergast endpoints
+      // Proxy public Jolpica (Django) Ergast endpoints
       '/ergast': {
-        target: 'http://localhost:5000',
+        target: 'https://api.jolpi.ca',
         changeOrigin: true,
         secure: false
       },

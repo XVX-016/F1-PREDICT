@@ -128,15 +128,21 @@ export default function BettingStats() {
               <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgColor} rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500`}></div>
 
               {/* Glow effect */}
-              <div className={`absolute inset-0 rounded-2xl ${stat.glowColor} blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500`}></div>
+              <div className={`absolute inset-0 rounded-2xl ${stat.glowColor} blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700`}></div>
+
+              {/* Glass Top Highlight */}
+              <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl pointer-events-none"></div>
 
               {/* Content */}
               <div className="relative z-10 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg group-hover:shadow-xl transition-all duration-300`}>
+                  <motion.div
+                    whileHover={{ rotate: 15, scale: 1.1 }}
+                    className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                  >
                     <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" />
+                  </motion.div>
+                  <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
                 </div>
 
                 <div>

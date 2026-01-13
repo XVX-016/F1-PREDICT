@@ -98,9 +98,9 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
-      
+
       const response = await Promise.race([
-        fetch(url, { 
+        fetch(url, {
           signal: controller.signal,
           headers: {
             'Accept': 'application/json',
@@ -109,18 +109,18 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
         }),
         createTimeout(TIMEOUT_DURATION)
       ]);
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data;
     } catch (error) {
       console.warn(`Jolpica API attempt ${attempt + 1} failed for ${url}:`, error);
-      
+
       if (attempt === retries) {
         // Final attempt fallback: use Ergast directly if Jolpica fails
         if (url.includes('api.jolpi.ca/ergast')) {
@@ -140,7 +140,7 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
         }
         throw new Error(`Failed to fetch data after ${retries + 1} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-      
+
       // Wait before retrying (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
     }
@@ -151,12 +151,12 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
 const getCachedOrFetch = async (key: string, fetchFn: () => Promise<any>, fallbackKey?: string) => {
   const cached = cache.get(key);
   const now = Date.now();
-  
+
   if (cached && (now - cached.timestamp) < CACHE_DURATION) {
     console.log(`Using cached data for ${key}`);
     return cached.data;
   }
-  
+
   try {
     console.log(`Fetching fresh data for ${key}`);
     const data = await fetchFn();
@@ -168,13 +168,13 @@ const getCachedOrFetch = async (key: string, fetchFn: () => Promise<any>, fallba
       console.warn(`Fetch failed for ${key}, using expired cached data`);
       return cached.data;
     }
-    
+
     // If no cached data and fallback key provided, use static fallback data
     if (fallbackKey && FALLBACK_DATA[fallbackKey as keyof typeof FALLBACK_DATA]) {
       console.warn(`API completely failed for ${key}, using static fallback data`);
       return FALLBACK_DATA[fallbackKey as keyof typeof FALLBACK_DATA];
     }
-    
+
     throw error;
   }
 };
@@ -232,7 +232,7 @@ export const getArchiveDriverStandings = async (year: number) => {
 export const getArchiveConstructorStandings = async (year: number) => {
   const key = `archive-constructor-standings-${year}`;
   return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/constructorstandings`));
-}; 
+};
 
 // Utility function to clear cache
 export const clearCache = () => {
@@ -252,12 +252,12 @@ export const getCacheStats = () => {
 export const preloadFallbackData = () => {
   const now = Date.now();
   console.log('Preloading fallback data into cache...');
-  
+
   // Preload with fallback data that will be used if API fails
   Object.entries(FALLBACK_DATA).forEach(([key, data]) => {
     cache.set(key, { data, timestamp: now - CACHE_DURATION - 1 }); // Mark as expired so it will try API first
   });
-  
+
   console.log('Fallback data preloaded successfully');
 };
 
@@ -265,11 +265,11 @@ export const preloadFallbackData = () => {
 export const isUsingFallbackData = (key: string) => {
   const cached = cache.get(key);
   if (!cached) return false;
-  
+
   // Check if the cached data matches our fallback data
   const fallbackData = FALLBACK_DATA[key as keyof typeof FALLBACK_DATA];
   if (!fallbackData) return false;
-  
+
   return JSON.stringify(cached.data) === JSON.stringify(fallbackData);
 };
 
@@ -279,7 +279,7 @@ export const getApiHealthStatus = async () => {
     const startTime = Date.now();
     await fetchWithTimeout(`${BASE_URL}/drivers`, 1); // Single attempt with short timeout
     const responseTime = Date.now() - startTime;
-    
+
     return {
       status: 'healthy',
       responseTime,
@@ -298,7 +298,7 @@ export const getApiHealthStatus = async () => {
 export const initializeJolpicaApi = () => {
   console.log('Initializing Jolpica API with fallback data...');
   preloadFallbackData();
-  
+
   // Test API health on initialization
   getApiHealthStatus().then(health => {
     console.log('Jolpica API Health Check:', health);

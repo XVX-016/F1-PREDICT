@@ -10,6 +10,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -21,6 +22,7 @@
     opacity: 0;
     transform: translateX(-100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -32,13 +34,16 @@
     opacity: 0;
     transform: scale(0.3);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.05);
   }
+
   70% {
     transform: scale(0.9);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -49,6 +54,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -59,9 +65,29 @@
   0% {
     transform: translate(0, 0);
   }
+
   100% {
     transform: translate(50px, 50px);
   }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
 }
 
 /* Enhanced F1 Slider Styling */
@@ -69,7 +95,8 @@
   -webkit-appearance: none !important;
   appearance: none !important;
   height: 6px;
-  background: #ffffff !important; /* white background for unused portion */
+  background: #ffffff !important;
+  /* white background for unused portion */
   border-radius: 3px;
   outline: none;
   transition: all 0.1s ease;
@@ -113,7 +140,8 @@
   appearance: none !important;
   width: 16px;
   height: 16px;
-  background: #ef4444 !important; /* red dot */
+  background: #ef4444 !important;
+  /* red dot */
   border: 2px solid #ef4444 !important;
   border-radius: 50%;
   cursor: pointer;
@@ -155,9 +183,12 @@
 
 /* Enhanced F1 Card Animations */
 @keyframes cardGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
   }
+
   50% {
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37), 0 0 20px rgba(239, 68, 68, 0.3);
   }
@@ -169,25 +200,29 @@
 
 /* F1 Grid Background */
 .f1-grid-bg {
-  background-image: none; /* disable subtle grid to avoid any perceived tint */
+  background-image: none;
+  /* disable subtle grid to avoid any perceived tint */
 }
 
 /* F1 Car Carousel Background */
 .f1-car-background {
   position: absolute;
   inset: 0;
-  opacity: 0.25; /* increased opacity to make background more visible */
+  opacity: 0.08;
+  /* reduced opacity for better content readability */
   pointer-events: none;
-  z-index: -1; /* negative z-index to ensure it stays behind content */
+  z-index: -1;
+  /* negative z-index to ensure it stays behind content */
   overflow: hidden;
 }
 
 .f1-car-background canvas,
-.f1-car-background > div {
+.f1-car-background>div {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover;
-  background: transparent !important; /* prevent black background */
+  background: transparent !important;
+  /* prevent black background */
 }
 
 /* Ensure F1 car carousel doesn't interfere with scrolling */
@@ -322,7 +357,7 @@
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(31, 38, 135, 0.37),
     inset 0 1px 1px rgba(255, 255, 255, 0.08);
 }
@@ -330,7 +365,7 @@
 .glass-enhanced:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 
+  box-shadow:
     0 12px 40px rgba(31, 38, 135, 0.5),
     inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
@@ -357,12 +392,12 @@
   .f1-grid-bg {
     background-size: 30px 30px;
   }
-  
+
   .slider::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
   }
-  
+
   .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -373,48 +408,87 @@
   .f1-grid-bg {
     background-size: 20px 20px;
   }
-  
+
   .slider::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
   }
-  
+
   .slider::-moz-range-thumb {
     width: 18px;
     height: 18px;
   }
 }
 
-/* Glassmorphism utilities */
+/* Glassmorphism utilities - Standardized for high-end look */
 .glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.glass-card {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.glass-navbar {
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.glass-card {
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(15, 15, 15, 0.5);
+  transform: translateY(-4px);
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.glass-navbar {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(24px) saturate(200%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
 .glass-btn-primary {
-  background: rgba(59, 130, 246, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(239, 68, 68, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.glass-btn-primary:hover {
+  background: rgba(239, 68, 68, 0.9);
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
 }
 
 .glass-input {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
 
 /* Form element improvements */
@@ -452,7 +526,9 @@
 }
 
 /* Ensure text is readable in all form elements */
-input, select, textarea {
+input,
+select,
+textarea {
   color: white !important;
 }
 
@@ -465,18 +541,26 @@ input::placeholder {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Orbitron', 'Inter', system-ui, sans-serif;
   }
-  
+
   body {
     background-color: #000000;
     color: #ffffff;
+    overflow-x: hidden;
+    width: 100vw;
   }
 }
 
 @layer components {
+
   /* Premium F1 Glass Navigation Bar */
   .glass-navbar {
     backdrop-filter: blur(35px) saturate(180%) contrast(120%);
@@ -485,7 +569,7 @@ input::placeholder {
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 0;
     margin: 0;
-    box-shadow: 
+    box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.2),
       inset 0 -1px 1px rgba(0, 0, 0, 0.4),
       0 4px 20px rgba(0, 0, 0, 0.4),
@@ -497,7 +581,7 @@ input::placeholder {
     position: relative;
     overflow: hidden;
   }
-  
+
   /* Liquid cursor glow effect */
   .glass-navbar::before {
     content: "";
@@ -506,13 +590,11 @@ input::placeholder {
     left: var(--x, 0px);
     width: 300px;
     height: 300px;
-    background: radial-gradient(
-      circle at center, 
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.08) 30%,
-      rgba(255, 255, 255, 0.03) 60%,
-      transparent 80%
-    );
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.08) 30%,
+        rgba(255, 255, 255, 0.03) 60%,
+        transparent 80%);
     transform: translate(-50%, -50%);
     pointer-events: none;
     transition: top 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -520,7 +602,7 @@ input::placeholder {
     z-index: 1;
     will-change: top, left;
   }
-  
+
   /* Additional depth layer */
   .glass-navbar::after {
     content: "";
@@ -529,12 +611,10 @@ input::placeholder {
     left: var(--x, 0px);
     width: 150px;
     height: 150px;
-    background: radial-gradient(
-      circle at center, 
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 80%
-    );
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 80%);
     transform: translate(-50%, -50%);
     pointer-events: none;
     transition: top 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -542,10 +622,10 @@ input::placeholder {
     z-index: 2;
     will-change: top, left;
   }
-  
+
   .glass-navbar:hover {
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.3),
       inset 0 -1px 1px rgba(0, 0, 0, 0.5),
       0 6px 25px rgba(0, 0, 0, 0.5),
@@ -563,7 +643,7 @@ input::placeholder {
     background: rgba(239, 68, 68, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 15px;
-    box-shadow: 
+    box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.15),
       inset 0 -1px 1px rgba(0, 0, 0, 0.3),
       0 4px 20px rgba(239, 68, 68, 0.3),
@@ -574,7 +654,7 @@ input::placeholder {
     overflow: hidden;
     z-index: 10;
   }
-  
+
   /* Liquid effect on buttons */
   .glass-btn::before {
     content: '';
@@ -583,23 +663,21 @@ input::placeholder {
     left: var(--btn-x, 0px);
     width: 200px;
     height: 200px;
-    background: radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0.1) 40%,
-      transparent 70%
-    );
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.1) 40%,
+        transparent 70%);
     transform: translate(-50%, -50%);
     transition: top 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     pointer-events: none;
     opacity: 0;
     will-change: top, left;
   }
-  
+
   .glass-btn:hover::before {
     opacity: 1;
   }
-  
+
   .glass-btn:hover {
     background: rgba(239, 68, 68, 0.25);
     transform: translateY(-3px) scale(1.05);
@@ -612,7 +690,7 @@ input::placeholder {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px;
-    box-shadow: 
+    box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.08),
       inset 0 -1px 1px rgba(0, 0, 0, 0.2),
       0 8px 32px rgba(0, 0, 0, 0.3),
@@ -631,12 +709,10 @@ input::placeholder {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -645,7 +721,7 @@ input::placeholder {
   .glass-card:hover {
     background: rgba(0, 0, 0, 0.4);
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.12),
       inset 0 -1px 1px rgba(0, 0, 0, 0.3),
       0 12px 40px rgba(0, 0, 0, 0.4),
@@ -664,7 +740,7 @@ input::placeholder {
     background: rgba(239, 68, 68, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 15px;
-    box-shadow: 
+    box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.2),
       inset 0 -1px 1px rgba(0, 0, 0, 0.3),
       0 4px 20px rgba(239, 68, 68, 0.5),
@@ -675,7 +751,7 @@ input::placeholder {
     overflow: hidden;
     z-index: 10;
   }
-  
+
   /* Liquid effect on primary buttons */
   .glass-btn-primary::before {
     content: '';
@@ -684,26 +760,24 @@ input::placeholder {
     left: var(--btn-x, 0px);
     width: 200px;
     height: 200px;
-    background: radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.25) 0%,
-      rgba(255, 255, 255, 0.15) 40%,
-      transparent 70%
-    );
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.15) 40%,
+        transparent 70%);
     transform: translate(-50%, -50%);
     transition: top 0.1s ease-out, left 0.1s ease-out;
     pointer-events: none;
     opacity: 0;
   }
-  
+
   .glass-btn-primary:hover::before {
     opacity: 1;
   }
-  
+
   .glass-btn-primary:hover {
     background: rgba(239, 68, 68, 0.35);
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 
+    box-shadow:
       0 0 15px rgba(239, 68, 68, 0.7),
       0 0 40px rgba(239, 68, 68, 0.5),
       0 8px 25px rgba(239, 68, 68, 0.5),
@@ -715,14 +789,14 @@ input::placeholder {
   .nav-active {
     position: relative;
     background: rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 
+    box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.2),
       inset 0 -1px 1px rgba(0, 0, 0, 0.3),
       0 4px 20px rgba(0, 0, 0, 0.3),
       inset 0 0 10px rgba(255, 255, 255, 0.05),
       0 0 0 1px rgba(255, 255, 255, 0.15) !important;
   }
-  
+
   .nav-active::after {
     content: '';
     position: absolute;
@@ -734,7 +808,7 @@ input::placeholder {
     transform: translateX(-50%);
     animation: active-underline 0.6s ease-out forwards;
   }
-  
+
   @keyframes active-underline {
     to {
       width: 80%;
@@ -746,7 +820,7 @@ input::placeholder {
     position: relative;
     overflow: hidden;
   }
-  
+
   .ripple-btn .ripple {
     position: absolute;
     border-radius: 50%;
@@ -756,7 +830,7 @@ input::placeholder {
     pointer-events: none;
     z-index: 20;
   }
-  
+
   @keyframes ripple-animation {
     to {
       transform: scale(4);
@@ -774,10 +848,10 @@ input::placeholder {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .glass-card:hover {
     transform: translateY(-4px);
-    box-shadow: 
+    box-shadow:
       0 16px 48px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
       0 0 0 1px rgba(239, 68, 68, 0.2);
@@ -794,10 +868,10 @@ input::placeholder {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
   }
-  
+
   .glass-input:focus {
     border-color: rgba(239, 68, 68, 0.5);
-    box-shadow: 
+    box-shadow:
       inset 0 2px 4px rgba(0, 0, 0, 0.2),
       0 0 0 3px rgba(239, 68, 68, 0.1);
   }
@@ -807,15 +881,15 @@ input::placeholder {
   .text-glow {
     text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
   }
-  
+
   .border-glow {
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
   }
-  
+
   .card-hover {
     transition: all 0.3s ease;
   }
-  
+
   .card-hover:hover {
     transform: translateY(-4px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
@@ -826,12 +900,12 @@ input::placeholder {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
-  
+
   .glass-blur-md {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
-  
+
   .glass-blur-lg {
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
@@ -917,7 +991,8 @@ body {
 }
 
 /* Ensure no horizontal scrollbars */
-html, body {
+html,
+body {
   max-width: 100%;
   overflow-x: hidden;
 }
@@ -935,7 +1010,11 @@ html, body {
 }
 
 /* Smooth animations for all interactive elements */
-button, a, input, select, textarea {
+button,
+a,
+input,
+select,
+textarea {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -951,52 +1030,58 @@ button, a, input, select, textarea {
     width: 6px;
     height: 6px;
   }
-  
+
   .f1-grid-bg {
     background-size: 30px 30px;
   }
-  
+
   /* Mobile-specific button improvements */
-  .glass-btn, .glass-btn-primary {
+  .glass-btn,
+  .glass-btn-primary {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Mobile navigation improvements */
   .glass-navbar {
     padding: 0.75rem 0;
   }
-  
+
   /* Mobile text improvements */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     word-break: break-word;
     hyphens: auto;
   }
-  
+
   /* Mobile card improvements */
   .glass-card {
     margin: 0.5rem;
   }
-  
+
   /* Mobile alignment fixes */
   .glass-navbar .flex {
     align-items: center;
   }
-  
+
   /* Mobile grid improvements */
   .grid {
     gap: 1rem;
   }
-  
+
   /* Mobile spacing consistency */
-  .space-x-1 > * + * {
+  .space-x-1>*+* {
     margin-left: 0.25rem;
   }
-  
-  .space-x-2 > * + * {
+
+  .space-x-2>*+* {
     margin-left: 0.5rem;
   }
-  
+
   /* Mobile podium improvements - Force single column on mobile */
   .grid.grid-cols-1.sm\\:grid-cols-3 {
     gap: 0.75rem;
@@ -1005,43 +1090,43 @@ button, a, input, select, textarea {
     width: 100% !important;
     max-width: 100% !important;
   }
-  
+
   /* Ensure cards don't overflow */
-  .grid.grid-cols-1.sm\\:grid-cols-3 > * {
+  .grid.grid-cols-1.sm\\:grid-cols-3>* {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
-  
+
   @media (min-width: 640px) {
     .grid.grid-cols-1.sm\\:grid-cols-3 {
       grid-template-columns: repeat(3, 1fr) !important;
     }
   }
-  
+
   /* Mobile text sizing */
   .text-xl {
     font-size: 1.125rem;
   }
-  
+
   .text-2xl {
     font-size: 1.25rem;
   }
-  
+
   .text-3xl {
     font-size: 1.5rem;
   }
-  
+
   /* Mobile navbar optimizations */
   .glass-navbar .flex {
     gap: 0.25rem;
   }
-  
+
   /* Ensure all nav buttons fit on mobile */
-  .glass-navbar .space-x-0\.5 > * + * {
+  .glass-navbar .space-x-0\.5>*+* {
     margin-left: 0.125rem;
   }
-  
+
   /* Mobile button sizing */
   .glass-navbar button {
     min-width: 44px;
@@ -1051,103 +1136,109 @@ button, a, input, select, textarea {
 
 /* Prevent Horizontal Scroll on Mobile */
 @media (max-width: 480px) {
-  body, html {
+
+  body,
+  html {
     overflow-x: hidden;
     width: 100%;
   }
-  
+
   .container {
     overflow-x: hidden;
     width: 100%;
   }
-  
+
   .f1-grid-bg {
     background-size: 20px 20px;
   }
-  
+
   /* Extra small mobile improvements */
-  .glass-btn, .glass-btn-primary {
+  .glass-btn,
+  .glass-btn-primary {
     min-height: 48px;
     font-size: 0.875rem;
   }
-  
+
   /* Mobile form improvements */
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     min-height: 44px;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
+    /* Prevents zoom on iOS */
   }
-  
+
   /* Mobile spacing adjustments */
   .px-4 {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .py-4 {
     padding-top: 1rem;
     padding-bottom: 1rem;
   }
-  
+
   /* Extra small mobile navbar */
   .glass-navbar {
     padding: 0.5rem 0;
   }
-  
+
   .glass-navbar .max-w-7xl {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
-  
+
   /* Ultra compact navigation for very small screens */
-  .glass-navbar .space-x-0\.5 > * + * {
+  .glass-navbar .space-x-0\.5>*+* {
     margin-left: 0.125rem;
   }
-  
+
   /* Ensure buttons are still touchable */
   .glass-navbar button {
     min-width: 40px;
     min-height: 40px;
   }
-  
+
   /* Mobile betting dashboard improvements */
   .container {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
-  
+
   /* Extra small mobile podium fixes */
   .grid.grid-cols-1.sm\\:grid-cols-3 {
     gap: 0.5rem !important;
     padding: 0 !important;
     margin: 0 !important;
   }
-  
+
   /* Force single column on extra small screens */
-  .grid.grid-cols-1.sm\\:grid-cols-3 > * {
+  .grid.grid-cols-1.sm\\:grid-cols-3>* {
     grid-column: 1 / -1 !important;
     width: 100% !important;
     margin: 0 !important;
   }
-  
+
   /* Mobile podium improvements */
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Mobile wallet display */
   .min-w-0 {
     min-width: 0;
   }
-  
+
   /* Force mobile container behavior */
   .max-w-7xl {
     max-width: 100% !important;
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
   }
-  
+
   /* Ensure podium section fits on mobile */
-  .bg-black\\/90 {
+  .bg-black\/90 {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -1159,6 +1250,38 @@ button, a, input, select, textarea {
   html {
     scroll-behavior: smooth;
   }
+}
+
+/* Responsive Grid enforcement - Phase 6 */
+.market-grid,
+.race-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1.5rem !important;
+}
+
+@media (min-width: 768px) {
+  .market-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .market-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .race-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Ensure no horizontal wiggle */
+body,
+#root {
+  overflow-x: hidden !important;
+  width: 100vw !important;
+  position: relative;
 }
 
 /* Allow scrolling on predict page */
@@ -1173,12 +1296,15 @@ button, a, input, select, textarea {
 
 /* Ensure clean scrolling without visual scrollbars */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .no-scrollbar::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
+  display: none;
+  /* Safari and Chrome */
 }
 
 /* Allow scrolling on predict page */
@@ -1241,12 +1367,14 @@ html.predict-page-active {
     box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
     transform: scale(1);
   }
+
   50% {
     background: rgba(239, 68, 68, 0.4);
     border-color: rgba(239, 68, 68, 0.6);
     box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transform: scale(1.02);
   }
+
   100% {
     background: rgba(239, 68, 68, 0.1);
     border-color: rgba(239, 68, 68, 0.2);
@@ -1268,12 +1396,10 @@ html.predict-page-active {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
   transition: left 0.6s ease;
   z-index: 1;
 }
@@ -1284,12 +1410,10 @@ html.predict-page-active {
 
 /* Enhanced Ripple Effect with Red Tint */
 .ripple-btn .ripple {
-  background: radial-gradient(
-    circle,
-    rgba(239, 68, 68, 0.6) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 100%
-  );
+  background: radial-gradient(circle,
+      rgba(239, 68, 68, 0.6) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%);
   animation: ripple-animation 0.6s linear;
 }
 
@@ -1298,6 +1422,7 @@ html.predict-page-active {
     transform: scale(0);
     opacity: 1;
   }
+
   100% {
     transform: scale(4);
     opacity: 0;
@@ -1308,7 +1433,7 @@ html.predict-page-active {
 .glassmorphism-bg:hover {
   background: rgba(239, 68, 68, 0.15) !important;
   border-color: rgba(239, 68, 68, 0.4) !important;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(239, 68, 68, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
@@ -1317,7 +1442,7 @@ html.predict-page-active {
 .glassmorphism-bg.active {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.3)) !important;
   border-color: rgba(239, 68, 68, 0.5) !important;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(239, 68, 68, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     0 0 0 1px rgba(239, 68, 68, 0.3) !important;
@@ -1326,13 +1451,10 @@ html.predict-page-active {
 
 /* Enhanced Glow Effect for Active States */
 .glow-effect.active {
-  background: radial-gradient(
-    circle,
-    rgba(239, 68, 68, 0.6) 0%,
-    rgba(220, 38, 38, 0.4) 50%,
-    transparent 70%
-  ) !important;
+  background: radial-gradient(circle,
+      rgba(239, 68, 68, 0.6) 0%,
+      rgba(220, 38, 38, 0.4) 50%,
+      transparent 70%) !important;
   opacity: 1 !important;
   transform: scale(1.2) !important;
 }
-

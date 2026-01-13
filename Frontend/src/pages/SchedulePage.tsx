@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, Flag, Bell, Target, MapPin, Trophy, X } from 'lucide-react';
 import { useRaces, Race as ApiRace } from '../hooks/useApi';
+import NextRaceHero from '../components/schedule/NextRaceHero';
+import RaceCard from '../components/schedule/RaceCard';
+import { NextRaceHeroSkeleton, RaceCardSkeleton } from '../components/common/SkeletonLoaders';
 
 // Removed CALENDAR import and static definition
 
@@ -31,8 +34,9 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'live' | 'completed'>('all');
   const [selectedMonth, setSelectedMonth] = useState<'all' | string>('all');
 
-  // Use API hook
-  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2025);
+  // Use API hook - derive year from current date
+  const currentYear = new Date().getFullYear();
+  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(currentYear);
 
   const [races, setRaces] = useState<RaceItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -226,8 +230,8 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
       setLoadingResults(true);
       try {
         const results = await getRaceResults(race.raceName);
-        if (results && results.length > 0) {
-          setRaceResults(results);
+        if (results && (results as any).length > 0) {
+          setRaceResults(results as any);
         }
       } catch (error) {
         console.error('Error fetching race results:', error);
@@ -251,6 +255,14 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
     }
     return true;
   });
+
+  // Grouping logic
+  const groupedRaces = filteredRaces.reduce((acc: Record<string, RaceItem[]>, race) => {
+    const month = new Date(race.date).toLocaleString('en-US', { month: 'long' });
+    if (!acc[month]) acc[month] = [];
+    acc[month].push(race);
+    return acc;
+  }, {});
 
   const renderPodiumResults = () => {
     if (loadingResults) {
@@ -389,7 +401,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4 flex items-center gap-3">
             <Calendar className="w-10 h-10 text-red-500" />
-            Race Schedule 2025
+            Formula 1 Race Schedule
           </h1>
           <p className="text-gray-400 text-lg">Complete Formula 1 calendar with race times and predictions</p>
         </div>
@@ -410,7 +422,7 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
               ].map(filter => (
                 <button
                   key={filter.id}
-                  onClick={() => setSelectedFilter(filter.id)}
+                  onClick={() => setSelectedFilter(filter.id as any)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${selectedFilter === filter.id
                     ? 'bg-red-600 text-white'
                     : 'bg-gray-700 hover:bg-gray-600'
@@ -449,157 +461,73 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
 
         {/* Race Calendar */}
         {loading ? (
-          <div className="text-center py-12 text-lg text-gray-400">Loading...</div>
+          <div className="space-y-8">
+            <NextRaceHeroSkeleton />
+            <div className="grid gap-4">
+              {[1, 2, 3].map(i => <RaceCardSkeleton key={i} />)}
+            </div>
+          </div>
         ) : error ? (
-          <div className="text-center py-12 text-lg text-red-400">{error}</div>
+          <div className="text-center py-12">
+            <div className="text-lg text-red-400 mb-4">{error}</div>
+            <p className="text-gray-400">Unable to load race schedule. Retrying...</p>
+          </div>
         ) : (
-          <div className="space-y-4">
-            {filteredRaces.map((race) => (
-              <div
-                key={race.round}
-                className="bg-gray-900/50 backdrop-blur-sm border border-red-600/20 rounded-xl p-6 hover:border-red-500/50 transition-all cursor-pointer"
-                onClick={() => openRaceDetails(race)}
-              >
-                <div className="grid md:grid-cols-4 gap-6 items-center">
-                  {/* Race Info */}
-                  <div className="md:col-span-2">
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="text-3xl">{getCountryFlag(race.country)}</div>
-                      <div>
-                        <h3 className="text-xl font-bold">{race.raceName}</h3>
-                        <div className="flex items-center gap-2 text-gray-400">
-                          <MapPin className="w-4 h-4" />
-                          <span className="text-sm">{race.circuitName}, {race.city}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(race.status)}`}>
-                        {race.status ? race.status.toUpperCase() : 'UPCOMING'}
-                      </span>
-                      <span className="text-sm text-gray-400">Round {race.round}</span>
-                    </div>
-                  </div>
-                  {/* Date & Time */}
-                  <div className="text-center">
-                    <div className="text-lg font-bold mb-1">
-                      {new Date(race.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </div>
-                    <div className="text-gray-400 text-sm mb-2">{race.time} UTC</div>
-                    {race.status === 'upcoming' && getCountdown(race.date) && (
-                      <div className="bg-red-600 px-3 py-1 rounded-full text-sm font-semibold">
-                        {getCountdown(race.date)}
-                      </div>
-                    )}
-                  </div>
-                  {/* Actions */}
-                  <div className="flex flex-col gap-2">
-                    <button
-                      className="bg-gray-800 hover:bg-gray-700 border border-gray-600 hover:border-red-500 py-2 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Set reminder logic
-                      }}
-                    >
-                      <Bell className="w-4 h-4" />
-                      Set Reminder
-                    </button>
-                    <button
-                      className="bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPageChange('predict', { raceName: race.raceName, raceId: race.raceName.toLowerCase().replace(/\s+/g, '-') });
-                      }}
-                    >
-                      <Target className="w-4 h-4" />
-                      Predict
-                    </button>
+          <div className="space-y-12">
+            {/* Next Race Hero - Always show first upcoming race */}
+            {races.find(r => r.status === 'upcoming') && (() => {
+              const nextRace = races.find(r => r.status === 'upcoming')!;
+              return (
+                <NextRaceHero
+                  race={{
+                    id: nextRace.round.toString(),
+                    name: nextRace.raceName,
+                    circuit: nextRace.circuitName,
+                    country: nextRace.country,
+                    startTime: nextRace.startISO || '',
+                    status: 'upcoming',
+                    predictionsCloseTime: nextRace.qualifying.date ? `${nextRace.qualifying.date}T${nextRace.qualifying.time || '00:00'}:00Z` : undefined
+                  }}
+                  onPredict={(raceId) => onPageChange('predict', { raceId })}
+                  onViewDetails={(raceId) => {
+                    const race = races.find(r => r.round.toString() === raceId);
+                    if (race) openRaceDetails(race);
+                  }}
+                />
+              );
+            })()}
+
+            {/* Grouped Races List */}
+            <div className="space-y-12">
+              {Object.entries(groupedRaces).map(([month, monthRaces]) => (
+                <div key={month} className="space-y-6">
+                  <h2 className="text-2xl font-black text-white flex items-center gap-4 px-2">
+                    <span className="bg-red-600 w-2 h-8 rounded-full"></span>
+                    {month.toUpperCase()}
+                  </h2>
+                  <div className="space-y-4">
+                    {monthRaces.map((race) => (
+                      <RaceCard
+                        key={race.round}
+                        race={race}
+                        getCountryFlag={getCountryFlag}
+                        getStatusColor={getStatusColor}
+                        getCountdown={getCountdown}
+                        onViewDetails={openRaceDetails}
+                        onPredict={(id, name) => onPageChange('predict', { raceId: id, raceName: name })}
+                      />
+                    ))}
                   </div>
                 </div>
-
-                {/* Detailed Schedule */}
-                <div className="mt-6 grid grid-cols-2 md:grid-cols-7 gap-4 text-sm">
-                  <div className="bg-gray-800/50 rounded-lg p-3">
-                    <div className="font-semibold text-blue-400 mb-1">FP1</div>
-                    <div className="text-gray-300">
-                      {race.fp1.date ? (
-                        <>
-                          <div>{new Date(race.fp1.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                          <div className="text-red-400">{race.fp1.time}</div>
-                        </>
-                      ) : (
-                        <span className="text-gray-500">—</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-800/50 rounded-lg p-3">
-                    <div className="font-semibold text-green-400 mb-1">
-                      {race.sprintQualifying.date ? 'Sprint Qual.' : 'FP2'}
-                    </div>
-                    <div className="text-gray-300">
-                      {race.sprintQualifying.date ? (
-                        <>
-                          <div>{new Date(race.sprintQualifying.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                          <div className="text-red-400">{race.sprintQualifying.time}</div>
-                        </>
-                      ) : race.fp2.date ? (
-                        <>
-                          <div>{new Date(race.fp2.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                          <div className="text-red-400">{race.fp2.time}</div>
-                        </>
-                      ) : (
-                        <span className="text-gray-500">—</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-800/50 rounded-lg p-3">
-                    <div className="font-semibold text-yellow-400 mb-1">
-                      {race.sprint.date ? 'Sprint' : 'FP3'}
-                    </div>
-                    <div className="text-gray-300">
-                      {race.sprint.date ? (
-                        <>
-                          <div>{new Date(race.sprint.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                          <div className="text-red-400">{race.sprint.time}</div>
-                        </>
-                      ) : race.fp3.date ? (
-                        <>
-                          <div>{new Date(race.fp3.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                          <div className="text-red-400">{race.fp3.time}</div>
-                        </>
-                      ) : (
-                        <span className="text-gray-500">—</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-800/50 rounded-lg p-3">
-                    <div className="font-semibold text-purple-400 mb-1">Qualifying</div>
-                    <div className="text-gray-300">
-                      <div>{new Date(race.qualifying.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                      <div className="text-red-400">{race.qualifying.time}</div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-800/50 rounded-lg p-3 col-span-2 md:col-span-1">
-                    <div className="font-semibold text-red-400 mb-1">Race</div>
-                    <div className="text-gray-300">
-                      <div>{new Date(race.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                      <div className="text-red-400 font-bold">{race.time}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
         {filteredRaces.length === 0 && !loading && !error && (
           <div className="text-center py-12">
             <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-600" />
-            <h3 className="text-xl font-bold mb-2">No races found</h3>
-            <p className="text-gray-400">Try adjusting your filters to see more races</p>
+            <h3 className="text-xl font-bold mb-2">No races match your filters</h3>
+            <p className="text-gray-400">Try adjusting your filter settings</p>
           </div>
         )}
       </div>
@@ -798,11 +726,11 @@ export default function SchedulePage({ onPageChange }: SchedulePageProps) {
                       <div>
                         <div className="font-semibold text-purple-400">Qualifying</div>
                         <div className="text-sm text-gray-400">
-                          {new Date(selectedRace.qualifying.date).toLocaleDateString('en-US', {
+                          {selectedRace.qualifying.date ? new Date(selectedRace.qualifying.date).toLocaleDateString('en-US', {
                             weekday: 'short',
                             month: 'short',
                             day: 'numeric'
-                          })}
+                          }) : 'TBD'}
                         </div>
                       </div>
                       <div className="text-right">
