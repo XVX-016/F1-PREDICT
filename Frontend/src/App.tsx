@@ -6,6 +6,18 @@ import LoadingSpinner from './components/LoadingSpinner';
 import { BettingProvider } from './contexts/BettingContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { initializeJolpicaApi } from './api/jolpica';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Initialize TanStack Query Client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes default stale time
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -122,7 +134,7 @@ function App() {
                 case 'teams':
                   return <TeamsPage />;
                 case 'predict':
-                  return <PredictPage raceData={raceData} />;
+                  return <PredictPage raceData={raceData} onPageChange={setCurrentPage} />;
                 case 'results':
                   return <ResultsPage />;
                 case 'profile':
@@ -163,17 +175,19 @@ function App() {
   };
 
   return (
-    <BettingProvider>
-      <NotificationProvider>
-        {/* Fixed background car carousel, always behind all content except on driver and teams pages */}
-        {currentPage !== 'driver' && currentPage !== 'teams' && <F1CarCarousel />}
-        {/* TODO: Implement navbar auto-hide on scroll */}
-        <div className="min-h-screen text-white relative z-50">
-          <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-          {renderPage()}
-        </div>
-      </NotificationProvider>
-    </BettingProvider>
+    <QueryClientProvider client={queryClient}>
+      <BettingProvider>
+        <NotificationProvider>
+          {/* Fixed background car carousel, always behind all content except on driver, teams, and predict pages */}
+          {currentPage !== 'driver' && currentPage !== 'teams' && currentPage !== 'predict' && <F1CarCarousel />}
+          {/* TODO: Implement navbar auto-hide on scroll */}
+          <div className="min-h-screen text-white relative z-50">
+            <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+            {renderPage()}
+          </div>
+        </NotificationProvider>
+      </BettingProvider>
+    </QueryClientProvider>
   );
 }
 

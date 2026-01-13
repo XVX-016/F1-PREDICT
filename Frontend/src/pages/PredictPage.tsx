@@ -1,452 +1,270 @@
-import React, { useState, useEffect } from 'react';
-import { Race, RacePrediction } from '../types/predictions';
-import { useRaces, Race as ApiRace } from '../hooks/useApi';
+import { useState, useEffect, useMemo } from 'react';
+import { useRaces, useRaceProbabilities } from '../hooks/useApi';
 import F1CarCarousel from '../components/F1CarCarousel';
-import { motion } from 'framer-motion';
-import PastRaceResultsCard from '../components/PastRaceResultsCard';
-import GlassWrapper from '../components/GlassWrapper';
-import PodiumSection from '../components/PodiumSection';
-import DriverList from '../components/DriverList';
-import { api } from '../services/api';
-
-// Enhanced F1 Font Styles
-const f1FontStyle = {
-  fontFamily: '"Orbitron", "Formula1", "Arial Black", sans-serif',
-  fontWeight: '900',
-  letterSpacing: '0.1em',
-  textTransform: 'uppercase' as const
-};
-
-const f1FontStyleLight = {
-  fontFamily: '"Orbitron", "Formula1", "Arial Black", sans-serif',
-  fontWeight: '400',
-  letterSpacing: '0.05em',
-  textTransform: 'uppercase' as const
-};
+import RaceHeader from '../components/predict/RaceHeader';
+import PredictionTabs from '../components/predict/PredictionTabs';
+import AIInsights from '../components/predict/AIInsights';
+import SubmitPredictionBar from '../components/predict/SubmitPredictionBar';
 
 interface PredictPageProps {
   raceData?: {
     raceName: string;
     raceId: string;
   };
+  onPageChange?: (page: string) => void;
+}
+
+interface Predictions {
+  winner?: string;
+  podium?: { first: string; second: string; third: string };
+  fastestLap?: string;
 }
 
 const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
-  const [currentRace, setCurrentRace] = useState<Race | null>(null);
-  const [availableRaces, setAvailableRaces] = useState<Race[]>([]);
-  const [prediction, setPrediction] = useState<RacePrediction | null>(null);
-  // Static data that doesn't change with race selection
-  const [staticModelStats, setStaticModelStats] = useState<any>(null);
-
+  const [predictions, setPredictions] = useState<Predictions>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Use API hook
-  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2025);
+  // Use API hook - fetch 2026 season by default
+  const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(2026);
+
+  // New TanStack Query hooks for backend data
+  const { data: backendProbabilities } = useRaceProbabilities(raceData?.raceId || '');
+  // const { data: backendMarkets } = useRaceMarkets(raceData?.raceId || ''); // For future use
+
+  // Intelligent initial race selection - don't redirect, just find the best match
+  const [selectedRaceId, setSelectedRaceId] = useState(raceData?.raceId);
 
   useEffect(() => {
-    // Add body class to prevent scrollbars
-    document.body.classList.add('predict-page-active');
+    if (!selectedRaceId && apiRaces && apiRaces.length > 0) {
+      // Find the first upcoming race
+      const upcoming = apiRaces.find(r => {
+        const raceTime = new Date(`${r.race_date}T${r.time || '00:00:00'}Z`).getTime();
+        return raceTime > Date.now();
+      });
+      if (upcoming) setSelectedRaceId(upcoming.id);
+    }
+  }, [apiRaces, selectedRaceId]);
 
-    // Cleanup function to remove body class
-    return () => {
-      document.body.classList.remove('predict-page-active');
+  // Mock drivers data (replace with actual API call)
+  const mockDrivers = [
+    { id: '1', name: 'Max Verstappen', number: 1, team: 'Red Bull Racing' },
+    { id: '2', name: 'Sergio Perez', number: 11, team: 'Red Bull Racing' },
+    { id: '3', name: 'Lewis Hamilton', number: 44, team: 'Mercedes' },
+    { id: '4', name: 'George Russell', number: 63, team: 'Mercedes' },
+    { id: '5', name: 'Charles Leclerc', number: 16, team: 'Ferrari' },
+    { id: '6', name: 'Carlos Sainz', number: 55, team: 'Ferrari' },
+    { id: '7', name: 'Lando Norris', number: 4, team: 'McLaren' },
+    { id: '8', name: 'Oscar Piastri', number: 81, team: 'McLaren' },
+    { id: '9', name: 'Fernando Alonso', number: 14, team: 'Aston Martin' },
+    { id: '10', name: 'Lance Stroll', number: 18, team: 'Aston Martin' }
+  ];
+
+  // Map backend probabilities to UI format
+  const aiPredictions = useMemo(() => {
+    if (!backendProbabilities?.probabilities) {
+      // Mock fallback if nothing in DB yet
+      return [
+        { driver: 'Max Verstappen', probability: 68, confidence: 'high' as const },
+        { driver: 'Charles Leclerc', probability: 15, confidence: 'medium' as const },
+        { driver: 'Lando Norris', probability: 12, confidence: 'medium' as const }
+      ];
+    }
+
+    return Object.entries(backendProbabilities.probabilities).map(([driverName, p]) => ({
+      driver: driverName,
+      probability: Math.round(p.win_prob * 100),
+      confidence: (p.win_prob > 0.3 ? 'high' : p.win_prob > 0.1 ? 'medium' : 'low') as 'high' | 'medium' | 'low'
+    })).sort((a: any, b: any) => b.probability - a.probability).slice(0, 3);
+  }, [backendProbabilities]);
+
+  // Status calculation logic (consistent with SchedulePage)
+  const getRaceStatus = (startISO: string) => {
+    const raceDateTime = new Date(startISO);
+    const now = new Date();
+    const diff = raceDateTime.getTime() - now.getTime();
+    if (diff > 2 * 60 * 60 * 1000) return 'open';
+    if (diff > -3 * 60 * 60 * 1000) return 'live';
+    return 'finished';
+  };
+
+  // Derive race data from API
+  const displayRace = useMemo(() => {
+    if (!apiRaces || apiRaces.length === 0) {
+      return {
+        id: 'loading',
+        name: 'Loading...',
+        circuit: '...',
+        country: '...',
+        startTime: new Date().toISOString(),
+        status: 'open' as const
+      };
+    }
+
+    const found = apiRaces.find(r => r.id === selectedRaceId || r.round.toString() === selectedRaceId);
+
+    if (!found) {
+      // Return the first race as fallback if still nothing
+      const fallback = apiRaces[0];
+      const startISO = `${fallback.race_date}T${fallback.time || '00:00'}:00Z`;
+      return {
+        id: fallback.id,
+        name: fallback.name,
+        circuit: fallback.circuit,
+        country: fallback.country,
+        startTime: startISO,
+        status: getRaceStatus(startISO) as 'open' | 'finished' | 'closed'
+      };
+    }
+
+    const startISO = `${found.race_date}T${found.time || '00:00'}:00Z`;
+    return {
+      id: found.id,
+      name: found.name,
+      circuit: found.circuit,
+      country: found.country,
+      startTime: startISO,
+      predictionsCloseTime: found.qualifying_time || undefined,
+      status: getRaceStatus(startISO) as 'open' | 'finished' | 'closed'
     };
+  }, [apiRaces, selectedRaceId]);
+
+  useEffect(() => {
+    // Simulate API loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (apiLoading) return;
-    if (apiError) {
-      setError(apiError);
-      setLoading(false);
-      return;
-    }
+  // Validation logic
+  const isWinnerValid = !!predictions.winner;
+  const isPodiumValid = () => {
+    const { first, second, third } = predictions.podium || {};
+    if (!first || !second || !third) return false;
+    return first !== second && first !== third && second !== third;
+  };
+  const isFastestLapValid = !!predictions.fastestLap;
 
-    initializePage();
-  }, [apiRaces, apiLoading, apiError]);
+  // All predictions must be valid to submit
+  const canSubmit = isWinnerValid && isPodiumValid() && isFastestLapValid;
 
-  // Debug: Log driver count when prediction changes
-  // Debug: Log driver count when prediction changes
-  useEffect(() => {
-    if (prediction?.all) {
-      console.log(`🔍 Driver count: ${prediction.all.length}/20 drivers`);
-    }
-  }, [prediction]);
+  const handlePredictionChange = (newPredictions: Predictions) => {
+    setPredictions(prev => ({ ...prev, ...newPredictions }));
+  };
 
-  const initializePage = async () => {
+  const handleSubmit = async () => {
+    if (!canSubmit || isSubmitted) return;
+
     try {
-      setLoading(true);
-      setError(null);
+      // TODO: Replace with actual API call
+      console.log('Submitting predictions:', predictions);
 
-      // Load static data
-      setStaticModelStats({
-        overallAccuracy: 87.5,
-        polePositionAccuracy: 82.3,
-        podiumAccuracy: 89.1,
-        trackTypePerformance: {
-          street: 85.2,
-          highSpeed: 88.7,
-          technical: 86.4,
-          hybrid: 87.9
-        }
-      });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      console.log('📅 Using 2025 F1 calendar from API...');
+      setIsSubmitted(true);
 
-      const mappedRaces: Race[] = apiRaces.map((r: ApiRace) => ({
-        id: r.id,
-        round: r.round,
-        name: r.name,
-        circuit: r.circuit,
-        city: r.city,
-        country: r.country,
-        startDate: r.race_date, // Using race_date directly
-        endDate: r.race_date,
-        timezone: "UTC", // Default to UTC as API returns UTC
-        has_sprint: !!r.sprint_time,
-        status: "upcoming" // TODO: proper status calculation if needed
-      }));
-
-      const allRacesSorted = mappedRaces
-        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-      setAvailableRaces(allRacesSorted);
-
-      const now = new Date();
-      let selectedRace = allRacesSorted.find(race => new Date(race.startDate) > now) || allRacesSorted[0];
-
-      if (raceData?.raceName) {
-        const requestedRace = allRacesSorted.find(race =>
-          race.name === raceData.raceName ||
-          race.id === raceData.raceId ||
-          race.name.toLowerCase().includes(raceData.raceName.toLowerCase())
-        );
-        if (requestedRace) selectedRace = requestedRace;
-      }
-
-      if (selectedRace) {
-        setCurrentRace(selectedRace);
-        await loadPredictions(selectedRace);
-      } else {
-        // Handle case where no races are found?
-        // Keep loading false
-      }
-
+      // Optional: Show success notification
+      console.log('✓ Prediction submitted successfully!');
     } catch (err) {
-      console.error('Error initializing page:', err);
-      setError('Failed to initialize page');
-    } finally {
-      if (apiRaces.length > 0) setLoading(false);
+      console.error('Failed to submit prediction:', err);
+      setError('Failed to submit prediction. Please try again.');
     }
   };
 
-  const loadPredictions = async (race: Race) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      console.log('🚀 Loading predictions for:', race.name);
-
-      const [probData, marketData] = await Promise.all([
-        api.getProbabilities(race.id).catch(err => {
-          console.warn('Probabilities fetch failed, using fallback', err);
-          return null;
-        }),
-        api.getMarkets(race.id).catch(err => {
-          console.warn('Markets fetch failed, using fallback', err);
-          return null;
-        })
-      ]);
-
-      if (!probData) {
-        throw new Error('Could not load prediction data. Backend might be down.');
-      }
-
-      // Map probabilities to RacePrediction format
-      const driverEntries = Object.entries(probData.probabilities);
-
-      const allPredictions: any[] = driverEntries.map(([driverId, probs]) => {
-        // Try to get driver name from market data if available
-        const marketEntry = marketData?.markets.find(m => m.driver_id === driverId);
-        const driverName = marketEntry?.driver_name || driverId;
-
-        return {
-          driverId,
-          driverName,
-          team: 'F1 Team', // TODO: Fetch from backend
-          winProbPct: probs.win_prob * 100,
-          podiumProbPct: probs.podium_prob * 100,
-          odds: marketEntry?.odds,
-          position: 0 // Will sort below
-        };
-      });
-
-      // Sort by win probability and assign positions
-      allPredictions.sort((a, b) => b.winProbPct - a.winProbPct);
-      allPredictions.forEach((p, i) => {
-        p.position = i + 1;
-      });
-
-      const predictionData: RacePrediction = {
-        raceId: race.id,
-        generatedAt: new Date().toISOString(),
-        top3: allPredictions.slice(0, 3) as any,
-        all: allPredictions as any,
-        modelStats: staticModelStats || {
-          accuracyPct: 87.5,
-          meanErrorSec: 0.12,
-          trees: 500,
-          lr: 0.05
-        }
-      };
-
-      setPrediction(predictionData);
-
-      console.log('✅ Predictions loaded and mapped successfully');
-
-      // Fire and forget: warm last race results
-      // (ResultsService removed)
-
-    } catch (err) {
-      console.error('Error loading predictions:', err);
-      setError(`${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRaceChange = async (raceId: string) => {
-    const selectedRace = availableRaces.find(race => race.id === raceId);
-    if (selectedRace) {
-      setCurrentRace(selectedRace);
-      await loadPredictions(selectedRace);
-    }
-  };
-
-  // Removed custom prediction handlers
-
-
-
-  // Removed custom prediction add function
-
-  if (loading && !currentRace) {
+  // Loading state
+  if (loading || apiLoading) {
     return (
-      <div className="min-h-screen text-white overflow-x-hidden pt-20 bg-black relative predict-page-container">
-
-        {/* F1 Car Carousel Background */}
-        <div className="f1-car-background">
-          <F1CarCarousel />
-        </div>
-
-        <div className="container mx-auto px-4 py-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-center mb-16"
-          >
-            <p className="text-2xl text-gray-300 mb-4" style={f1FontStyleLight}>
-              Loading race data...
-            </p>
-          </motion.div>
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-2xl font-bold mb-2">Loading race data...</div>
+          <div className="text-gray-400">Please wait</div>
         </div>
       </div>
     );
   }
 
-  if (error && !currentRace) {
+  // Error state
+  if (error || apiError) {
     return (
-      <div className="min-h-screen text-white overflow-x-hidden pt-20 bg-gradient-to-br from-black via-gray-900 to-black relative predict-page-container">
-
-        {/* F1 Car Carousel Background */}
-        <div className="f1-car-background">
-          <F1CarCarousel />
-        </div>
-
-        <div className="container mx-auto px-4 py-8 text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-16"
-          >
-            <h1 className="text-7xl mb-6 text-white" style={f1FontStyle}>ERROR</h1>
-            <div className="w-32 h-1 bg-red-500 mx-auto mb-6 rounded-full"></div>
-            <p className="text-2xl text-red-400 mb-8" style={f1FontStyleLight}>{error}</p>
-            <button
-              onClick={initializePage}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-8 py-4 rounded-xl transition-all transform hover:scale-105 glass-card"
-              style={f1FontStyle}
-            >
-              TRY AGAIN
-            </button>
-          </motion.div>
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-400 mb-2">Error</div>
+          <div className="text-gray-400">{error || (apiError as any)?.message || 'An error occurred'}</div>
         </div>
       </div>
     );
   }
-
-  if (!currentRace) {
-    return (
-      <div className="min-h-screen text-white overflow-x-hidden pt-20 bg-gradient-to-br from-black via-gray-900 to-black relative predict-page-container">
-
-        {/* F1 Car Carousel Background */}
-        <div className="f1-car-background">
-          <F1CarCarousel />
-        </div>
-
-        <div className="container mx-auto px-4 py-8 text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-16"
-          >
-            <h1 className="text-7xl mb-6 text-white" style={f1FontStyle}>NO RACE AVAILABLE</h1>
-            <div className="w-32 h-1 bg-red-500 mx-auto mb-6 rounded-full"></div>
-            <p className="text-2xl text-gray-300" style={f1FontStyleLight}>Please check back later for upcoming races.</p>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-
-
-
-
-
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden pt-24 md:pt-28 relative predict-page-container">
-      {/* Background only: car carousel. Removed extra overlay layers to avoid page-wide glass/tint. */}
-
+    <div className="min-h-screen bg-black text-white relative">
       {/* F1 Car Carousel Background */}
-      <div className="f1-car-background" aria-hidden="true">
+      <div className="f1-car-background" style={{ opacity: 0.08 }}>
         <F1CarCarousel />
       </div>
-      {/* Subtle dark overlay to keep text readable while allowing background to show */}
-      <div className="absolute inset-0 bg-black/60 z-0 pointer-events-none" aria-hidden="true"></div>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      {/* Sticky Race Header */}
+      <RaceHeader race={displayRace} />
 
-        {/* Page Heading */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-6xl font-black mb-3 text-white" style={f1FontStyle}>RACE PREDICTIONS</h1>
-          <div className="w-24 h-1 bg-red-500 mx-auto mb-4 rounded-full"></div>
-          <p className="text-lg md:text-xl text-gray-300" style={f1FontStyleLight}>AI-powered predictions with track-specific calibration</p>
+      {/* Main Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8 pb-32">
+        <div className="space-y-8">
+          {/* Page Title */}
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-2" style={{ fontFamily: '"Orbitron", sans-serif' }}>
+              MAKE YOUR PREDICTION
+            </h2>
+            <p className="text-gray-400">
+              Select your predictions for each category below
+            </p>
+          </div>
+
+          {/* Prediction Tabs */}
+          <PredictionTabs
+            drivers={mockDrivers}
+            onPredictionChange={handlePredictionChange}
+            disabled={isSubmitted || displayRace.status !== 'open'}
+          />
+
+          {/* AI Insights - Collapsed by Default */}
+          <AIInsights
+            predictions={aiPredictions}
+            explanation={backendProbabilities ? "Simulation results based on historical performance and current season data." : "AI analysis pending for this race session."}
+            confidence={backendProbabilities ? "high" : "low"}
+          />
+
+          {/* Validation Feedback */}
+          {!canSubmit && !isSubmitted && (
+            <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-yellow-400 text-xl">⚠️</span>
+                <div>
+                  <div className="font-semibold text-yellow-300 mb-1">
+                    Complete all predictions to submit
+                  </div>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    {!isWinnerValid && <li>• Select a race winner</li>}
+                    {!isPodiumValid() && <li>• Complete the podium (all 3 positions with different drivers)</li>}
+                    {!isFastestLapValid && <li>• Select fastest lap driver</li>}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Enhanced Race Selector with Glassmorphism */}
-        {availableRaces.length > 0 && (
-          <div className="mb-8 text-center">
-            <div className="inline-flex items-center space-x-4 backdrop-blur-md bg-black/30 rounded-xl p-4 border border-white/20 shadow-2xl shadow-black/50">
-              <span className="text-gray-300 font-medium">Select Race:</span>
-              <div className="relative">
-                <select
-                  value={currentRace?.id || ''}
-                  onChange={(e) => {
-                    const selectedRace = availableRaces.find(race => race.id === e.target.value);
-                    if (selectedRace) {
-                      handleRaceChange(selectedRace.id);
-                    }
-                  }}
-                  className="appearance-none pr-8 backdrop-blur-sm bg-black/40 text-white border border-white/30 rounded-lg px-4 py-2 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all duration-200 hover:border-white/40"
-                  style={{ direction: 'ltr' }}
-                >
-                  {availableRaces.map((race) => (
-                    <option key={race.id} value={race.id} className="bg-gray-900 text-white">
-                      {race.name}
-                    </option>
-                  ))}
-                </select>
-                <svg className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        )}
-
-
-
-        {error && (
-          <GlassWrapper className="p-8 mb-12 text-center bg-black/70 border-white/10">
-            <h2 className="text-3xl mb-4 text-red-400" style={f1FontStyle}>ERROR LOADING PREDICTIONS</h2>
-            <p className="text-gray-300 mb-4">{error}</p>
-            <div className="text-sm text-gray-400 mb-4">
-              <p>This could be due to:</p>
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Backend services not running</li>
-                <li>Network connectivity issues</li>
-                <li>Data service temporarily unavailable</li>
-              </ul>
-            </div>
-            <button
-              onClick={() => loadPredictions(currentRace)}
-              className="glass-card bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-6 py-3 rounded-xl transition-all transform hover:scale-105 hover:bg-white/5"
-              style={f1FontStyle}
-            >
-              RETRY
-            </button>
-          </GlassWrapper>
-        )}
-
-
-
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">Loading predictions...</p>
-          </div>
-        ) : prediction ? (
-          <div className="space-y-10">
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-
-              {/* Predicted Podium */}
-              <div className="mb-12">
-                {prediction.top3 && prediction.top3.length >= 3 ? (
-                  <PodiumSection
-                    drivers={prediction.top3 as any}
-                    title="PREDICTED PODIUM"
-                  />
-                ) : (
-                  <div className="text-center py-12">
-                    <p className="text-gray-400 text-lg">Loading podium predictions...</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Complete Driver Predictions */}
-              {prediction.all ? (
-                <DriverList
-                  drivers={prediction.all as any}
-                />
-              ) : (
-                <GlassWrapper className="p-8 mb-12">
-                  <div className="text-center py-8">
-                    <p className="text-gray-400">Loading driver predictions...</p>
-                  </div>
-                </GlassWrapper>
-              )}
-
-
-
-              {/* Past Race Results Card */}
-              <PastRaceResultsCard className="mb-12" />
-
-            </div>
-          </div>
-        ) : (
-          <GlassWrapper className="p-8 text-center">
-            <h2 className="text-3xl mb-4" style={f1FontStyle}>NO PREDICTIONS AVAILABLE</h2>
-            <p className="text-gray-300">Unable to load predictions for this race. Please try again later.</p>
-          </GlassWrapper>
-        )}
-
-
       </div>
+
+      {/* Sticky Submit Bar */}
+      <SubmitPredictionBar
+        isValid={canSubmit}
+        isSubmitted={isSubmitted}
+        raceStartsIn="23h 58m"
+        onSubmit={handleSubmit}
+        disabled={displayRace.status !== 'open'}
+      />
     </div>
   );
 };

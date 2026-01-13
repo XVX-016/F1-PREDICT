@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { api } from '../services/api';
 
 // Types matched to Backend API responses
 export interface Constructor {
@@ -39,6 +40,7 @@ export interface Race {
     name: string;
     circuit: string;
     race_date: string;
+    time: string;
     country: string;
     city: string;
     circuit_image_url: string;
@@ -47,86 +49,87 @@ export interface Race {
     fp3_time: string;
     qualifying_time: string;
     sprint_time: string;
+    status: 'upcoming' | 'live' | 'completed';
 }
 
 export function useConstructors() {
-    const [data, setData] = useState<Constructor[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        async function fetchConstructors() {
-            try {
-                const { data, error } = await supabase
-                    .from('constructors')
-                    .select('*')
-                    .order('name');
-
-                if (error) throw error;
-                setData(data || []);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchConstructors();
-    }, []);
-
-    return { data, loading, error };
+    return useQuery<Constructor[]>({
+        queryKey: ['constructors'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('constructors')
+                .select('*')
+                .order('name');
+            if (error) throw error;
+            return data || [];
+        },
+        staleTime: 1000 * 60 * 60, // 1 hour
+    });
 }
 
 export function useDrivers() {
-    const [data, setData] = useState<Driver[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        async function fetchDrivers() {
-            try {
-                const { data, error } = await supabase
-                    .from('drivers')
-                    .select('*, constructors(name, color)')
-                    .order('name');
-
-                if (error) throw error;
-                setData(data || []);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchDrivers();
-    }, []);
-
-    return { data, loading, error };
+    return useQuery<Driver[]>({
+        queryKey: ['drivers'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('drivers')
+                .select('*, constructors(name, color)')
+                .order('name');
+            if (error) throw error;
+            return data || [];
+        },
+        staleTime: 1000 * 60 * 60, // 1 hour
+    });
 }
 
-export function useRaces(season: number = 2025) {
-    const [data, setData] = useState<Race[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+export function useRaces(season: number = 2026) {
+    return useQuery<Race[]>({
+        queryKey: ['races', season],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('races')
+                .select('*')
+                .eq('season', season)
+                .order('round');
+            if (error) throw error;
+            return data || [];
+        },
+        staleTime: 1000 * 60 * 60, // 1 hour
+    });
+}
 
-    useEffect(() => {
-        async function fetchRaces() {
+// New high-performance hooks for Python Backend
+export function useRaceProbabilities(raceId: string) {
+    return useQuery({
+        queryKey: ['probabilities', raceId],
+        queryFn: async () => {
+            if (!raceId) return null;
             try {
-                const { data, error } = await supabase
-                    .from('races')
-                    .select('*')
-                    .eq('season', season)
-                    .order('round');
-
-                if (error) throw error;
-                setData(data || []);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
+                return await api.getProbabilities(raceId);
+            } catch (err) {
+                // Return null on 404 or other errors to let UI handle "Pending" state
+                console.warn(`Probabilities not found for race ${raceId}`);
+                return null;
             }
-        }
-        fetchRaces();
-    }, [season]);
+        },
+        enabled: !!raceId,
+        staleTime: 1000 * 60 * 15, // 15 mins
+    });
+}
 
-    return { data, loading, error };
+export function useRaceMarkets(raceId: string) {
+    return useQuery({
+        queryKey: ['markets', raceId],
+        queryFn: async () => {
+            if (!raceId) return null;
+            try {
+                return await api.getMarkets(raceId);
+            } catch (err) {
+                console.warn(`Markets not found for race ${raceId}`);
+                return null;
+            }
+        },
+        enabled: !!raceId,
+        staleTime: 1000 * 60 * 15, // 15 mins
+    });
 }

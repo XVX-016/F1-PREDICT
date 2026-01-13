@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { getRaces, getDriverStandings, getConstructorStandings, getArchiveRaces, getArchiveResults, getArchiveDriverStandings, getArchiveConstructorStandings } from '../api/jolpica';
+import { useState } from 'react';
+import { getArchiveRaces, getArchiveResults, getArchiveDriverStandings, getArchiveConstructorStandings } from '../api/jolpica';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronDown } from 'lucide-react';
 import F1CarCarousel from '../components/F1CarCarousel';
 
@@ -16,7 +17,7 @@ const AVAILABLE_YEARS = Array.from({ length: 2025 - 1950 + 1 }, (_, i) => 2025 -
 // Helper functions for images
 const getDriverAvatar = (driverName: string) => {
   if (!driverName) return '/avatars/default.png';
-  
+
   // Handle special cases for driver names
   const specialCases: { [key: string]: string } = {
     'Nico Hulkenberg': 'nicohulkenberg',
@@ -40,12 +41,12 @@ const getDriverAvatar = (driverName: string) => {
     'Daniel Ricciardo': 'danielricciardo',
     'Liam Lawson': 'liamlawson'
   };
-  
+
   // Check if there's a special case mapping
   if (specialCases[driverName]) {
     return `/avatars/${specialCases[driverName]}.png`;
   }
-  
+
   // Default processing
   const name = driverName.toLowerCase().replace(/\s+/g, '');
   return `/avatars/${name}.png`;
@@ -53,7 +54,7 @@ const getDriverAvatar = (driverName: string) => {
 
 const getTeamLogo = (teamName: string) => {
   if (!teamName) return '/team-logos/williams.webp';
-  
+
   const teamMap: { [key: string]: string } = {
     'Red Bull Racing': 'redbull',
     'Red Bull Racing Honda RBPT': 'redbull',
@@ -76,13 +77,13 @@ const getTeamLogo = (teamName: string) => {
     'RB F1 Team': 'racingbulls',
     'Racing Bulls': 'racingbulls'
   };
-  
+
   // Debug logging for Red Bull team names
   if (teamName && teamName.toLowerCase().includes('red bull')) {
     console.log('Red Bull team detected for logo:', teamName);
     console.log('Mapped to logo: redbull');
   }
-  
+
   const logoName = teamMap[teamName] || 'williams';
   return `/team-logos/${logoName}.webp`;
 };
@@ -110,13 +111,13 @@ const getTeamColor = (teamName: string) => {
     'RB F1 Team': '#5E8FAA', // Racing Bulls Blue
     'Racing Bulls': '#5E8FAA' // Racing Bulls Blue
   };
-  
+
   // Debug logging for Red Bull team names
   if (teamName && teamName.toLowerCase().includes('red bull')) {
     console.log('Red Bull team detected:', teamName);
     console.log('Applied color:', teamColors[teamName] || '#3671C6');
   }
-  
+
   return teamColors[teamName] || '#6B7280'; // Default gray
 };
 
@@ -174,169 +175,89 @@ const getTrackCountry = (raceName: string) => {
 };
 
 export default function ResultsPage() {
-  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedYear, setSelectedYear] = useState(2025);
   const [activeContentFilter, setActiveContentFilter] = useState('races');
-  const [races, setRaces] = useState<any[]>([]);
-  const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [driverStandings, setDriverStandings] = useState<any[]>([]);
-  const [teamStandings, setTeamStandings] = useState<any[]>([]);
-  const [error, setError] = useState('');
+  const [error] = useState('');
 
-  // Load data based on selected year and content filter
-  useEffect(() => {
-    setError('');
-    setLoading(true);
+  // Using TanStack Query directly here for simplicity since it interacts with jolpica
+  useQuery({
+    queryKey: ['archive-races', selectedYear],
+    queryFn: async () => {
+      const data = await getArchiveRaces(selectedYear);
+      let raceArray = [];
+      if (Array.isArray(data)) raceArray = data;
+      else if (data?.MRData?.RaceTable?.Races) raceArray = data.MRData.RaceTable.Races;
+      return raceArray;
+    },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+  });
 
-    const loadData = async () => {
-      try {
-        if (activeContentFilter === 'races') {
-          // Load races for selected year and cache list
-          if (selectedYear === 2025) {
-            const data = await getRaces();
-            console.log('getRaces response:', data);
-            let raceArray = [];
-            if (Array.isArray(data)) {
-              raceArray = data;
-            } else if (data?.Races) {
-              raceArray = data.Races;
-            } else if (data?.MRData?.RaceTable?.Races) {
-              raceArray = data.MRData.RaceTable.Races;
-            }
-            setRaces(raceArray);
-          } else {
-            // Load archive races
-            const data = await getArchiveRaces(selectedYear);
-            console.log('getArchiveRaces response:', data);
-            let raceArray = [];
-            if (Array.isArray(data)) {
-              raceArray = data;
-            } else if (data?.MRData?.RaceTable?.Races) {
-              raceArray = data.MRData.RaceTable.Races;
-            }
-            setRaces(raceArray);
-          }
-        } else if (activeContentFilter === 'drivers') {
-          // Load driver standings for selected year
-          if (selectedYear === 2025) {
-            const data = await getDriverStandings();
-            let standingsArray = [];
-            if (Array.isArray(data)) {
-              standingsArray = data;
-            } else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings) {
-              standingsArray = data.MRData.StandingsTable.StandingsLists[0].DriverStandings;
-            }
-            setDriverStandings(standingsArray);
-          } else {
-            const data = await getArchiveDriverStandings(selectedYear);
-            let standingsArray = [];
-            if (Array.isArray(data)) {
-              standingsArray = data;
-            } else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings) {
-              standingsArray = data.MRData.StandingsTable.StandingsLists[0].DriverStandings;
-            }
-            setDriverStandings(standingsArray);
-          }
-        } else if (activeContentFilter === 'teams') {
-          // Load constructor standings for selected year
-          if (selectedYear === 2025) {
-            const data = await getConstructorStandings();
-            let standingsArray = [];
-            if (Array.isArray(data)) {
-              standingsArray = data;
-            } else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings) {
-              standingsArray = data.MRData.StandingsTable.StandingsLists[0].ConstructorStandings;
-            }
-            setTeamStandings(standingsArray);
-          } else {
-            const data = await getArchiveConstructorStandings(selectedYear);
-            let standingsArray = [];
-            if (Array.isArray(data)) {
-              standingsArray = data;
-            } else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings) {
-              standingsArray = data.MRData.StandingsTable.StandingsLists[0].ConstructorStandings;
-            }
-            setTeamStandings(standingsArray);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-        setError(`Failed to load ${activeContentFilter} data for ${selectedYear}. Please try again.`);
-      } finally {
-        setLoading(false);
+  const { data: archiveResults, isLoading: resultsLoading } = useQuery({
+    queryKey: ['archive-results', selectedYear],
+    queryFn: async () => {
+      // Fetch all results for the season in one go if possible, or handle cleverly
+      // Ergast doesn't have a simple "all winners" endpoint without rounds
+      // But we can fetch /results which returns all finishers for all races if we omit round
+      const data = await getArchiveResults(selectedYear);
+      let resultsArray: any[] = [];
+
+      // Ergast /results returns multiple races each with its own Results array
+      if (data?.MRData?.RaceTable?.Races) {
+        resultsArray = data.MRData.RaceTable.Races.map((race: any) => ({
+          ...race.Results[0], // Winner only as per UI
+          raceName: race.raceName,
+          date: race.date,
+          round: race.round
+        }));
       }
-    };
+      return resultsArray;
+    },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    enabled: activeContentFilter === 'races',
+  });
 
-    loadData();
-  }, [selectedYear, activeContentFilter]);
+  const { data: driverStandings, isLoading: driversLoading } = useQuery({
+    queryKey: ['archive-drivers', selectedYear],
+    queryFn: async () => {
+      const data = await getArchiveDriverStandings(selectedYear);
+      let standingsArray = [];
+      if (Array.isArray(data)) standingsArray = data;
+      else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings) {
+        standingsArray = data.MRData.StandingsTable.StandingsLists[0].DriverStandings;
+      }
+      return standingsArray;
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+    enabled: activeContentFilter === 'drivers',
+  });
 
-  // Load race results for the selected year (always show all races for year)
-  useEffect(() => {
-    if (activeContentFilter === 'races') {
-      setLoading(true);
-      setError('');
-      
-      const loadResults = async () => {
-        try {
-          // Use cached race list; fetch if empty
-          let raceArray = races;
-          if (!raceArray || raceArray.length === 0) {
-            const data = await getArchiveRaces(selectedYear);
-            if (Array.isArray(data)) raceArray = data; else if (data?.MRData?.RaceTable?.Races) raceArray = data.MRData.RaceTable.Races;
-            setRaces(raceArray);
-          }
-          
-          if (raceArray.length === 0) {
-            setError(`No races available for ${selectedYear}. Try selecting a different year.`);
-            setLoading(false);
-            return;
-          }
-          
-          // Always load winners for all races in the selected year
-          const allResults: any[] = [];
-          for (const race of raceArray) {
-            try {
-              const resultData = await getArchiveResults(selectedYear, race.round);
-              let resultsArray: any[] = [];
-              if (Array.isArray(resultData)) resultsArray = resultData; else if (resultData?.MRData?.RaceTable?.Races?.[0]?.Results) {
-                resultsArray = resultData.MRData.RaceTable.Races[0].Results;
-              }
-              if (resultsArray.length > 0) {
-                const winner = resultsArray[0];
-                allResults.push({
-                  ...winner,
-                  raceName: race.raceName,
-                  date: race.date,
-                  round: race.round
-                });
-              }
-            } catch (_) { /* continue */ }
-          }
-          setResults(allResults);
-        } catch (error) {
-          console.error('Failed to load races:', error);
-          setError(`Failed to load race data for ${selectedYear}. Please try again.`);
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      loadResults();
-    }
-  }, [selectedYear, activeContentFilter, races]);
+  const { data: teamStandings, isLoading: teamsLoading } = useQuery({
+    queryKey: ['archive-teams', selectedYear],
+    queryFn: async () => {
+      const data = await getArchiveConstructorStandings(selectedYear);
+      let standingsArray = [];
+      if (Array.isArray(data)) standingsArray = data;
+      else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings) {
+        standingsArray = data.MRData.StandingsTable.StandingsLists[0].ConstructorStandings;
+      }
+      return standingsArray;
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+    enabled: activeContentFilter === 'teams',
+  });
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden">
       {/* F1 Car Background */}
       <F1CarCarousel />
-      
+
       {/* Top Red Line */}
       <div className="relative z-20 h-1 bg-red-600"></div>
-      
+
       {/* F1 Archive Header */}
       <div className="relative z-20 bg-black/80 backdrop-blur-sm pt-20">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-4xl font-bold text-white">F1 ARCHIVE</h1>
+          <h1 className="text-4xl font-bold text-white">F1 RESULTS</h1>
           <p className="text-gray-400 mt-2">Historical Formula 1 data and results</p>
         </div>
       </div>
@@ -367,11 +288,10 @@ export default function ResultsPage() {
                 <button
                   key={filter.id}
                   onClick={() => setActiveContentFilter(filter.id)}
-                  className={`text-gray-300 hover:text-white transition-colors pb-2 font-medium ${
-                    activeContentFilter === filter.id 
-                      ? 'text-white border-b-2 border-red-600' 
-                      : ''
-                  }`}
+                  className={`text-gray-300 hover:text-white transition-colors pb-2 font-medium ${activeContentFilter === filter.id
+                    ? 'text-white border-b-2 border-red-600'
+                    : ''
+                    }`}
                 >
                   {filter.label}
                 </button>
@@ -390,15 +310,15 @@ export default function ResultsPage() {
         <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-6 overflow-x-auto">
           {error ? (
             <div className="text-center py-12 text-lg text-red-400">{error}</div>
-          ) : loading ? (
+          ) : (resultsLoading || driversLoading || teamsLoading) ? (
             <div className="text-center py-12 text-lg text-gray-400">Loading...</div>
           ) : activeContentFilter === 'races' ? (
             <>
               <h2 className="text-2xl font-bold mb-6 text-center">{selectedYear} RACE RESULTS</h2>
-              {(!results || results.length === 0) ? (
+              {(!archiveResults || archiveResults.length === 0) ? (
                 <div className="text-center py-8 text-gray-400">No race results available for this season.</div>
               ) : (
-                                              <table className="w-full text-left">
+                <table className="w-full text-left">
                   <thead>
                     <tr className="text-gray-400 border-b border-gray-700">
                       <th className="py-3 px-4 text-left font-medium">GRAND PRIX</th>
@@ -410,7 +330,7 @@ export default function ResultsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {results.map((r, i) => (
+                    {archiveResults.map((r: any, i: number) => (
                       <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/40 transition-all">
                         <td className="py-3 px-4">
                           <span className="text-white text-base">{getTrackCountry(r.raceName) || 'Unknown'}</span>
@@ -420,12 +340,12 @@ export default function ResultsPage() {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <div 
+                            <div
                               className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
                               style={{ backgroundColor: getTeamColor(r.Constructor?.name) }}
                             >
-                              <img 
-                                src={getDriverAvatar(`${r.Driver?.givenName}${r.Driver?.familyName}`)} 
+                              <img
+                                src={getDriverAvatar(`${r.Driver?.givenName}${r.Driver?.familyName}`)}
                                 alt={r.Driver?.familyName}
                                 className="w-7 h-7 rounded-full object-cover object-top"
                                 onError={(e) => {
@@ -440,12 +360,12 @@ export default function ResultsPage() {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <div 
+                            <div
                               className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
                               style={{ backgroundColor: getTeamColor(r.Constructor?.name) }}
                             >
-                              <img 
-                                src={getTeamLogo(r.Constructor?.name)} 
+                              <img
+                                src={getTeamLogo(r.Constructor?.name)}
                                 alt={r.Constructor?.name}
                                 className="w-7 h-7 object-contain"
                                 onError={(e) => {
@@ -485,16 +405,16 @@ export default function ResultsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {driverStandings.map((d, i) => (
+                    {driverStandings?.map((d: any, i: number) => (
                       <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/40 transition-all">
                         <td className="py-2 pr-4 font-bold">{d.position}</td>
                         <td className="py-2 pr-4 flex items-center gap-2">
-                          <div 
+                          <div
                             className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden"
                             style={{ backgroundColor: getTeamColor(d.Constructors?.[0]?.name) }}
                           >
-                            <img 
-                              src={getDriverAvatar(`${d.Driver?.givenName}${d.Driver?.familyName}`)} 
+                            <img
+                              src={getDriverAvatar(`${d.Driver?.givenName}${d.Driver?.familyName}`)}
                               alt={d.Driver?.familyName}
                               className="w-5 h-5 rounded-full object-cover object-top"
                               onError={(e) => {
@@ -507,12 +427,12 @@ export default function ResultsPage() {
                         </td>
                         <td className="py-2 pr-4">{d.Driver?.nationality}</td>
                         <td className="py-2 pr-4 flex items-center gap-2">
-                          <div 
+                          <div
                             className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden"
                             style={{ backgroundColor: getTeamColor(d.Constructors?.[0]?.name) }}
                           >
-                            <img 
-                              src={getTeamLogo(d.Constructors?.[0]?.name)} 
+                            <img
+                              src={getTeamLogo(d.Constructors?.[0]?.name)}
                               alt={d.Constructors?.[0]?.name}
                               className="w-5 h-5 object-contain"
                               onError={(e) => {
@@ -545,16 +465,16 @@ export default function ResultsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {teamStandings.map((t, i) => (
+                    {teamStandings?.map((t: any, i: number) => (
                       <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/40 transition-all">
                         <td className="py-2 pr-4 font-bold">{t.position}</td>
                         <td className="py-2 pr-4 flex items-center gap-2">
-                          <div 
+                          <div
                             className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden"
                             style={{ backgroundColor: getTeamColor(t.Constructor?.name) }}
                           >
-                            <img 
-                              src={getTeamLogo(t.Constructor?.name)} 
+                            <img
+                              src={getTeamLogo(t.Constructor?.name)}
                               alt={t.Constructor?.name}
                               className="w-5 h-5 object-contain"
                               onError={(e) => {

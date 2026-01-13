@@ -24,7 +24,7 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
   const [upcomingRaces, setUpcomingRaces] = useState<Race[]>([]);
 
   // Use API hook
-  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2025);
+  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2026);
 
   const [loadingRaces, setLoadingRaces] = useState(true);
 
