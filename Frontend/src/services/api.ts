@@ -35,13 +35,13 @@ export const api = {
     },
 
     getProbabilities: async (raceId: string): Promise<ProbabilityResponse> => {
-        const response = await fetch(`${API_BASE_URL}/api/race/${raceId}/probabilities`);
+        const response = await fetch(`${API_BASE_URL}/api/races/${raceId}/probabilities`);
         if (!response.ok) throw new Error('Failed to fetch race probabilities');
         return response.json();
     },
 
     getMarkets: async (raceId: string): Promise<MarketResponse> => {
-        const response = await fetch(`${API_BASE_URL}/api/race/${raceId}/markets`);
+        const response = await fetch(`${API_BASE_URL}/api/races/${raceId}/markets`);
         if (!response.ok) throw new Error('Failed to fetch race markets');
         return response.json();
     },

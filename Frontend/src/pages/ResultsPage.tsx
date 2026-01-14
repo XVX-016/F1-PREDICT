@@ -173,7 +173,7 @@ const getTrackCountry = (raceName: string) => {
 };
 
 export default function ResultsPage() {
-  const [selectedYear, setSelectedYear] = useState(2025);
+  const [selectedYear, setSelectedYear] = useState(2026);
   const [activeContentFilter, setActiveContentFilter] = useState('races');
   const [error] = useState('');
 
@@ -264,19 +264,22 @@ export default function ResultsPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center h-16">
             {/* Year Selector */}
-            <div className="relative">
-              <select
-                className="bg-transparent text-white border-none outline-none cursor-pointer pr-8 appearance-none font-medium"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(Number(e.target.value))}
-              >
-                {AVAILABLE_YEARS.map(year => (
-                  <option key={year} value={year} className="bg-gray-900">
-                    {year}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+            <div className="flex items-center gap-3">
+              <span className="text-gray-400 font-bold text-sm tracking-widest">SEASON:</span>
+              <div className="relative group">
+                <select
+                  className="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg px-4 py-2 outline-none cursor-pointer pr-10 appearance-none font-bold transition-all shadow-sm group-hover:border-red-500/50"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                >
+                  {AVAILABLE_YEARS.map(year => (
+                    <option key={year} value={year} className="bg-gray-900 text-white">
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none group-hover:text-red-500 transition-colors" />
+              </div>
             </div>
 
             {/* Content Type Filters - All on the right side */}

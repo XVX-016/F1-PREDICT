@@ -86,11 +86,17 @@ const SignInPage = lazyWithTimeout(() => import('./pages/SignInPage'));
 const AuthCallback = lazyWithTimeout(() => import('./pages/AuthCallback'));
 
 function App() {
+  // Helper to extract page name from hash (ignoring query params)
+  const getPageFromHash = (hash: string) => {
+    const cleanHash = hash.replace('#/', '');
+    return cleanHash.split('?')[0] || 'home';
+  };
+
   // Get initial page from hash
   const getInitialPage = () => {
-    const hash = window.location.hash.replace('#/', '');
-    return hash || 'home';
+    return getPageFromHash(window.location.hash);
   };
+
   const [currentPage, setCurrentPageState] = useState(getInitialPage());
   const [raceData, setRaceData] = useState<any>(null);
 
@@ -101,16 +107,25 @@ function App() {
 
   // Update hash on page change
   const setCurrentPage = (page: string, data?: any) => {
-    setCurrentPageState(page);
+    // Check if page string already has params
+    const pageName = page.split('?')[0];
+    setCurrentPageState(pageName);
     setRaceData(data || null);
-    window.location.hash = '/' + page;
+
+    // If we're updating manual state, we update hash.
+    // If page string implies params (e.g. 'intelligence?driver=VER'), set it directly.
+    if (page.startsWith('/')) {
+      window.location.hash = page;
+    } else {
+      window.location.hash = '/' + page;
+    }
   };
 
   // Listen for hash changes (e.g., browser back/forward)
   React.useEffect(() => {
     const onHashChange = () => {
-      const hash = window.location.hash.replace('#/', '');
-      setCurrentPageState(hash || 'home');
+      const page = getPageFromHash(window.location.hash);
+      setCurrentPageState(page);
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);

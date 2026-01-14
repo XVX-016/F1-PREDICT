@@ -113,15 +113,15 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
 
   return (
     <>
-      <nav ref={navbarRef} className="glass-navbar liquid-flow fixed top-0 w-full z-[9999] bg-black/10 backdrop-blur-3xl border-b border-white/20 shadow-2xl shadow-red-500/10">
-        <div className="max-w-7xl mx-auto px-4 py-4 md:py-5">
+      <nav ref={navbarRef} className="carbon-fiber fixed top-0 w-full z-[9999] border-b border-white/5">
+        <div className="carbon-fiber-overlay max-w-7xl mx-auto px-4 py-4 md:py-5">
           <div className="flex items-center justify-between relative">
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 text-gray-300 hover:text-white transition-colors"
+                className="p-2 text-gray-400 hover:text-white transition-colors"
               >
                 <Menu className="w-6 h-6" />
               </button>
@@ -134,12 +134,9 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
                 onClick={() => onPageChange('home')}
                 aria-label="Go to homepage"
               >
-                <div className="relative">
-                  <Zap className="w-6 h-6 md:w-8 md:h-8 text-red-500 group-hover:text-red-400 transition-all duration-300" />
-                  <div className="absolute inset-0 bg-red-500/20 rounded-full blur-lg"></div>
-                </div>
-                <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent group-hover:from-red-400 group-hover:to-red-300 transition-all duration-300" style={{ fontFamily: '"Orbitron", sans-serif' }}>
-                  F1PREDICT
+                <Zap className="w-5 h-5 md:w-6 md:h-6 text-red-600 group-hover:text-red-500 transition-all duration-300" />
+                <span className="text-lg md:text-xl font-black italic uppercase tracking-tighter text-white group-hover:text-red-500 transition-all duration-300">
+                  F1<span className="text-gray-500 group-hover:text-red-300 transition-colors">PREDICT</span>
                 </span>
               </div>
             </div>
@@ -197,8 +194,8 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
       </nav>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-2xl border-t border-white/10 md:hidden z-[9999] px-6 pt-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-        <div className="flex justify-between items-center max-w-lg mx-auto">
+      <nav className="carbon-fiber fixed bottom-0 left-0 right-0 border-t border-white/5 md:hidden z-[9999] px-6 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+        <div className="carbon-fiber-overlay flex justify-between items-center max-w-lg mx-auto">
           {primaryTabs.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
@@ -259,10 +256,12 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 w-[280px] bg-black/90 backdrop-blur-2xl border-r border-white/10 z-[10001] p-6 flex flex-col"
+              className="fixed top-0 left-0 bottom-0 w-[280px] bg-[#0a0a0a] border-r border-white/10 z-[10001] p-6 flex flex-col"
             >
               <div className="flex items-center justify-between mb-10">
-                <span className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">F1PREDICT</span>
+                <span className="text-xl font-black italic uppercase tracking-tighter text-white">
+                  F1<span className="text-gray-500">PREDICT</span>
+                </span>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white">
                   <X className="w-6 h-6" />
                 </button>
