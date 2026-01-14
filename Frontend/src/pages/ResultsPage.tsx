@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { getArchiveRaces, getArchiveResults, getArchiveDriverStandings, getArchiveConstructorStandings } from '../api/jolpica';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown } from 'lucide-react';
-import F1CarCarousel from '../components/F1CarCarousel';
-
 // Content type filters (like official F1 site)
 const CONTENT_FILTERS = [
   { id: 'races', label: 'Races' },
@@ -248,8 +246,7 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden">
-      {/* F1 Car Background */}
-      <F1CarCarousel />
+      {/* Hero Background is handled globally in App.tsx */}
 
       {/* Top Red Line */}
       <div className="relative z-20 h-1 bg-red-600"></div>

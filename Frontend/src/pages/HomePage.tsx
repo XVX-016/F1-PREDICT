@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, Trophy, Flag, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
-import F1CarCarousel from '../components/F1CarCarousel';
 import CountdownTimer from '../components/betting/CountdownTimer';
 // import { sampleRaces } from '../data/sampleRaces'; // Removed
 // import { F1_2025_CALENDAR } from '../data/f1-2025-calendar'; // Removed
@@ -213,8 +212,6 @@ export default function HomePage({ setCurrentPage }: HomePageProps) {
       {/* Hero Section */}
 
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-
-        <F1CarCarousel />
 
         <div className="relative z-20 text-center max-w-5xl mx-auto px-4 sm:px-6">
 

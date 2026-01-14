@@ -18,7 +18,6 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useBetting } from '../contexts/BettingContext';
 import { TransactionType } from '../types/betting';
-import F1CarCarousel from '../components/F1CarCarousel';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -89,8 +88,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden pt-32 relative">
-      {/* F1 Car Carousel Background */}
-      <F1CarCarousel />
+      {/* Hero Background is handled globally in App.tsx */}
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Header */}

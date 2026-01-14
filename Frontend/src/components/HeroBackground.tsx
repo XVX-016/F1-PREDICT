@@ -1,0 +1,46 @@
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+
+interface HeroBackgroundProps {
+    currentPage: string;
+}
+
+export default function HeroBackground({ currentPage }: HeroBackgroundProps) {
+    const [style, setStyle] = useState<any>({
+        '--bg-blur': '0px',
+        backgroundImage: "url('/hero/hero-car.jpg')"
+    });
+
+    useEffect(() => {
+        // Mapping page to blur and image values
+        const configMap: Record<string, { blur: number; image: string }> = {
+            'home': { blur: 0, image: '/hero/hero-car.jpg' },
+            'predict': { blur: 12, image: '/hero/predict-hero.png' },
+            'betting': { blur: 20, image: '/hero/hero-car.jpg' },
+            'schedule': { blur: 8, image: '/hero/schedule-hero.jpg' },
+            'results': { blur: 10, image: '/hero/hero-car.jpg' },
+            'profile': { blur: 15, image: '/hero/hero-car.jpg' },
+            'teams': { blur: 12, image: '/hero/hero-car.jpg' },
+            'driver': { blur: 8, image: '/hero/hero-car.jpg' },
+        };
+
+        const config = configMap[currentPage] ?? configMap['home'];
+
+        setStyle({
+            '--bg-blur': `${config.blur}px`,
+            backgroundImage: `url('${config.image}')`
+        });
+    }, [currentPage]);
+
+    return (
+        <motion.div
+            key={currentPage} // Force re-render/re-animate on page change
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="hero-static-bg"
+            style={style}
+            aria-hidden="true"
+        />
+    );
+}
