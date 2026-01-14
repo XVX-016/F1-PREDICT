@@ -52,16 +52,18 @@ export default function AIInsights({ predictions, explanation, confidence = 'med
             >
                 <div className="flex items-center gap-3">
                     <Brain className="w-5 h-5 text-purple-400" />
-                    <span className="font-bold text-white">🔍 AI Analysis (Optional)</span>
+                    <span className="font-bold text-white tracking-tight uppercase" style={{ fontFamily: 'Orbitron', fontSize: '11px' }}>
+                        Physics Engine Insights
+                    </span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">
-                        {isExpanded ? 'Hide' : 'Show'} insights
+                    <span className="text-[10px] uppercase font-mono text-gray-400">
+                        {isExpanded ? 'Collapse' : 'Expand'} Logic
                     </span>
                     {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                        <ChevronUp className="w-4 h-4 text-gray-400" />
                     ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 text-gray-400" />
                     )}
                 </div>
             </button>
@@ -79,45 +81,45 @@ export default function AIInsights({ predictions, explanation, confidence = 'med
                         <div className="p-6 space-y-6">
                             {/* Confidence Level */}
                             <div className="flex items-center justify-between">
-                                <span className="text-gray-300 font-semibold">Model Confidence:</span>
-                                <span className={`font-bold ${getConfidenceColor(confidence)}`}>
+                                <span className="text-gray-300 font-mono text-xs uppercase">Sim Confidence Level:</span>
+                                <span className={`font-bold font-mono text-xs ${getConfidenceColor(confidence)}`}>
                                     {getConfidenceLabel(confidence)}
                                 </span>
                             </div>
 
                             {/* Top Predictions */}
                             <div>
-                                <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                <h4 className="text-[10px] font-mono text-gray-400 uppercase mb-3 flex items-center gap-2">
                                     <TrendingUp className="w-4 h-4" />
-                                    Top 3 AI Predictions
+                                    Optimized Race Outcomes
                                 </h4>
                                 <div className="space-y-2">
                                     {predictions.slice(0, 3).map((pred, index) => (
                                         <div
                                             key={index}
-                                            className="group flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded-lg hover:border-purple-500/30 transition-all"
+                                            className="group flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded-lg hover:border-purple-500/30 transition-all font-mono"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]' :
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]' :
                                                     index === 1 ? 'bg-gray-400 text-black shadow-[0_0_10px_rgba(156,163,175,0.3)]' :
                                                         'bg-orange-600/80 text-white shadow-[0_0_10px_rgba(234,88,12,0.3)]'
                                                     }`}>
                                                     {index + 1}
                                                 </div>
-                                                <span className="text-white font-semibold">{pred.driver}</span>
+                                                <span className="text-white font-semibold text-xs tracking-tighter">{pred.driver}</span>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-24 md:w-32 bg-gray-800 rounded-full h-2 overflow-hidden relative">
+                                            <div className="flex items-center gap-3 text-xs">
+                                                <div className="w-24 md:w-32 bg-gray-800 rounded-full h-1 overflow-hidden relative">
                                                     <motion.div
                                                         initial={{ width: 0 }}
                                                         animate={{ width: `${pred.probability}%` }}
                                                         transition={{ duration: 1, delay: 0.2 + index * 0.1 }}
-                                                        className="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full relative"
+                                                        className="bg-gradient-to-r from-red-600 to-red-400 h-full rounded-full relative"
                                                     >
                                                         <div className="absolute top-0 right-0 w-2 h-full bg-white opacity-30 shadow-[0_0_8px_#fff]"></div>
                                                     </motion.div>
                                                 </div>
-                                                <span className="text-purple-400 font-bold w-10 text-right text-sm">
+                                                <span className="text-white font-bold w-10 text-right">
                                                     {pred.probability}%
                                                 </span>
                                             </div>
@@ -128,21 +130,20 @@ export default function AIInsights({ predictions, explanation, confidence = 'med
 
                             {/* Explanation */}
                             {explanation && (
-                                <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
-                                    <h4 className="text-sm font-semibold text-blue-300 mb-2 flex items-center gap-2">
-                                        <AlertCircle className="w-4 h-4" />
-                                        Why?
+                                <div className="bg-red-900/10 border border-red-500/20 rounded-lg p-4 font-mono">
+                                    <h4 className="text-[10px] font-bold text-red-400 mb-2 uppercase tracking-widest flex items-center gap-2">
+                                        <AlertCircle className="w-3 h-3" />
+                                        Strategic Intelligence
                                     </h4>
-                                    <p className="text-sm text-gray-300 leading-relaxed">
+                                    <p className="text-[10px] text-gray-400 leading-relaxed uppercase">
                                         {explanation}
                                     </p>
                                 </div>
                             )}
 
                             {/* Disclaimer */}
-                            <div className="text-xs text-gray-500 italic border-t border-white/10 pt-4">
-                                ⚠️ AI predictions are based on historical data and current form. They should be used as guidance only.
-                                Your own analysis and intuition are valuable!
+                            <div className="text-[9px] text-gray-600 italic border-t border-white/5 pt-4 uppercase font-mono">
+                                ⚠️ Simulation data derived from Deterministic Physics Engine v2.1. Stochastic variance applies.
                             </div>
                         </div>
                     </motion.div>

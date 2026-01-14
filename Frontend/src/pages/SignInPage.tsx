@@ -69,7 +69,7 @@ export default function SignInPage({ onPageChange }: SignInPageProps) {
           message: 'Welcome back to F1 Predict!'
         });
         if (onPageChange) {
-          onPageChange('betting');
+          onPageChange('home');
         }
       } else {
         setError(result.error || 'Sign in failed');

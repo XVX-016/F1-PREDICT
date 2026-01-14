@@ -95,18 +95,18 @@ export default function RaceHeader({ race }: RaceHeaderProps) {
 
         if (race.status === 'closed' || predictionsCountdown === 'Closed') {
             return (
-                <div className="flex items-center gap-2 bg-red-600/30 px-4 py-2 rounded-full">
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span className="text-red-300 font-semibold">Predictions Closed</span>
+                <div className="flex items-center gap-2 bg-red-600/30 px-4 py-2 rounded-full border border-red-500/20">
+                    <AlertCircle className="w-4 h-4 text-red-500" />
+                    <span className="text-red-400 font-mono text-[10px] font-bold uppercase tracking-widest">Logic Lockdown</span>
                 </div>
             );
         }
 
         return (
-            <div className="flex items-center gap-2 bg-green-600/30 px-4 py-2 rounded-full">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-green-300 font-semibold">
-                    Predictions close in {predictionsCountdown}
+            <div className="flex items-center gap-2 bg-green-600/10 px-4 py-2 rounded-full border border-green-500/20">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                <span className="text-green-400 font-mono text-[10px] font-bold uppercase tracking-widest">
+                    Strategy Window: {predictionsCountdown}
                 </span>
             </div>
         );

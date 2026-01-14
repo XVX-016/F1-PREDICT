@@ -75,7 +75,7 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
       addNotification({
         type: 'success',
         title: 'Account Created Successfully!',
-        message: 'Welcome to F1 Predict! You can now start betting.'
+        message: 'Welcome to F1 Intel! Your engineering access is now active.'
       });
       onClose();
       setFormData({
@@ -93,7 +93,7 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear field error when user starts typing
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: '' }));
@@ -155,7 +155,7 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
                 <Gift className="w-6 h-6 text-yellow-400" />
                 <div>
                   <div className="text-yellow-400 font-bold">Welcome Bonus!</div>
-                  <div className="text-yellow-300 text-sm">Get 10,000 PC to start betting</div>
+                  <div className="text-yellow-300 text-sm">Access high-fidelity race telemetry</div>
                 </div>
               </div>
             </div>
@@ -181,9 +181,8 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${
-                      fieldErrors.username ? 'border-red-500' : ''
-                    }`}
+                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${fieldErrors.username ? 'border-red-500' : ''
+                      }`}
                     placeholder="Enter your username"
                     disabled={isLoading}
                   />
@@ -205,9 +204,8 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${
-                      fieldErrors.email ? 'border-red-500' : ''
-                    }`}
+                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${fieldErrors.email ? 'border-red-500' : ''
+                      }`}
                     placeholder="Enter your email"
                     disabled={isLoading}
                   />
@@ -229,9 +227,8 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${
-                      fieldErrors.password ? 'border-red-500' : ''
-                    }`}
+                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${fieldErrors.password ? 'border-red-500' : ''
+                      }`}
                     placeholder="Create a password"
                     disabled={isLoading}
                   />
@@ -261,9 +258,8 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${
-                      fieldErrors.confirmPassword ? 'border-red-500' : ''
-                    }`}
+                    className={`w-full bg-black/50 border border-white/20 rounded-xl pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all duration-200 ${fieldErrors.confirmPassword ? 'border-red-500' : ''
+                      }`}
                     placeholder="Confirm your password"
                     disabled={isLoading}
                   />
@@ -310,7 +306,7 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignU
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-400">
                 <User className="w-4 h-4 text-blue-400" />
-                <span>Track your betting performance</span>
+                <span>Analyze strategy stability metrics</span>
               </div>
             </div>
 

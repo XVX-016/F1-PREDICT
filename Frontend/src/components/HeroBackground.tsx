@@ -16,7 +16,7 @@ export default function HeroBackground({ currentPage }: HeroBackgroundProps) {
         const configMap: Record<string, { blur: number; image: string }> = {
             'home': { blur: 0, image: '/hero/hero-car.jpg' },
             'predict': { blur: 12, image: '/hero/predict-hero.png' },
-            'betting': { blur: 20, image: '/hero/hero-car.jpg' },
+            'intelligence': { blur: 20, image: '/hero/hero-car.jpg' },
             'schedule': { blur: 8, image: '/hero/schedule-hero.jpg' },
             'results': { blur: 10, image: '/hero/hero-car.jpg' },
             'profile': { blur: 15, image: '/hero/hero-car.jpg' },
