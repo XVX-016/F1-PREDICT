@@ -204,16 +204,33 @@
   /* disable subtle grid to avoid any perceived tint */
 }
 
-/* F1 Car Carousel Background */
-.f1-car-background {
-  position: absolute;
+/* Hero Static Background Styling - Gold Standard 2026 Refinement */
+.hero-static-bg {
+  position: fixed;
   inset: 0;
-  opacity: 0.08;
-  /* reduced opacity for better content readability */
+  width: 100%;
+  height: 100%;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: blur(var(--bg-blur, 0px)) saturate(0.8) brightness(0.7);
+  -webkit-mask-image: linear-gradient(to top, black 20%, transparent 90%);
+  mask-image: linear-gradient(to top, black 20%, transparent 90%);
+  transition: filter 0.5s ease;
+  z-index: -10;
   pointer-events: none;
-  z-index: -1;
-  /* negative z-index to ensure it stays behind content */
-  overflow: hidden;
+}
+
+/* Base Content Stacking */
+main,
+.main-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* F1 Car Carousel Background (Legacy - will be removed) */
+.f1-car-background {
+  display: none;
 }
 
 .f1-car-background canvas,
@@ -450,6 +467,11 @@
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(24px) saturate(200%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
 }
 
 .glass-btn {

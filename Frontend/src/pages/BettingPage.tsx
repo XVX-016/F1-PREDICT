@@ -18,7 +18,7 @@ import BettingStats from '../components/betting/BettingStats';
 import MarketFiltersComponent from '../components/betting/MarketFilters';
 import SignInModal from '../components/auth/SignInModal';
 import BetModal from '../components/betting/BetModal';
-import F1CarCarousel from '../components/F1CarCarousel';
+// Countdown removed from header per design update
 // Countdown removed from header per design update
 // import { F1_2025_CALENDAR } from '../data/f1-2025-calendar';
 import WalletDisplay from '../components/betting/WalletDisplay';
@@ -161,20 +161,17 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
 
   if (loading && markets.length === 0) {
     return (
-      <div className="min-h-screen relative">
-        <F1CarCarousel />
-        <div className="relative z-10 pt-24">
-          <div className="text-center mb-8 px-4">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 opacity-50" style={{ fontFamily: '"Orbitron", sans-serif' }}>
-              Pole to Podium
-            </h1>
-            <div className="h-1 bg-red-500/20 w-32 mx-auto rounded-full mt-4" />
-          </div>
+      <div className="relative z-10 pt-24">
+        <div className="text-center mb-8 px-4">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 opacity-50" style={{ fontFamily: '"Orbitron", sans-serif' }}>
+            Pole to Podium
+          </h1>
+          <div className="h-1 bg-red-500/20 w-32 mx-auto rounded-full mt-4" />
+        </div>
 
-          <div className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map(i => <MarketSkeleton key={i} />)}
-            </div>
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map(i => <MarketSkeleton key={i} />)}
           </div>
         </div>
       </div>
@@ -183,8 +180,7 @@ export default function BettingPage({ onPageChange }: BettingPageProps) {
 
   return (
     <div className="min-h-screen relative">
-      {/* F1 Car Carousel Background */}
-      <F1CarCarousel />
+      {/* Hero Background is handled globally in App.tsx */}
 
       {/* Content */}
       <div className="relative z-10 pt-24">
