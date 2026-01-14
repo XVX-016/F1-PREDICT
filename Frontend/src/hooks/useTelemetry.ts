@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useTelemetryStore } from '../stores/useTelemetryStore';
 
 export interface TelemetrySnapshot {
     state: {
@@ -13,24 +14,40 @@ export interface TelemetrySnapshot {
             tyre_age: number;
             compound: string;
             last_lap: string;
+            delta?: number;
         };
     };
     timestamp: string | number;
 }
 
 export function useTelemetry(raceId: string, active: boolean = false) {
-    const [snapshot, setSnapshot] = useState<TelemetrySnapshot | null>(null);
-    const [isConnected, setIsConnected] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const {
+        snapshot,
+        isConnected,
+        error,
+        setRaceId,
+        updateSnapshot,
+        setConnectionStatus
+    } = useTelemetryStore();
+
     const ws = useRef<WebSocket | null>(null);
 
+    // Effect to handle connection lifecycle
     useEffect(() => {
         if (!active || !raceId) {
             if (ws.current) {
                 ws.current.close();
+                ws.current = null;
             }
             return;
         }
+
+        // Avoid reconnecting if already connected to the same race
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            return;
+        }
+
+        setRaceId(raceId);
 
         const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
         const WS_URL = API_BASE_URL.replace('http', 'ws') + `/ws/race/${raceId}`;
@@ -42,34 +59,38 @@ export function useTelemetry(raceId: string, active: boolean = false) {
 
         socket.onopen = () => {
             console.log('✅ Telemetry WS Connected');
-            setIsConnected(true);
-            setError(null);
+            setConnectionStatus(true);
         };
 
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                setSnapshot(data);
+                if (data) {
+                    // Normalize data structure if needed
+                    updateSnapshot(data as any);
+                }
             } catch (err) {
                 console.error('❌ Failed to parse telemetry message:', err);
             }
         };
 
-        socket.onerror = (err) => {
-            console.error('❌ Telemetry WS Error:', err);
-            setError('Connection failed');
-            setIsConnected(false);
+        socket.onerror = () => {
+            console.error('❌ Telemetry WS Error');
+            setConnectionStatus(false, 'Connection failed');
         };
 
         socket.onclose = () => {
             console.log('🔌 Telemetry WS Closed');
-            setIsConnected(false);
+            setConnectionStatus(false);
+            ws.current = null;
         };
 
         return () => {
-            socket.close();
+            if (active) {
+                socket.close();
+            }
         };
-    }, [raceId, active]);
+    }, [raceId, active, setRaceId, setConnectionStatus, updateSnapshot]);
 
     return { snapshot, isConnected, error };
 }
