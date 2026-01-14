@@ -10,9 +10,9 @@ export const API_CONFIG = {
       LATEST: '/predictions/latest',
       BY_RACE: '/predictions/race',
     },
-    BETTING: {
-      MARKETS: '/betting/markets',
-      PLACE: '/betting/place',
+    INTELLIGENCE: {
+      PROBABILITIES: '/race/probabilities',
+      SIMULATION: '/race/simulation',
     },
     LIVE: {
       STATUS: '/live/status',
@@ -20,20 +20,20 @@ export const API_CONFIG = {
     },
     PROFILE: '/profile',
   },
-  
+
   // Backend API endpoints
   BACKEND: {
     BASE_URL: ENV_CONFIG.BACKEND_URL,
     USERS: '/users',
     PROFILE: '/users/profile',
   },
-  
+
   // Weather API
   WEATHER: {
     BASE_URL: 'https://api.weatherapi.com/v1',
     FORECAST: '/forecast.json',
   },
-  
+
   // Jolpica F1 API (fallback)
   JOLPICA: {
     BASE_URL: ENV_CONFIG.JOLPICA_BASE_URL,
@@ -58,13 +58,13 @@ export const checkMLServiceHealth = async (): Promise<boolean> => {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-    
+
     const response = await fetch(`${API_CONFIG.ML_SERVICE.BASE_URL}${API_CONFIG.ML_SERVICE.HEALTH}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' },
       signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
     return response.ok;
   } catch (error) {
