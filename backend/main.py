@@ -15,8 +15,7 @@ from api.races import router as races_router
 from api.drivers import router as drivers_router
 from api.constructors import router as constructors_router
 from api.live import router as live_router
-from api.bets import router as bets_router
-from api.markets import router as markets_router
+from api.live_telemetry import router as telemetry_router
 from api.user import router as user_router
 
 # Configure logging
@@ -25,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="F1 Prediction API",
-    description="Simulation-first F1 prediction platform",
+    title="F1 Race Intelligence API",
+    description="Deterministic physics + Monte Carlo strategy simulation for Formula 1",
     version="2.0.0"
 )
 
@@ -44,8 +43,7 @@ app.include_router(races_router)
 app.include_router(drivers_router)
 app.include_router(constructors_router)
 app.include_router(live_router)
-app.include_router(bets_router)
-app.include_router(markets_router)
+app.include_router(telemetry_router)
 app.include_router(user_router)
 
 @app.get("/health")

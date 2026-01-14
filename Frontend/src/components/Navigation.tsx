@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, User, Trophy, Zap, List, LogOut, Menu, X, UserCircle } from 'lucide-react';
+import { Calendar, User, Trophy, Zap, List, LogOut, Menu, X, UserCircle, Activity } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface NavigationProps {
@@ -16,7 +16,7 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
   const primaryTabs = [
     { id: 'home', label: 'Home', icon: List },
     { id: 'predict', label: 'Predict', icon: Zap },
-    { id: 'betting', label: 'Betting', icon: Trophy },
+    { id: 'intelligence', label: 'Intelligence', icon: Activity },
     { id: 'schedule', label: 'Schedule', icon: Calendar },
   ];
 

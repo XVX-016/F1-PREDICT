@@ -1,8 +1,8 @@
-# F1 Prediction Platform - Architecture
+# F1 Race Intelligence System - Architecture
 
 ## Core Principle
 
-> **ML estimates relative pace. Simulation determines race outcomes. Probabilities power fantasy markets.**
+> **ML estimates relative pace. Simulation determines race outcomes. Strategy analysis powers team decisions.**
 
 ## Architecture Layers
 
@@ -26,7 +26,7 @@
 └───────────┬────────────┘
             ↓
 ┌────────────────────────┐
-│   FRONTEND / FANTASY   │
+│   FRONTEND / ANALYSIS  │
 └────────────────────────┘
 ```
 

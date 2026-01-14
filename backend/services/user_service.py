@@ -23,15 +23,5 @@ class UserService:
             logger.error(f"Error fetching profile {user_id}: {e}")
             return None
 
-    def get_points(self, user_id: str):
-        try:
-            res = self.db.table("user_points").select("*").eq("user_id", user_id).execute()
-            if res.data:
-                return res.data[0]
-            else:
-                return {"user_id": user_id, "balance": 0, "points": 0} # Handle missing wallet
-        except Exception as e:
-            logger.error(f"Error fetching points {user_id}: {e}")
-            return {"user_id": user_id, "balance": 0}
 
 user_service = UserService()

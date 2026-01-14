@@ -1,14 +1,11 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { DriverPrediction } from '../types/predictions';
 
 interface DriverWinTableProps {
   drivers: DriverPrediction[];
-  onAddToBetSlip?: (driver: string, stake: number) => void;
-  showBetButtons?: boolean;
 }
 
-export function DriverWinTable({ drivers, onAddToBetSlip, showBetButtons = false }: DriverWinTableProps) {
+export function DriverWinTable({ drivers }: DriverWinTableProps) {
   // Helper function to get unique key for each driver
   const getDriverKey = (driver: DriverPrediction, index: number): string => {
     if (driver.driverId) {
@@ -26,7 +23,7 @@ export function DriverWinTable({ drivers, onAddToBetSlip, showBetButtons = false
       </div>
       <div className="max-h-64 overflow-auto divide-y divide-white/5">
         {drivers.map((driver, i) => (
-          <motion.div 
+          <motion.div
             key={getDriverKey(driver, i)}
             className="flex items-center justify-between py-3 hover:bg-white/5 px-2 rounded-lg transition-colors duration-200"
             initial={{ opacity: 0, x: -20 }}
@@ -46,19 +43,12 @@ export function DriverWinTable({ drivers, onAddToBetSlip, showBetButtons = false
                 <div className="text-xs text-gray-400">win</div>
               </div>
               <div className="w-20 bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-red-400 to-red-600 rounded-full transition-all duration-500"
                   style={{ width: `${driver.winProbPct}%` }}
                 />
               </div>
-              {showBetButtons && onAddToBetSlip && (
-                <button
-                  onClick={() => onAddToBetSlip(driver.driverName, 100)}
-                  className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors duration-200"
-                >
-                  Add to Bet Slip
-                </button>
-              )}
+
             </div>
           </motion.div>
         ))}
