@@ -1,49 +1,112 @@
-# F1 Race Intelligence System
+# F1 Race Intelligence & Strategy Engine
 
-A simulation-first, ML-assisted F1 race prediction platform.
+A high-fidelity Formula 1 race intelligence platform that models tyre degradation, fuel burn, pit loss, and safety car risk using deterministic physics and Monte Carlo simulation — visualized through real-time D3 dashboards.
 
-## Key Features
-- **Simulation-First**: Outcomes are determined by physics-based Monte Carlo simulations, not raw ML classes.
-- **ML-Assisted**: LightGBM models predict pure driver pace deltas (relative speed) to feed the simulation.
-- **Production-Ready**: "Thin Client" frontend communicates with a robust FastAPI backend.
-- **Auditable**: Full tracking of every model run and simulation instance in Supabase.
+This project replaces traditional betting-style prediction systems with an engineering-grade race strategy analysis workflow inspired by real F1 pit walls.
 
-## Quick Start (Docker)
+## What This Is
 
-The fastest way to get the platform running is using Docker Compose.
+This platform answers a single question:
 
-```bash
-# 1. Clone and configure environment
-cp .env.example .env
-# Edit .env with your Supabase credentials
+> “Given live race conditions, what strategy minimizes total race time while remaining robust to uncertainty?”
 
-# 2. Start the stack (automated setup)
-docker-compose up --build
+It does this by combining:
+- Deterministic physics models (tyre wear, fuel burn, pit loss)
+- Probabilistic Monte Carlo simulation (safety car, weather transitions)
+- Real-time telemetry ingestion
+- Interactive D3-based strategy visualization
+
+There is **no betting, no odds, and no financial abstraction** — only race engineering.
+
+## Core Concepts
+
+### Deterministic Layer
+Models physics-driven effects such as:
+- Tyre degradation (compound-specific exponential decay)
+- Fuel burn and mass reduction
+- Pit stop time loss and traffic penalties
+
+### Probabilistic Layer
+Introduces uncertainty using Monte Carlo simulation:
+- Safety car probability by lap window
+- Weather transitions
+- Strategy robustness under variance
+
+### Visualization Layer
+Transforms simulation output into intuitive engineering views:
+- Live gap evolution
+- Pace degradation curves
+- Strategy risk vs reward maps
+
+## System Architecture
+
+```mermaid
+flowchart LR
+    A[Live F1 Telemetry<br/>UDP / APIs] --> B[Redis<br/>Live State Store]
+    B --> C[WebSocket Stream]
+
+    C --> D[React Frontend]
+    D --> E[User Interaction<br/>Driver / Strategy Selection]
+
+    E --> F[Python Simulation Engine<br/>FastAPI]
+    F --> G[Monte Carlo Strategy Results]
+
+    G --> D
+    D --> H[D3.js Visualizations<br/>Gap Ticker / Pace Curves]
+
+    H --> I[Strategy Analyst]
 ```
-The backend will automatically run `setup.py` on first start to initialize the pipeline.
 
-## Local Development
+## Feature Showcase
 
-For manual setup and detailed developer instructions:
-See [**Development Guide**](docs/DEVELOPMENT.md)
+### 🔴 Live Gap Ticker (D3.js)
+A real-time D3 visualization updating every ~60ms that shows:
+- Relative gaps to the race leader
+- Directional delta (closing / falling back)
+- Smooth diff-based animation (no jitter)
 
-## Architecture
+**Color encoding:**
+- Green → gap closing
+- Red → gap increasing
+- Neutral → stable
 
-- **Backend**: Python (FastAPI, FastF1, LightGBM, Scikit-Learn)
-- **Frontend**: React (TypeScript, Vite)
-- **Database**: Supabase (PostgreSQL)
+This acts as the primary entry point into deeper strategy analysis.
 
-For a deep dive into how it works:
-See [**Architecture Deep Dive**](docs/ARCHITECTURE.md)
+### 🧠 Deep Pull Architecture
+Clicking a driver does not fetch static data. Instead, it:
+1. Captures the live race snapshot
+2. Routes the user into a contextual simulation view
+3. Triggers on-demand Monte Carlo computation
+4. Visualizes strategy outcomes dynamically
 
-## API Endpoints
+This mirrors real-world pit wall workflows: **observe → hypothesize → simulate → decide**.
 
-- `GET /health` - API status
-- `GET /api/races` - Race calendar and metadata
-- `GET /api/races/{id}/pace-deltas` - Raw ML pace deltas
-- `GET /api/drivers/{id}/telemetry` - Live telemetry stream
+## Technology Stack
 
-## Deployment
+### Frontend
+- **React + TypeScript**: Core UI framework
+- **Zustand**: Global state management
+- **D3.js**: High-performance visualization
+- **Framer Motion**: Micro-interactions
 
-Detailed instructions for Railway, Vercel, and Render:
-See [**Deployment Guide**](docs/DEPLOYMENT.md)
+### Backend
+- **FastAPI**: Simulation services
+- **Python**: NumPy, Pandas for physics modeling
+- **Redis**: Live telemetry state storage
+- **WebSockets**: Real-time data streaming
+
+### Design System
+- Matte graphite base
+- Carbon fiber texture accents
+- Minimal neon (used only for deltas and alerts)
+
+## About
+
+This project was built as a personal exploration into race strategy engineering, inspired by Formula 1 telemetry systems and pit wall decision-making.
+
+It prioritizes:
+- Physics over heuristics
+- Transparency over black-box AI
+- Robustness over single-point predictions
+
+The goal is not to predict outcomes — but to understand *why* strategies succeed or fail.

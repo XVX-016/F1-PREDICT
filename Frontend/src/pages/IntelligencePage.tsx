@@ -1,36 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Zap, Shield, ChevronRight, Terminal as TerminalIcon } from 'lucide-react';
+import { Activity, Shield, ChevronRight, Terminal as TerminalIcon } from 'lucide-react';
+import { useTelemetryStore } from '../stores/useTelemetryStore';
+import { useTelemetry } from '../hooks/useTelemetry';
 
 const IntelligencePage = () => {
-    const [isLive, setIsLive] = useState(false);
+    // Ensure connection is active
+    useTelemetry('abu_dhabi_2024', true);
+
+    const { isConnected, snapshot } = useTelemetryStore();
     const [selectedStrategy, setSelectedStrategy] = useState('one-stop');
 
+    // Deep Pull Context State
+    const [contextDriver, setContextDriver] = useState<string | null>(null);
+    const [isSimulating, setIsSimulating] = useState(false);
+
+    useEffect(() => {
+        // Parse Hash Params manually since we use hash routing
+        const hash = window.location.hash;
+        if (hash.includes('?')) {
+            const params = new URLSearchParams(hash.split('?')[1]);
+            const driver = params.get('driver');
+            if (driver) {
+                setContextDriver(driver);
+                setIsSimulating(true);
+                // Trigger Deep Pull Simulation here
+                setTimeout(() => setIsSimulating(false), 2000); // Mock simulation delay
+            }
+        }
+    }, []);
+
     return (
-        <div className="min-h-screen bg-black/60 pt-24 pb-12 px-6 overflow-x-hidden">
+        <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-6 overflow-x-hidden">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-4xl font-bold tracking-tighter" style={{ fontFamily: 'Orbitron' }}>
+                        <h1 className="text-4xl font-bold tracking-tighter text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
                             STRATEGY <span className="text-red-600">INTEL</span>
                         </h1>
-                        <p className="text-gray-400 mt-2 font-mono uppercase tracking-widest text-xs">
-                            Race Intelligence Pit Wall // Monte Carlo Analysis Engine
+                        <p className="text-gray-500 mt-2 font-mono uppercase tracking-widest text-xs">
+                            {contextDriver ? `Target Analysis: ${contextDriver} // Lap ${snapshot?.state?.lap || '18'}` : 'Race Intelligence Pit Wall // Monte Carlo Analysis Engine'}
                         </p>
                     </div>
 
                     <div className="flex gap-4">
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={`px-6 py-2 rounded-lg font-mono text-sm border transition-all duration-300 ${isLive ? 'bg-red-600/20 border-red-500 text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)]' : 'bg-white/5 border-white/10 text-gray-500'
+                        <motion.div
+                            className={`px-6 py-2 rounded-lg font-mono text-xs font-bold border transition-all duration-300 flex items-center gap-2 ${isConnected ? 'bg-red-900/20 border-red-500 text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-white/5 border-white/10 text-gray-500'
                                 }`}
-                            onClick={() => setIsLive(!isLive)}
                         >
-                            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${isLive ? 'bg-red-500 animate-pulse' : 'bg-gray-700'}`}></span>
-                            {isLive ? 'LIVE TELEMETRY ACTIVE' : 'CONNECT TELEMETRY'}
-                        </motion.button>
+                            <span className={`inline-block w-2 h-2 rounded-full ${isConnected ? 'bg-red-500 animate-pulse' : 'bg-gray-700'}`}></span>
+                            {isConnected ? 'LIVE TELEMETRY ACTIVE' : 'TELEMETRY DISCONNECTED'}
+                        </motion.div>
                     </div>
                 </div>
 
@@ -40,6 +61,13 @@ const IntelligencePage = () => {
                     <div className="lg:col-span-8 space-y-6">
                         {/* Strategy Fan Chart Placeholder */}
                         <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 aspect-video relative group overflow-hidden">
+                            {isSimulating && (
+                                <div className="absolute inset-0 bg-black/80 z-20 flex flex-col items-center justify-center backdrop-blur-sm">
+                                    <Activity className="w-8 h-8 text-red-500 animate-pulse mb-4" />
+                                    <p className="text-red-500 font-mono text-sm uppercase tracking-widest animate-pulse">Running Monte Carlo Simulation...</p>
+                                    <p className="text-gray-500 font-mono text-xs mt-2">Target: {contextDriver}</p>
+                                </div>
+                            )}
                             <div className="absolute top-4 left-6 z-10">
                                 <h3 className="text-sm font-mono text-gray-400 uppercase tracking-tighter flex items-center gap-2">
                                     <Activity className="w-4 h-4 text-red-500" />
@@ -61,8 +89,8 @@ const IntelligencePage = () => {
                                         <button
                                             key={strat}
                                             className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 font-mono text-sm flex justify-between items-center group ${selectedStrategy === strat.toLowerCase().replace(' ', '-')
-                                                    ? 'bg-red-600/10 border-red-600/50 text-white'
-                                                    : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
+                                                ? 'bg-red-600/10 border-red-600/50 text-white'
+                                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
                                                 }`}
                                             onClick={() => setSelectedStrategy(strat.toLowerCase().replace(' ', '-'))}
                                         >

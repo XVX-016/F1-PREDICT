@@ -1,10 +1,8 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Activity } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { useTelemetry } from '../../hooks/useTelemetry';
 
 export const LiveGapTicker: React.FC<{ raceId: string }> = ({ raceId }) => {
-    const { snapshot, isConnected } = useTelemetry(raceId, true);
+    const { snapshot } = useTelemetry(raceId, true);
 
     // Mock gaps if no snapshot for demonstration
     const drivers = snapshot?.drivers || {
@@ -27,8 +25,8 @@ export const LiveGapTicker: React.FC<{ raceId: string }> = ({ raceId }) => {
                         <span className="text-white font-black">{id}</span>
                         <span className="text-gray-500">+{data.gap.toFixed(3)}s</span>
                         <div className={`text-[9px] px-1 rounded ${data.compound === 'SOFT' ? 'bg-red-500/20 text-red-500' :
-                                data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                                    'bg-white/10 text-white/50'
+                            data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
+                                'bg-white/10 text-white/50'
                             }`}>
                             {data.compound[0]}
                         </div>
@@ -41,8 +39,8 @@ export const LiveGapTicker: React.FC<{ raceId: string }> = ({ raceId }) => {
                         <span className="text-white font-black">{id}</span>
                         <span className="text-gray-500">+{data.gap.toFixed(3)}s</span>
                         <div className={`text-[9px] px-1 rounded ${data.compound === 'SOFT' ? 'bg-red-500/20 text-red-500' :
-                                data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                                    'bg-white/10 text-white/50'
+                            data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
+                                'bg-white/10 text-white/50'
                             }`}>
                             {data.compound[0]}
                         </div>

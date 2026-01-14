@@ -3,17 +3,15 @@ import { Activity, Trophy, Flag, Zap, Shield, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { useRaces, Race as ApiRace } from '../hooks/useApi';
 import { api } from '../services/api';
-import { Race, RacePrediction } from '../types/predictions';
-import { LiveGapTicker } from '../components/intelligence/LiveGapTicker';
+import { Race } from '../types/predictions';
+import { D3GapTicker } from '../components/intelligence/D3GapTicker';
 
 export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
   const [upcomingRaces, setUpcomingRaces] = useState<Race[]>([]);
-  const { data: apiRaces, loading: apiLoading, error: apiError } = useRaces(2026);
+  const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(2025);
   const [loadingRaces, setLoadingRaces] = useState(true);
   const [errorRaces, setErrorRaces] = useState<string | null>(null);
   const [nextRace, setNextRace] = useState<Race | null>(null);
-  const [dynamicPrediction, setDynamicPrediction] = useState<RacePrediction | null>(null);
-  const [loadingDynamicPrediction, setLoadingDynamicPrediction] = useState(false);
 
   const toCircuitBannerImage = (circuitName: string, raceName: string): string => {
     const key = `${raceName} ${circuitName}`.toLowerCase();
@@ -89,32 +87,30 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
     const loadPredictions = async () => {
       if (!nextRace) return;
       try {
-        setLoadingDynamicPrediction(true);
         const response = await api.getProbabilities(nextRace.id);
         if (response && response.probabilities) {
-          const top3 = Object.entries(response.probabilities)
-            .map(([driverId, p]) => ({
-              driverName: driverId,
-              winProbPct: p.win_prob * 100,
-              team: 'F1 Team'
-            }))
-            .sort((a, b) => b.winProbPct - a.winProbPct)
-            .slice(0, 3);
-          setDynamicPrediction({ top3, all: [] } as any);
+          // Prediction loaded
         }
       } catch (error) {
         console.error('Error loading predictions:', error);
       } finally {
-        setLoadingDynamicPrediction(false);
+        // Prediction loading complete
       }
     };
     loadPredictions();
   }, [nextRace]);
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden bg-black/40">
+    <div className="min-h-screen text-white overflow-x-hidden bg-[#0a0a0a]">
       {/* Live Gap Ticker */}
-      <LiveGapTicker raceId={nextRace?.id || 'abu_dhabi_2024'} />
+      <D3GapTicker
+        raceId={nextRace?.id || 'abu_dhabi_2024'}
+        onDriverClick={(driverId) => {
+          // Context-aware routing
+          setCurrentPage('intelligence');
+          // In a real app, we'd set global state here for the Intelligence page to pick up
+        }}
+      />
 
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
@@ -128,29 +124,29 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl md:text-8xl font-black mb-6 tracking-tighter" style={{ fontFamily: 'Orbitron' }}>
-              RACE <span className="text-red-600">INTEL</span>
+            <h1 className="text-6xl md:text-9xl font-black mb-6 tracking-tighter uppercase leading-[0.8] text-white">
+              RACE <span className="text-red-700">INTEL</span>
             </h1>
 
-            <p className="text-lg md:text-2xl mb-12 text-gray-400 max-w-3xl mx-auto font-mono uppercase tracking-[0.2em]">
+            <p className="text-sm md:text-base mb-12 text-gray-500 max-w-2xl mx-auto font-mono uppercase tracking-[0.4em]">
               Deterministic Physics + Monte Carlo Strategy Simulation
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                className="px-8 py-4 rounded-xl font-bold text-lg bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:scale-105"
+                className="px-10 py-4 bg-red-700 hover:bg-red-600 text-white font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all duration-300 border border-white/5"
                 onClick={() => setCurrentPage('predict')}
               >
                 Access Engine Room
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
 
               <button
-                className="px-8 py-4 rounded-xl font-bold text-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center gap-3 transition-all duration-300"
+                className="px-10 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all duration-300"
                 onClick={() => setCurrentPage('intelligence')}
               >
                 Live Pit Wall
-                <Activity className="w-5 h-5" />
+                <Activity className="w-4 h-4" />
               </button>
             </div>
           </motion.div>
@@ -162,23 +158,23 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tighter" style={{ fontFamily: 'Orbitron' }}>
-                NEXT EVENT: <span className="text-red-600">{nextRace?.name?.toUpperCase() || 'LOADING...'}</span>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white uppercase">
+                NEXT EVENT: <span className="text-red-700">{nextRace?.name?.toUpperCase() || 'LOADING...'}</span>
               </h2>
-              <div className="flex items-center gap-4 text-gray-500 font-mono text-sm uppercase">
-                <span className="flex items-center gap-2"><Flag className="w-4 h-4" /> {nextRace?.circuit}</span>
-                <span className="flex items-center gap-2"><Trophy className="w-4 h-4" /> Round {nextRace?.round}</span>
+              <div className="flex items-center gap-4 text-gray-500 font-mono text-[10px] uppercase tracking-wider">
+                <span className="flex items-center gap-2"><Flag className="w-3 h-3" /> {nextRace?.circuit}</span>
+                <span className="flex items-center gap-2"><Trophy className="w-3 h-3" /> Round {nextRace?.round}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 pt-8 border-t border-white/5">
-              <div className="space-y-1">
-                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Physics Confidence</p>
-                <p className="text-2xl font-bold text-white">98.4%</p>
+            <div className="grid grid-cols-2 gap-6 pt-12 border-t border-white/5">
+              <div className="space-y-2">
+                <p className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">Physics Confidence</p>
+                <p className="text-3xl font-black text-white font-mono">98.4<span className="text-gray-600">%</span></p>
               </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Monte Carlo Iterations</p>
-                <p className="text-2xl font-bold text-white">50,000</p>
+              <div className="space-y-2">
+                <p className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">Monte Carlo Iterations</p>
+                <p className="text-3xl font-black text-white font-mono">50,000</p>
               </div>
             </div>
 
@@ -206,14 +202,14 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
       </section>
 
       {/* Upcoming Race Schedule */}
-      <section className="py-24 px-4 sm:px-6 relative z-10 bg-black/40">
+      <section className="py-24 px-4 sm:px-6 relative z-10 bg-[#0c0c0c]">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
             <div>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase" style={{ fontFamily: 'Orbitron' }}>
-                Circuit <span className="text-red-600">Calendar</span>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-white">
+                Circuit <span className="text-red-700">Calendar</span>
               </h2>
-              <p className="text-gray-500 mt-2 font-mono uppercase text-xs tracking-[0.2em]">Scheduled System Deployments 2026</p>
+              <p className="text-gray-600 mt-2 font-mono uppercase text-[10px] tracking-[0.4em]">Scheduled System Deployments 2026</p>
             </div>
             <button
               className="px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-mono uppercase tracking-widest hover:bg-white/10 transition-colors"
