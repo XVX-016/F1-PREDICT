@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Trophy, Medal, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -57,50 +57,92 @@ export default function PredictionTabs({ drivers, onPredictionChange, disabled =
         return first !== second && first !== third && second !== third;
     };
 
-    // Driver Card Component with Photo
-    const DriverCard = ({ driver, isSelected, onClick }: { driver: Driver; isSelected: boolean; onClick: () => void }) => (
-        <motion.button
-            whileHover={!disabled ? { scale: 1.03 } : {}}
-            whileTap={!disabled ? { scale: 0.97 } : {}}
-            onClick={onClick}
-            disabled={disabled}
-            className={`p-4 rounded-lg border-2 transition-all text-left ${isSelected
-                    ? 'border-red-500 bg-red-500/20 shadow-lg shadow-red-500/30'
-                    : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
-                } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-            <div className="flex items-center gap-3">
-                {/* Driver Photo */}
-                {driver.photoUrl ? (
-                    <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isSelected ? 'border-red-400' : 'border-white/20'
-                        } shadow-lg`}>
-                        <img
-                            src={driver.photoUrl}
-                            alt={driver.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                        />
-                    </div>
-                ) : (
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${isSelected ? 'bg-red-500 text-white' : 'bg-gray-700 text-gray-400'
-                        }`}>
-                        {driver.number}
-                    </div>
-                )}
+    // Driver Card Component with Physics Metrics
+    const DriverCard = ({ driver, isSelected, onClick }: { driver: Driver; isSelected: boolean; onClick: () => void }) => {
+        // Mocked physics metrics for UI demonstration
+        const tyreHealth = useMemo(() => 65 + Math.random() * 30, [driver.id]);
+        const stability = useMemo(() => 80 + Math.random() * 15, [driver.id]);
 
-                {/* Driver Info */}
-                <div className="flex-1">
-                    <div className="font-bold text-white">{driver.name}</div>
-                    <div className="text-sm text-gray-400">{driver.team}</div>
-                </div>
+        return (
+            <motion.button
+                whileHover={!disabled ? { scale: 1.02 } : {}}
+                whileTap={!disabled ? { scale: 0.98 } : {}}
+                onClick={onClick}
+                disabled={disabled}
+                className={`group relative p-4 rounded-xl border-2 transition-all text-left overflow-hidden ${isSelected
+                    ? 'border-red-600 bg-red-600/10 shadow-[0_0_20px_rgba(220,38,38,0.2)]'
+                    : 'border-white/5 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                    } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                {/* Background Decor */}
+                <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full blur-3xl opacity-10 transition-colors ${isSelected ? 'bg-red-500' : 'bg-white'
+                    }`} />
 
-                {/* Driver Number */}
-                <div className={`text-2xl font-bold ${isSelected ? 'text-red-400' : 'text-gray-500'}`}>
-                    #{driver.number}
+                <div className="relative z-10 flex flex-col gap-4">
+                    <div className="flex items-center gap-3">
+                        {/* Driver Photo */}
+                        {driver.photoUrl ? (
+                            <div className={`w-12 h-12 rounded-full overflow-hidden border-2 transition-colors ${isSelected ? 'border-red-500' : 'border-white/20'
+                                } shadow-lg`}>
+                                <img
+                                    src={driver.photoUrl}
+                                    alt={driver.name}
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                />
+                            </div>
+                        ) : (
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold font-mono ${isSelected ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400'
+                                }`}>
+                                {driver.number}
+                            </div>
+                        )}
+
+                        {/* Driver Info */}
+                        <div className="flex-1">
+                            <div className="font-bold text-white tracking-tighter text-sm uppercase" style={{ fontFamily: 'Orbitron' }}>{driver.name}</div>
+                            <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest">{driver.team}</div>
+                        </div>
+
+                        {/* Driver Number */}
+                        <div className={`text-xl font-bold font-mono italic ${isSelected ? 'text-red-500' : 'text-gray-700'}`}>
+                            #{driver.number}
+                        </div>
+                    </div>
+
+                    {/* Physics Metrics Row */}
+                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
+                        <div>
+                            <div className="flex justify-between text-[9px] font-mono text-gray-500 uppercase mb-1">
+                                <span>Tyre Life</span>
+                                <span className={tyreHealth < 30 ? 'text-red-500 animate-pulse' : 'text-white'}>{Math.round(tyreHealth)}%</span>
+                            </div>
+                            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${tyreHealth}%` }}
+                                    className={`h-full ${tyreHealth < 30 ? 'bg-red-500' : tyreHealth < 60 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <div className="flex justify-between text-[9px] font-mono text-gray-500 uppercase mb-1">
+                                <span>Stability</span>
+                                <span className="text-white">{Math.round(stability)}%</span>
+                            </div>
+                            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${stability}%` }}
+                                    className="bg-blue-500 h-full"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </motion.button>
-    );
+            </motion.button>
+        );
+    };
 
     return (
         <div className="space-y-6">
@@ -118,8 +160,8 @@ export default function PredictionTabs({ drivers, onPredictionChange, disabled =
                             onClick={() => setActiveTab(tab.id)}
                             disabled={disabled}
                             className={`flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${isActive
-                                    ? 'bg-red-600 text-white shadow-lg'
-                                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                                ? 'bg-red-600 text-white shadow-lg'
+                                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                                 } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Icon className="w-4 h-4" />
@@ -143,7 +185,7 @@ export default function PredictionTabs({ drivers, onPredictionChange, disabled =
                         <div>
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <Trophy className="w-5 h-5 text-yellow-500" />
-                                Select Race Winner
+                                Select Target Race Winner
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {drivers.map((driver) => (
@@ -162,7 +204,7 @@ export default function PredictionTabs({ drivers, onPredictionChange, disabled =
                         <div>
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <Medal className="w-5 h-5 text-yellow-500" />
-                                Select Podium Finish
+                                Projected Podium Hierarchy
                             </h3>
                             <div className="space-y-4">
                                 {/* 1st Place */}
