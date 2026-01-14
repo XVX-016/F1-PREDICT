@@ -1,6 +1,6 @@
 """
-Result Service for F1 Betting
-Manages race results - fetching, storing, and providing results for bet settlement
+Result Service for F1 Intelligence
+Manages race results - fetching, storing, and providing results for strategy analysis
 """
 
 import logging
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class ResultService:
     """
     Service for managing F1 race results.
-    Handles fetching, storing, and providing results for bet settlement.
+    Handles fetching, storing, and providing results for strategy analysis.
     """
     
     def __init__(self):

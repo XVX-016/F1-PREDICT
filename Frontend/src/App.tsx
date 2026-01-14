@@ -3,7 +3,7 @@ import Navigation from './components/Navigation';
 import HeroBackground from './components/HeroBackground';
 import LoadingSpinner from './components/LoadingSpinner';
 
-import { BettingProvider } from './contexts/BettingContext';
+
 import { NotificationProvider } from './contexts/NotificationContext';
 import { initializeJolpicaApi } from './api/jolpica';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -80,7 +80,7 @@ const TeamsPage = lazyWithTimeout(() => import('./pages/TeamsPage'));
 const PredictPage = lazyWithTimeout(() => import('./pages/PredictPage'));
 const ResultsPage = lazyWithTimeout(() => import('./pages/ResultsPage'));
 const ProfilePage = lazyWithTimeout(() => import('./pages/ProfilePage'));
-const BettingPage = lazyWithTimeout(() => import('./pages/BettingPage'));
+const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'));
 const SignUpPage = lazyWithTimeout(() => import('./pages/SignUpPage'));
 const SignInPage = lazyWithTimeout(() => import('./pages/SignInPage'));
 const AuthCallback = lazyWithTimeout(() => import('./pages/AuthCallback'));
@@ -139,8 +139,8 @@ function App() {
                   return <ResultsPage />;
                 case 'profile':
                   return <ProfilePage />;
-                case 'betting':
-                  return <BettingPage onPageChange={setCurrentPage} />;
+                case 'intelligence':
+                  return <IntelligencePage />;
                 case 'signup':
                   return <SignUpPage onPageChange={setCurrentPage} />;
                 case 'signin':
@@ -176,17 +176,15 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BettingProvider>
-        <NotificationProvider>
-          {/* Premium static hero background with adaptive blur */}
-          <HeroBackground currentPage={currentPage} />
-          {/* TODO: Implement navbar auto-hide on scroll */}
-          <div className="min-h-screen text-white relative z-50">
-            <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-            {renderPage()}
-          </div>
-        </NotificationProvider>
-      </BettingProvider>
+      <NotificationProvider>
+        {/* Premium static hero background with adaptive blur */}
+        <HeroBackground currentPage={currentPage} />
+        {/* TODO: Implement navbar auto-hide on scroll */}
+        <div className="min-h-screen text-white relative z-50">
+          <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+          {renderPage()}
+        </div>
+      </NotificationProvider>
     </QueryClientProvider>
   );
 }

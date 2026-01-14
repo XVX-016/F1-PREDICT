@@ -1,4 +1,4 @@
-# F1 Prediction Platform
+# F1 Race Intelligence System
 
 A simulation-first, ML-assisted F1 race prediction platform.
 
@@ -39,8 +39,9 @@ See [**Architecture Deep Dive**](docs/ARCHITECTURE.md)
 ## API Endpoints
 
 - `GET /health` - API status
-- `GET /api/races/{id}/probabilities` - Calibrated win/podium/top10 probabilities
-- `GET /api/races/{id}/markets` - Fantasy odds and market data
+- `GET /api/races` - Race calendar and metadata
+- `GET /api/races/{id}/pace-deltas` - Raw ML pace deltas
+- `GET /api/drivers/{id}/telemetry` - Live telemetry stream
 
 ## Deployment
 

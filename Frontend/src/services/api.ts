@@ -1,4 +1,4 @@
-import { RacePrediction, DriverPrediction } from '../types/predictions';
+
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -26,18 +26,6 @@ export interface MarketResponse {
 }
 
 export const api = {
-    getProbabilities: async (raceId: string): Promise<ProbabilityResponse> => {
-        const response = await fetch(`${API_BASE_URL}/api/races/${raceId}/probabilities`);
-        if (!response.ok) throw new Error('Failed to fetch probabilities');
-        return response.json();
-    },
-
-    getMarkets: async (raceId: string): Promise<MarketResponse> => {
-        const response = await fetch(`${API_BASE_URL}/api/races/${raceId}/markets`);
-        if (!response.ok) throw new Error('Failed to fetch markets');
-        return response.json();
-    },
-
     getDriverTelemetry: async (driverId: string, raceId?: string) => {
         const url = new URL(`${API_BASE_URL}/api/drivers/${driverId}/telemetry-summary`);
         if (raceId) url.searchParams.append('race_id', raceId);
