@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Mail, Lock, Eye, EyeOff, Loader2, Coins, Gift } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
-import F1CarCarousel from '../components/F1CarCarousel';
 
 interface SignUpPageProps {
   onPageChange?: (page: string) => void;
@@ -104,9 +103,8 @@ export default function SignUpPage({ onPageChange }: SignUpPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative">
-      {/* Car carousel background */}
-      <F1CarCarousel />
+    <div className="min-h-screen text-white flex items-center justify-center p-4 relative">
+      {/* Hero Background is handled globally in App.tsx */}
 
       {/* Close button */}
       <button

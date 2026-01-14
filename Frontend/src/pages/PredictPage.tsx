@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRaces, useRaceProbabilities } from '../hooks/useApi';
-import F1CarCarousel from '../components/F1CarCarousel';
 import RaceHeader from '../components/predict/RaceHeader';
 import PredictionTabs from '../components/predict/PredictionTabs';
 import AIInsights from '../components/predict/AIInsights';
@@ -200,11 +199,8 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
-      {/* F1 Car Carousel Background */}
-      <div className="f1-car-background" style={{ opacity: 0.08 }}>
-        <F1CarCarousel />
-      </div>
+    <div className="min-h-screen text-white relative">
+      {/* Hero Background is handled globally in App.tsx */}
 
       {/* Sticky Race Header */}
       <RaceHeader race={displayRace} />

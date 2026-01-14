@@ -1,0 +1,5 @@
+Columns in 'races' table:
+id, season, round, name, circuit, race_date, regulation_era, fp1_time, fp2_time, fp3_time, qualifying_time, sprint_time, circuit_image_url, country, city
+
+Sample Data:
+{'id': '456fcb80-917f-4a27-a11b-225f68b32080', 'season': 2026, 'round': 1, 'name': 'Bahrain Grand Prix', 'circuit': 'Bahrain International Circuit', 'race_date': '2026-03-01', 'regulation_era': None, 'fp1_time': None, 'fp2_time': None, 'fp3_time': None, 'qualifying_time': None, 'sprint_time': None, 'circuit_image_url': None, 'country': None, 'city': None}

@@ -1,6 +1,6 @@
 import React, { useState, lazy, Suspense, useEffect } from 'react';
 import Navigation from './components/Navigation';
-import F1CarCarousel from './components/F1CarCarousel';
+import HeroBackground from './components/HeroBackground';
 import LoadingSpinner from './components/LoadingSpinner';
 
 import { BettingProvider } from './contexts/BettingContext';
@@ -178,8 +178,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BettingProvider>
         <NotificationProvider>
-          {/* Fixed background car carousel, always behind all content except on driver, teams, and predict pages */}
-          {currentPage !== 'driver' && currentPage !== 'teams' && currentPage !== 'predict' && <F1CarCarousel />}
+          {/* Premium static hero background with adaptive blur */}
+          <HeroBackground currentPage={currentPage} />
           {/* TODO: Implement navbar auto-hide on scroll */}
           <div className="min-h-screen text-white relative z-50">
             <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
