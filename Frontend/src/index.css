@@ -228,10 +228,7 @@ main,
   z-index: 1;
 }
 
-/* F1 Car Carousel Background (Legacy - will be removed) */
-.f1-car-background {
-  display: none;
-}
+
 
 .f1-car-background canvas,
 .f1-car-background>div {

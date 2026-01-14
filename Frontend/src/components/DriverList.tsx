@@ -7,7 +7,6 @@ interface DriverItem {
   driverName: string;
   team: string;
   winProbPct: number;
-  odds?: number;
 }
 interface DriverListProps {
   drivers: DriverItem[];
@@ -132,9 +131,6 @@ export default function DriverList({ drivers }: DriverListProps) {
               <>
                 <div className="font-bold text-gray-300 text-xl">{driver.winProbPct.toFixed(2)}%</div>
                 <div className="text-sm text-gray-400">Win Probability</div>
-                {driver.odds && (
-                  <div className="text-xs font-bold text-red-500 mt-1">ODDS: {driver.odds.toFixed(2)}</div>
-                )}
               </>
             </div>
           </motion.div>
