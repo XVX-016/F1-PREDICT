@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Activity, Trophy, Flag, Zap, Shield, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRaces, Race as ApiRace } from '../hooks/useApi';
 import { api } from '../services/api';
 import { Race } from '../types/predictions';
-import { D3GapTicker } from '../components/intelligence/D3GapTicker';
 
 export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
-  const [upcomingRaces, setUpcomingRaces] = useState<Race[]>([]);
   const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(2025);
-  const [loadingRaces, setLoadingRaces] = useState(true);
-  const [errorRaces, setErrorRaces] = useState<string | null>(null);
   const [nextRace, setNextRace] = useState<Race | null>(null);
 
   const toCircuitBannerImage = (circuitName: string, raceName: string): string => {
@@ -43,17 +38,7 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
   };
 
   useEffect(() => {
-    if (apiLoading) {
-      setLoadingRaces(true);
-      return;
-    }
-    if (apiError) {
-      setErrorRaces(apiError instanceof Error ? apiError.message : 'Unknown error');
-      setLoadingRaces(false);
-      return;
-    }
-
-    if (!apiRaces) return;
+    if (apiLoading || apiError || !apiRaces) return;
 
     const now = new Date();
     const mappedRaces: Race[] = apiRaces.map((r: ApiRace) => ({
@@ -71,16 +56,12 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
     }));
 
     const sortedRaces = mappedRaces.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-    const upcoming = sortedRaces
-      .filter(r => new Date(r.startDate) >= now)
-      .slice(0, 3);
-    setUpcomingRaces(upcoming);
+    const next = sortedRaces
+      .filter(r => new Date(r.startDate) >= now)[0];
 
-    const next = upcoming[0];
     if (next) {
       setNextRace(next);
     }
-    setLoadingRaces(false);
   }, [apiRaces, apiLoading, apiError]);
 
   useEffect(() => {
@@ -101,163 +82,127 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
   }, [nextRace]);
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden bg-[#0a0a0a]">
-      {/* Live Gap Ticker */}
-      <D3GapTicker
-        raceId={nextRace?.id || 'abu_dhabi_2024'}
-        onDriverClick={(driverId) => {
-          // Context-aware routing
-          setCurrentPage('intelligence');
-          // In a real app, we'd set global state here for the Intelligence page to pick up
-        }}
-      />
-
-      {/* Hero Section */}
-      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden relative">
+      {/* Hero Section - Quiet and Professional */}
+      <section
+        className="relative flex flex-col items-center justify-center overflow-hidden border-b border-slateMid/60"
+        style={{ minHeight: 'calc(100vh - 56px)' }}
+      >
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-600/10 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-carbon/80"></div>
         </div>
 
         <div className="relative z-20 text-center max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-6xl md:text-9xl font-black mb-6 tracking-tighter uppercase leading-[0.8] text-white">
-              RACE <span className="text-red-700">INTEL</span>
+            <h1 className="text-5xl md:text-7xl font-semibold mb-4 tracking-wide text-textPrimary uppercase">
+              F1 RACE <span className="text-f1Red">INTELLIGENCE</span>
             </h1>
 
-            <p className="text-sm md:text-base mb-12 text-gray-500 max-w-2xl mx-auto font-mono uppercase tracking-[0.4em]">
-              Deterministic Physics + Monte Carlo Strategy Simulation
+            <p className="text-sm md:text-base mb-12 text-textSecondary max-w-2xl mx-auto font-normal">
+              A digital pit wall for Formula 1 strategy. Deterministic physics models and Monte Carlo simulations.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                className="px-10 py-4 bg-red-700 hover:bg-red-600 text-white font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all duration-300 border border-white/5"
-                onClick={() => setCurrentPage('predict')}
+                className="px-8 py-3 bg-[#141821] text-textPrimary border border-white/10 hover:border-f1Red transition-all uppercase tracking-widest text-[10px] font-black rounded-sm"
+                onClick={() => setCurrentPage('intelligence')}
               >
-                Access Engine Room
-                <ChevronRight className="w-4 h-4" />
+                Intelligence Engine
               </button>
 
               <button
-                className="px-10 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all duration-300"
-                onClick={() => setCurrentPage('intelligence')}
+                className="px-8 py-3 bg-[#141821] text-textPrimary border border-white/10 hover:border-f1Red transition-all uppercase tracking-widest text-[10px] font-black rounded-sm"
+                onClick={() => setCurrentPage('predict')}
               >
-                Live Pit Wall
-                <Activity className="w-4 h-4" />
+                Live Forecast
               </button>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Next Race Quick Intel */}
-      <section className="py-24 px-4 sm:px-6 relative z-10 border-t border-white/5">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white uppercase">
-                NEXT EVENT: <span className="text-red-700">{nextRace?.name?.toUpperCase() || 'LOADING...'}</span>
-              </h2>
-              <div className="flex items-center gap-4 text-gray-500 font-mono text-[10px] uppercase tracking-wider">
-                <span className="flex items-center gap-2"><Flag className="w-3 h-3" /> {nextRace?.circuit}</span>
-                <span className="flex items-center gap-2"><Trophy className="w-3 h-3" /> Round {nextRace?.round}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6 pt-12 border-t border-white/5">
-              <div className="space-y-2">
-                <p className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">Physics Confidence</p>
-                <p className="text-3xl font-black text-white font-mono">98.4<span className="text-gray-600">%</span></p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">Monte Carlo Iterations</p>
-                <p className="text-3xl font-black text-white font-mono">50,000</p>
-              </div>
-            </div>
-
-            <button
-              className="text-red-500 font-mono text-xs uppercase tracking-[0.3em] flex items-center gap-2 hover:gap-4 transition-all"
-              onClick={() => setCurrentPage('intelligence')}
-            >
-              View Live Strategy Stream <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="relative aspect-square md:aspect-video bg-black/40 border border-white/10 rounded-3xl overflow-hidden group">
-            <img
-              src={toCircuitBannerImage(nextRace?.circuit || '', nextRace?.name || '')}
-              alt="Circuit Layout"
-              className="w-full h-full object-contain p-12 opacity-50 transition-transform duration-700 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-            <div className="absolute bottom-6 left-6 flex items-center gap-2">
-              <Shield className="w-5 h-5 text-red-600" />
-              <span className="text-xs font-mono text-white/50 uppercase">Verified Simulation Data</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Race Schedule */}
-      <section className="py-24 px-4 sm:px-6 relative z-10 bg-[#0c0c0c]">
+      {/* Next Session / Status Section */}
+      <section className="py-20 px-4 sm:px-6 relative z-10 bg-graphite border-b border-slateMid/40">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
-            <div>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-white">
-                Circuit <span className="text-red-700">Calendar</span>
-              </h2>
-              <p className="text-gray-600 mt-2 font-mono uppercase text-[10px] tracking-[0.4em]">Scheduled System Deployments 2026</p>
-            </div>
-            <button
-              className="px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-mono uppercase tracking-widest hover:bg-white/10 transition-colors"
-              onClick={() => setCurrentPage('schedule')}
-            >
-              Full Schedule
-            </button>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            {/* Main Info */}
+            <div className="lg:col-span-8 space-y-8">
+              <div className="space-y-2">
+                <p className="text-f1Red font-mono text-[10px] uppercase tracking-[0.4em] mb-4">Target Session: Forecast</p>
+                <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter text-white uppercase">
+                  {nextRace?.name?.toUpperCase() || 'SYNCHRONIZING...'}
+                </h2>
+                <div className="flex items-center gap-6 pt-2 text-textSecondary font-mono text-xs uppercase tracking-wider">
+                  <span>Track: {nextRace?.circuit}</span>
+                  <span>Weather: Dry</span>
+                  <span>Safety Car Risk: Low</span>
+                </div>
+              </div>
 
-          {loadingRaces ? (
-            <div className="flex gap-4 py-12">
-              {[1, 2, 3].map(i => <div key={i} className="flex-1 h-64 bg-white/5 rounded-2xl animate-pulse"></div>)}
-            </div>
-          ) : errorRaces ? (
-            <div className="text-center py-12 text-red-400 font-mono uppercase text-xs">{errorRaces}</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {upcomingRaces.map((race: Race, index: number) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ y: -10 }}
-                  className="bg-black/60 border border-white/5 rounded-2xl overflow-hidden group shadow-2xl transition-all hover:border-red-500/30"
-                >
-                  <div className="h-40 bg-zinc-900/50 flex items-center justify-center relative overflow-hidden">
-                    <img
-                      src={toCircuitBannerImage(race.circuit, race.name)}
-                      alt={race.circuit}
-                      className="w-full h-full object-contain p-8 opacity-40 group-hover:opacity-100 transition-opacity duration-500"
-                    />
-                    <div className="absolute top-4 left-4 bg-black/80 px-3 py-1 rounded text-[10px] font-mono text-white/50 border border-white/10">
-                      ROUND {race.round}
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-slateMid/40">
+                <div className="space-y-4">
+                  <h3 className="text-xs font-semibold text-textSecondary uppercase tracking-widest">Strategy Snapshot</h3>
+                  <div className="p-6 bg-slateDark/50 border border-slateMid/40 rounded-sm">
+                    <p className="text-2xl font-mono text-textPrimary">SOFT &rarr; MEDIUM</p>
+                    <p className="text-xs text-textSecondary mt-1 uppercase tracking-wider">Optimal 1-Stop robustness: 94%</p>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-1 tracking-tight">{race.name}</h3>
-                    <p className="text-[10px] text-red-500 font-mono uppercase tracking-[0.2em] mb-4">{new Date(race.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
-                    <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                      <span className="text-[10px] font-mono text-gray-500 uppercase">{race.country}</span>
-                      <Zap className="w-4 h-4 text-white/20 group-hover:text-red-500 transition-colors" />
-                    </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-xs font-semibold text-textSecondary uppercase tracking-widest">Last Race Summary</h3>
+                  <div className="p-6 bg-slateDark/50 border border-slateMid/40 rounded-sm">
+                    <p className="text-2xl font-mono text-textPrimary">WINNER: VER</p>
+                    <p className="text-xs text-textSecondary mt-1 uppercase tracking-wider">SC: 1 | Rain: No | Intels: 54k</p>
                   </div>
-                </motion.div>
-              ))}
+                </div>
+              </div>
             </div>
-          )}
+
+            {/* Sidebar / Circuit */}
+            <div className="lg:col-span-4 aspect-square bg-slateDark/30 border border-slateMid/40 rounded-sm flex items-center justify-center relative group overflow-hidden">
+              <img
+                src={toCircuitBannerImage(nextRace?.circuit || '', nextRace?.name || '')}
+                alt="Circuit Layout"
+                className="w-full h-full object-contain p-12 opacity-30 transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute bottom-4 left-4">
+                <span className="text-[10px] font-mono text-textSecondary uppercase tracking-widest">Simulation Model v2.4</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
-    </div>
+      </section >
+
+      {/* Platform Capabilities */}
+      < section className="py-24 px-4 sm:px-6 bg-carbon/50" >
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-xs font-semibold text-textSecondary uppercase tracking-[0.5em] mb-12 text-center">System Capabilities</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-1px bg-slateMid/40 border border-slateMid/40">
+            <div className="p-12 bg-graphite flex flex-col justify-center text-center">
+              <h3 className="text-lg font-semibold text-textPrimary mb-4 uppercase tracking-wider">Deterministic Models</h3>
+              <p className="text-sm text-textSecondary font-normal leading-relaxed">
+                Physics-based tyre degradation and fuel-burn calculations derived from real-time telemetry.
+              </p>
+            </div>
+            <div className="p-12 bg-graphite flex flex-col justify-center text-center border-x border-slateMid/40">
+              <h3 className="text-lg font-semibold text-textPrimary mb-4 uppercase tracking-wider">Monte Carlo Simulation</h3>
+              <p className="text-sm text-textSecondary font-normal leading-relaxed">
+                Probabilistic modeling for safety cars, red flags, and dynamic weather transitions.
+              </p>
+            </div>
+            <div className="p-12 bg-graphite flex flex-col justify-center text-center">
+              <h3 className="text-lg font-semibold text-textPrimary mb-4 uppercase tracking-wider">Strategy Visualization</h3>
+              <p className="text-sm text-textSecondary font-normal leading-relaxed">
+                High-density D3 charts for pace comparison, gap evolution, and pit-window optimization.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section >
+    </div >
   );
 }
 
