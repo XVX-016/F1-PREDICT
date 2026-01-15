@@ -1,4 +1,5 @@
 import { useConstructors } from "../hooks/useApi";
+import PageContainer from "../components/layout/PageContainer";
 
 const TeamsPage = () => {
   const { data: teams, isLoading, error } = useConstructors();
@@ -7,9 +8,13 @@ const TeamsPage = () => {
   if (error) return <div className="min-h-screen text-white pt-32 text-center text-red-500">Error: {(error as any)?.message || 'Failed to load teams'}</div>;
 
   return (
-    <div className="min-h-screen text-white py-32">
-      <h1 className="text-4xl font-bold mb-12 text-center">F1 Teams 2025</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[98vw] mx-auto px-2 md:px-6">
+    <PageContainer>
+      <header className="border-l-4 border-[#E10600] pl-6 py-2 mb-12">
+        <h1 className="text-4xl font-black uppercase tracking-tighter text-white">F1 Teams 2025</h1>
+        <p className="text-slate-400 font-mono text-xs mt-1 uppercase tracking-widest">Constructor Presence</p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {teams?.map((team) => (
           <div
             key={team.id}
@@ -32,7 +37,7 @@ const TeamsPage = () => {
                       </span>
                       <span className="text-base">{driver.country_code}</span>
                       <span>
-                        <span className="font-bold" style={{ fontFamily: 'Orbitron, sans-serif' }}>{driver.name}</span>
+                        <span className="font-bold uppercase text-xs" style={{ letterSpacing: '0.1em' }}>{driver.name}</span>
                       </span>
                     </div>
                   ))}
@@ -51,7 +56,7 @@ const TeamsPage = () => {
           </div>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

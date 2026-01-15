@@ -3,6 +3,15 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      colors: {
+        graphite: '#121416',     // Primary surface
+        carbon: '#0B0E11',       // Deepest/Navbar background
+        slateDark: '#1C1E20',    // Secondary surface / Panels
+        slateMid: '#2A2F38',     // Borders / dividers
+        textPrimary: '#E6E8EB',  // Headings
+        textSecondary: '#9AA1AC',// Metadata
+        f1Red: '#E10600'         // Accent ONLY
+      },
       screens: {
         'xs': '475px',
         'sm': '640px',

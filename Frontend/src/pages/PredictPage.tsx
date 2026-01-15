@@ -199,7 +199,23 @@ const PredictPage: React.FC<PredictPageProps> = ({ raceData }) => {
   }
 
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen text-white relative pt-14">
+      <div className="w-full bg-slateDark/90 border-b border-white/5 py-1.5 px-8 flex justify-between items-center z-[100] relative">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#E10600] animate-pulse"></span>
+            <span className="text-[10px] font-black tracking-[0.2em] text-white uppercase">Simulation Mode</span>
+          </div>
+          <div className="h-4 w-[1px] bg-slate-700"></div>
+          <p className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">
+            <span className="text-[#E10600] font-bold">10,000+ Deterministic iterations</span> per session. Resultant vectors are model output only.
+          </p>
+        </div>
+        <div className="flex gap-4">
+          <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest px-2 py-0.5 border border-slate-800 rounded-xs bg-black/20">NOT LIVE TELEMETRY</span>
+          <span className="hidden md:block text-[9px] font-mono text-slate-600 uppercase">MODEL_V2.4.8_STABLE</span>
+        </div>
+      </div>
       {/* Hero Background is handled globally in App.tsx */}
 
       {/* Sticky Race Header */}

@@ -5,6 +5,7 @@ import { useRaces, Race as ApiRace } from '../hooks/useApi';
 import RaceCard from '../components/schedule/RaceCard';
 import RaceDetailView from '../components/schedule/RaceDetailView';
 import { RaceCardSkeleton } from '../components/common/SkeletonLoaders';
+import PageContainer from '../components/layout/PageContainer';
 
 type RaceSession = { date: string | null; time: string | null };
 type RaceItem = {
@@ -109,89 +110,86 @@ export default function SchedulePage({ }: SchedulePageProps) {
   }, {});
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-20">
-      <div className="max-w-5xl mx-auto px-6">
-        {/* Header with Year Toggle */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Calendar className="w-5 h-5 text-red-600" />
-              <span className="text-xs font-black text-red-600 tracking-[0.3em] uppercase">Season Calendar</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter">
-              {selectedYear} <span className="text-red-600">Schedule</span>
-            </h1>
+    <PageContainer>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+        <header className="border-l-4 border-[#E10600] pl-6 py-2">
+          <div className="flex items-center gap-3 mb-2">
+            <Calendar className="w-4 h-4 text-[#E10600]" />
+            <span className="text-xs font-black text-slate-500 tracking-[0.3em] uppercase">Season Calendar</span>
           </div>
+          <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white">
+            {selectedYear} <span className="text-[#E10600]">Schedule</span>
+          </h1>
+        </header>
 
-          <div className="flex items-center bg-white/5 border border-white/10 rounded-xl p-1">
-            {[2025, 2026].map(year => (
-              <button
-                key={year}
-                onClick={() => setSelectedYear(year)}
-                className={`px-6 py-2 rounded-lg text-sm font-black transition-all ${selectedYear === year ? 'bg-red-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'
-                  }`}
-              >
-                {year}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-          {['all', 'upcoming', 'live', 'completed'].map(filter => (
+        <div className="flex items-center bg-slateDark/40 border border-slateMid/20 rounded-xl p-1">
+          {[2025, 2026].map(year => (
             <button
-              key={filter}
-              onClick={() => setSelectedFilter(filter as any)}
-              className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border ${selectedFilter === filter
-                ? 'bg-white text-black border-white'
-                : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30'
+              key={year}
+              onClick={() => setSelectedYear(year)}
+              className={`px-6 py-2 rounded-lg text-sm font-black transition-all ${selectedYear === year ? 'bg-[#E10600] text-white shadow-lg' : 'text-gray-500 hover:text-white'
                 }`}
             >
-              {filter}
+              {year}
             </button>
           ))}
         </div>
-
-        {/* Race List Container */}
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map(i => <RaceCardSkeleton key={i} />)}
-          </div>
-        ) : error ? (
-          <div className="glass-card py-20 text-center border-red-500/20">
-            <p className="text-red-400 font-mono text-sm uppercase tracking-widest mb-4">Calibration Error</p>
-            <p className="text-gray-400">{error}</p>
-          </div>
-        ) : (
-          <div className="space-y-16">
-            {Object.entries(groupedRaces).map(([month, monthRaces]) => (
-              <div key={month} className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-xl font-black text-white uppercase italic tracking-wider">{month}</h2>
-                  <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
-                </div>
-                <div className="space-y-4">
-                  {monthRaces.map((race) => (
-                    <RaceCard
-                      key={race.id}
-                      race={race}
-                      getCountryFlag={getCountryFlag}
-                      onViewDetails={(r) => setSelectedRace(r)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {filteredRaces.length === 0 && !loading && !error && (
-          <div className="text-center py-20 glass-card">
-            <p className="text-gray-500 font-mono text-xs uppercase tracking-[0.3em]">No Sessions Found for this Range</p>
-          </div>
-        )}
       </div>
+
+      {/* Filter Tabs */}
+      <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+        {['all', 'upcoming', 'live', 'completed'].map(filter => (
+          <button
+            key={filter}
+            onClick={() => setSelectedFilter(filter as any)}
+            className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border ${selectedFilter === filter
+              ? 'bg-white text-black border-white'
+              : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30'
+              }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      {/* Race List Container */}
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map(i => <RaceCardSkeleton key={i} />)}
+        </div>
+      ) : error ? (
+        <div className="glass-card py-20 text-center border-red-500/20">
+          <p className="text-red-400 font-mono text-sm uppercase tracking-widest mb-4">Calibration Error</p>
+          <p className="text-gray-400">{error}</p>
+        </div>
+      ) : (
+        <div className="space-y-16">
+          {Object.entries(groupedRaces).map(([month, monthRaces]) => (
+            <div key={month} className="space-y-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-black text-white uppercase italic tracking-wider">{month}</h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
+              </div>
+              <div className="space-y-4">
+                {monthRaces.map((race) => (
+                  <RaceCard
+                    key={race.id}
+                    race={race}
+                    getCountryFlag={getCountryFlag}
+                    onViewDetails={(r) => setSelectedRace(r)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {filteredRaces.length === 0 && !loading && !error && (
+        <div className="text-center py-20 glass-card">
+          <p className="text-gray-500 font-mono text-xs uppercase tracking-[0.3em]">No Sessions Found for this Range</p>
+        </div>
+      )}
 
       {/* Detailed Track Intel View (Drill-down) */}
       <AnimatePresence>
@@ -203,6 +201,6 @@ export default function SchedulePage({ }: SchedulePageProps) {
           />
         )}
       </AnimatePresence>
-    </div>
+    </PageContainer>
   );
 }

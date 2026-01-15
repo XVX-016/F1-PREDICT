@@ -1,6 +1,7 @@
 import React, { useState, lazy, Suspense, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import HeroBackground from './components/HeroBackground';
+import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 
 
@@ -73,7 +74,7 @@ const lazyWithTimeout = (importFn: () => Promise<any>, timeout = 10000) => {
 };
 
 const HomePage = lazyWithTimeout(() => import('./pages/HomePage'));
-const DriverDetailPage = lazyWithTimeout(() => import('./pages/DriverDetailPage'));
+const DriversPage = lazyWithTimeout(() => import('./pages/DriversPage'));
 const TelemetryPage = lazyWithTimeout(() => import('./pages/TelemetryPage'));
 const SchedulePage = lazyWithTimeout(() => import('./pages/SchedulePage'));
 const TeamsPage = lazyWithTimeout(() => import('./pages/TeamsPage'));
@@ -84,6 +85,7 @@ const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'
 const SignUpPage = lazyWithTimeout(() => import('./pages/SignUpPage'));
 const SignInPage = lazyWithTimeout(() => import('./pages/SignInPage'));
 const AuthCallback = lazyWithTimeout(() => import('./pages/AuthCallback'));
+const AboutPage = lazyWithTimeout(() => import('./pages/AboutPage'));
 
 function App() {
   // Helper to extract page name from hash (ignoring query params)
@@ -141,7 +143,7 @@ function App() {
                 case 'home':
                   return <HomePage setCurrentPage={setCurrentPage} />;
                 case 'driver':
-                  return <DriverDetailPage />;
+                  return <DriversPage />;
                 case 'telemetry':
                   return <TelemetryPage />;
                 case 'schedule':
@@ -162,6 +164,8 @@ function App() {
                   return <SignInPage onPageChange={setCurrentPage} />;
                 case 'auth-callback':
                   return <AuthCallback onComplete={setCurrentPage} />;
+                case 'about':
+                  return <AboutPage />;
                 default:
                   return <HomePage setCurrentPage={setCurrentPage} />;
               }
@@ -195,9 +199,12 @@ function App() {
         {/* Premium static hero background with adaptive blur */}
         <HeroBackground currentPage={currentPage} />
         {/* TODO: Implement navbar auto-hide on scroll */}
-        <div className="min-h-screen text-white relative z-50">
+        <div className="min-h-screen text-white relative z-50 flex flex-col">
           <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-          {renderPage()}
+          <main className="flex-grow">
+            {renderPage()}
+          </main>
+          <Footer />
         </div>
       </NotificationProvider>
     </QueryClientProvider>

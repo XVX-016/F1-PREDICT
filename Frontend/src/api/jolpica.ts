@@ -108,7 +108,7 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
           }
         }),
         createTimeout(TIMEOUT_DURATION)
-      ]);
+      ]) as Response;
 
       clearTimeout(timeoutId);
 
@@ -215,23 +215,25 @@ export const getConstructorStandings = async () => {
 // Archive API functions with improved error handling
 export const getArchiveRaces = async (year: number) => {
   const key = `archive-races-${year}`;
-  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/races`));
+  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/races?limit=100`));
 };
 
 export const getArchiveResults = async (year: number, round?: number) => {
-  const url = round ? `${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/${round}/results` : `${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/results`;
+  const url = round
+    ? `${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/${round}/results?limit=100`
+    : `${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/results?limit=1000`;
   const key = round ? `archive-results-${year}-${round}` : `archive-results-${year}`;
   return getCachedOrFetch(key, () => fetchWithTimeout(url));
 };
 
 export const getArchiveDriverStandings = async (year: number) => {
   const key = `archive-driver-standings-${year}`;
-  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/driverstandings`));
+  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/driverstandings?limit=100`));
 };
 
 export const getArchiveConstructorStandings = async (year: number) => {
   const key = `archive-constructor-standings-${year}`;
-  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/constructorstandings`));
+  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/constructorstandings?limit=100`));
 };
 
 // Utility function to clear cache
