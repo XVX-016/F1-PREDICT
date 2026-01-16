@@ -29,7 +29,8 @@ class SimulationEngine:
         Public entry point with sensitivity analysis.
         """
         # Run main simulation
-        main_results = self.run_simulation_internal(race_id, params, self.iterations)
+        iters = params.get("iterations", self.iterations)
+        main_results = self.run_simulation_internal(race_id, params, iters)
         
         # Generate Sensitivity
         tyre_deg = params.get("tyre_deg_multiplier", 1.0)
@@ -104,7 +105,7 @@ class SimulationEngine:
         dnf_counts = {d: 0 for d in driver_ids}
 
         for _ in range(iterations):
-            race_times = self.simulator.simulate_race(
+            race_times, _ = self.simulator.simulate_race(
                 driver_profiles=driver_profiles,
                 total_laps=60,
                 driver_strategies=driver_strategies
@@ -123,6 +124,14 @@ class SimulationEngine:
                 
                 if rank == 0: win_counts[d] += 1
                 if rank < 3: podium_counts[d][rank] += 1
+
+        # At the end of iterations, run one more race with trace capture for replay
+        _, representative_trace = self.simulator.simulate_race(
+            driver_profiles=driver_profiles,
+            total_laps=60,
+            driver_strategies=driver_strategies,
+            capture_trace=True
+        )
 
         win_prob = {d: count / iterations for d, count in win_counts.items()}
         podium_prob = {d: [c / iterations for c in counts] for d, counts in podium_counts.items()}
@@ -145,6 +154,7 @@ class SimulationEngine:
             "dnf_risk": dnf_risk,
             "pace_series": pace_series,
             "strategy_recommendation": optimization_result,
+            "race_trace": representative_trace,
             "explanations": {
                 "VER": ["High aerodynamic efficiency favors current track layout."],
                 "NOR": ["Strong sector 2 performance offset by poor start statistics."],
@@ -156,6 +166,55 @@ class SimulationEngine:
                 "model_version": self.model_version
             }
         }
+
+    def compare_strategies(
+        self,
+        race_id: str,
+        driver_id: str,
+        strategy_a: Dict[str, Any],
+        strategy_b: Dict[str, Any],
+        params: Dict[str, Any],
+        iterations: int = 2000
+    ) -> Dict[str, Any]:
+        """
+        Compares two specific strategies under identical conditions.
+        """
+        # Fixed seed for comparison purity
+        seed = params.get("seed", 42)
+        
+        driver_profile = {
+            "base_lap_ms": 90000,
+            "pace_delta_ms": 0,
+            "variance_ms": 150,
+            "dnf_prob": 0.05
+        }
+        
+        results = {}
+        for label, strategy in [("A", strategy_a), ("B", strategy_b)]:
+            np.random.seed(seed)
+            times = []
+            for _ in range(iterations):
+                time = self.simulator.simulate_single_driver(
+                    driver_profile=driver_profile,
+                    strategy=strategy,
+                    total_laps=60
+                )
+                if time != float('inf'):
+                    times.append(time)
+            
+            results[label] = {
+                "mean_time": float(np.mean(times)) if times else 0,
+                "std_time": float(np.std(times)) if times else 0,
+                "win_count": len([t for t in times if t < 5400000]) # Mock win threshold
+            }
+            
+        # Calc Delta
+        results["delta"] = {
+            "mean_time": results["A"]["mean_time"] - results["B"]["mean_time"],
+            "std_time": results["A"]["std_time"] - results["B"]["std_time"]
+        }
+        
+        return results
 
 # Singleton instance
 simulation_engine = SimulationEngine()

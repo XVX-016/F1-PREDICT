@@ -43,6 +43,10 @@ const StrategyRecommendationCard: React.FC<StrategyRecommendationCardProps> = ({
                 </div>
                 <div className="flex gap-4">
                     <div className="text-right">
+                        <p className="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Expected Time</p>
+                        <p className="text-lg font-mono font-bold text-white">{raceTimeStr}</p>
+                    </div>
+                    <div className="text-right">
                         <p className="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Stability</p>
                         <p className="text-lg font-mono font-bold text-green-400">{stabilityScore}%</p>
                     </div>
