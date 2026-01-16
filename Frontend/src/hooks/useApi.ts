@@ -1,6 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { api } from '../services/api';
+
+// ... (existing types)
+
+export function useSimulateRace() {
+    return useMutation({
+        mutationFn: ({ raceId, params }: { raceId: string; params: any }) =>
+            api.simulateRace(raceId, params),
+    });
+}
 
 // Types matched to Backend API responses
 export interface Constructor {

@@ -8,7 +8,7 @@ interface NavigationProps {
 }
 
 const navItems = [
-  { label: "Predict", id: "predict" },
+  { label: "Simulation", id: "simulation" },
   { label: "Intelligence", id: "intelligence" },
   { label: "Schedule", id: "schedule" },
   { label: "Results", id: "results" },

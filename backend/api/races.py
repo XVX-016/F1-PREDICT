@@ -3,50 +3,58 @@ Race API endpoints - Phase 6 (Enhanced)
 Exposes simulation-first probabilities, fantasy markets, and feature attribution.
 """
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
 import logging
-from services.probability_engine import probability_engine
+from services.simulation_engine import simulation_engine
 from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/races", tags=["races"])
 
+class SimulationRequest(BaseModel):
+    tyre_deg_multiplier: float = 1.0
+    sc_probability: float = 0.15
+    strategy_aggression: str = "Balanced"
+    weather_scenario: str = "Dry"
+    grid_source: str = "Qualifying"
+    seed: Optional[int] = None
+
 @router.get("/")
-async def get_races(season: int = 2025):
-    """Get race calendar for a specific season (default 2025)"""
+async def get_races(season: int = 2026):
+    """Get race calendar for a specific season (default 2026)"""
     try:
         db = get_db()
-        # Fetch all columns including new session times and circuit images
-        # We perform a client-side filter for now or rely on 'season' column if consistent
         response = db.table("races").select("*").order("round").execute()
-        
-        # Simple Python filter if needed, or rely on query param if the column exists and is reliable
         races = response.data
         if season:
              races = [r for r in races if r.get('season') == season]
-             
         return races
     except Exception as e:
         logger.error(f"Error fetching races: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch races")
 
+@router.post("/{race_id}/simulate")
+async def simulate_race(race_id: str, request: SimulationRequest):
+    """
+    Executes a high-fidelity Monte Carlo simulation (10,000 iterations).
+    """
+    try:
+        logger.info(f"Triggering simulation for race {race_id} with seed {request.seed}")
+        results = simulation_engine.run_simulation(race_id, request.dict())
+        return results
+    except Exception as e:
+        logger.error(f"Simulation failed for race {race_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Simulation failed: {str(e)}")
+
 @router.get("/{race_id}/probabilities")
 async def get_race_probabilities(race_id: str):
-    """Returns Monte Carlo derived probabilities for a race."""
+    """Returns baseline probabilities for a race."""
     try:
-        # Mock probabilities if engine doesn't have data yet
-        probs = probability_engine.get_latest_probabilities(race_id)
-        if not probs:
-            # Fallback for demonstration
-            return {
-                "race_id": race_id,
-                "probabilities": {
-                    "VER": {"win_prob": 0.45, "podium_prob": 0.85, "top10_prob": 0.95},
-                    "NOR": {"win_prob": 0.25, "podium_prob": 0.70, "top10_prob": 0.90},
-                    "LEC": {"win_prob": 0.15, "podium_prob": 0.60, "top10_prob": 0.85}
-                }
-            }
-        return probs
+        # Use simulation engine for baseline if no cached data exists
+        # In this context, we just return the "latest" or a default run
+        return simulation_engine.run_simulation(race_id, {"seed": 42})
     except Exception as e:
         logger.error(f"Error fetching probabilities: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch probabilities")
@@ -55,7 +63,6 @@ async def get_race_probabilities(race_id: str):
 async def get_race_markets(race_id: str):
     """Returns fantasy markets derived from physics engine."""
     try:
-        # We transform probabilities into "markets" (e.g. over/under, matchups)
         return {
             "race_id": race_id,
             "markets": [
