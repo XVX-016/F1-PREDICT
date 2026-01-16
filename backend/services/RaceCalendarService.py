@@ -556,3 +556,23 @@ class RaceCalendarService:
         }
         
         return characteristics.get(track_type, characteristics["permanent"])
+
+    def get_current_race_status(self) -> Dict[str, Any]:
+        """
+        Determines the current or next race status from the calendar.
+        For Week 1 MVP, we mock a 'Live' scenario or fetch from Ergast if connectivity allows.
+        """
+        # Placeholder logic: return a static "Live" state for testing UI
+        # In production this would check self.races against datetime.utcnow()
+        return {
+            "raceId": "2026-01-17-test-race",
+            "name": "Bahrain Grand Prix",
+            "round": 1,
+            "session": "FP2",
+            "status": "LIVE", # or UPCOMING, COMPLETED
+            "trackTemp": "42°C",
+            "airTemp": "31°C",
+            "humidity": "45%",
+            "windSpeed": "12 km/h",
+            "nextSessionTime": "2026-03-02T15:00:00Z"
+        }

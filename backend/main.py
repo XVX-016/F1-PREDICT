@@ -11,12 +11,11 @@ load_dotenv()
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from api.races import router as races_router
-from api.drivers import router as drivers_router
-from api.constructors import router as constructors_router
-from api.live import router as live_router
-from api.live_telemetry import router as telemetry_router
-from api.user import router as user_router
+import api.races as races
+import api.drivers as drivers
+import api.constructors as constructors
+import api.status as status
+import api.user as user
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,12 +38,11 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(drivers.router, prefix="/api/drivers", tags=["drivers"])
 app.include_router(constructors.router, prefix="/api/constructors", tags=["constructors"])
 app.include_router(races.router, prefix="/api/races", tags=["races"])
 app.include_router(status.router, prefix="/api", tags=["status"])
-app.include_router(user_router)
+app.include_router(user.router, prefix="/api/users", tags=["users"])
 
 @app.get("/health")
 async def health_check():
