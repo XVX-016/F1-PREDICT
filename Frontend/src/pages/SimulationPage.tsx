@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRaces, useRaceProbabilities, useSimulateRace } from '../hooks/useApi';
+import { useRaceStatus } from '../hooks/useRaceStatus';
 import SimulationHeader from '../components/simulation/SimulationHeader';
 
 // New simulation-specific components will be imported here
@@ -38,6 +39,7 @@ const SimulationPage: React.FC<SimulationPageProps> = ({ raceData }) => {
   const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(2026);
   const { data: backendProbabilities } = useRaceProbabilities(raceData?.raceId || '');
   const simulationMutation = useSimulateRace();
+  const { data: liveStatus } = useRaceStatus(); // Lifted to top level
 
   const [loading, setLoading] = useState(true);
   const error = apiError || null;
@@ -93,6 +95,25 @@ const SimulationPage: React.FC<SimulationPageProps> = ({ raceData }) => {
     }
 
     const found = apiRaces.find(r => r.id === selectedRaceId || r.round.toString() === selectedRaceId);
+
+    // Live Status Override
+    // Live Status Override (Using top-level hook)
+
+    // If we have live status and it matches the selected race (or we are defaulting), use it
+    if (liveStatus && liveStatus.status === 'LIVE') {
+      return {
+        id: liveStatus.raceId,
+        name: liveStatus.name,
+        circuit: found?.circuit || 'Unknown Circuit',
+        country: found?.country || 'Unknown Location',
+        startTime: new Date().toISOString(), // Live now
+        status: 'LIVE' as const,
+        trackTemp: liveStatus.trackTemp,
+        airTemp: liveStatus.airTemp,
+        humidity: liveStatus.humidity,
+        windSpeed: liveStatus.windSpeed
+      };
+    }
 
     if (!found) {
       const fallback = apiRaces[0];
@@ -195,8 +216,10 @@ const SimulationPage: React.FC<SimulationPageProps> = ({ raceData }) => {
           </p>
         </div>
         <div className="flex gap-4">
-          <span className="text-[9px] font-bold text-[#E10600] uppercase tracking-widest px-2 py-0.5 border border-slate-800 rounded-xs bg-black/20">NOT LIVE TELEMETRY</span>
-          <span className="hidden md:block text-[9px] font-mono text-slate-600 uppercase">MODEL_V2.4.8_STABLE</span>
+          <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 border rounded-xs ${liveStatus?.status === 'LIVE' ? 'text-green-500 border-green-500/20 bg-green-500/10' : 'text-[#E10600] border-slate-800 bg-black/20'}`}>
+            {liveStatus?.status === 'LIVE' ? 'LIVE TELEMETRY ACTIVE' : 'NOT LIVE TELEMETRY'}
+          </span>
+          <span className="hidden md:block text-[9px] font-mono text-slate-600 uppercase">MODEL_V2.5.0_LGBM</span>
         </div>
       </div>
 
