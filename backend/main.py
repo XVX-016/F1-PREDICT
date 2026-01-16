@@ -39,11 +39,11 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(races_router)
-app.include_router(drivers_router)
-app.include_router(constructors_router)
-app.include_router(live_router)
-app.include_router(telemetry_router)
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(drivers.router, prefix="/api/drivers", tags=["drivers"])
+app.include_router(constructors.router, prefix="/api/constructors", tags=["constructors"])
+app.include_router(races.router, prefix="/api/races", tags=["races"])
+app.include_router(status.router, prefix="/api", tags=["status"])
 app.include_router(user_router)
 
 @app.get("/health")
