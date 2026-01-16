@@ -46,6 +46,16 @@ export const api = {
         return response.json();
     },
 
+    simulateRace: async (raceId: string, params: any): Promise<any> => {
+        const response = await fetch(`${API_BASE_URL}/api/races/${raceId}/simulate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(params),
+        });
+        if (!response.ok) throw new Error('Simulation failed');
+        return response.json();
+    },
+
     getLiveUpdates: (raceId: string, onMessage: (data: any) => void) => {
         const eventSource = new EventSource(`${API_BASE_URL}/api/live/${raceId}`);
         eventSource.onmessage = (event) => {
