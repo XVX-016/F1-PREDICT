@@ -6,6 +6,7 @@ import SimulationHeader from '../components/simulation/SimulationHeader';
 import SimulationControls from '../components/simulation/SimulationControls';
 import RunSimulationPanel from '../components/simulation/RunSimulationPanel';
 import SimulationResults from '../components/simulation/SimulationResults';
+import StrategyRecommendationCard from '../components/simulation/StrategyRecommendationCard';
 import ParameterSensitivityPanel from '../components/simulation/ParameterSensitivityPanel';
 import ModelExplanationPanel from '../components/simulation/ModelExplanationPanel';
 import AIInsights from '../components/predict/AIInsights';
@@ -246,6 +247,12 @@ const SimulationPage: React.FC<SimulationPageProps> = ({ raceData }) => {
                   </div>
                 )}
               </div>
+
+              {results && results.strategy_recommendation && (
+                <div className="mb-12">
+                  <StrategyRecommendationCard recommendation={results.strategy_recommendation} />
+                </div>
+              )}
 
               <SimulationResults
                 results={results}
