@@ -7,6 +7,8 @@ from engine.physics.fuel import fuel_time_penalty
 
 logger = logging.getLogger(__name__)
 
+from services.strategy_optimizer import StrategyOptimizer
+
 class SimulationEngine:
     """
     Orchestrates deterministic physics models and Monte Carlo sampling.
@@ -14,6 +16,7 @@ class SimulationEngine:
     
     def __init__(self):
         self.simulator = RaceSimulator()
+        self.optimizer = StrategyOptimizer(self.simulator)
         self.model_version = "v2.5.0-proto"
         self.iterations = 10000
 
@@ -75,6 +78,27 @@ class SimulationEngine:
                 "dnf_prob": 0.03 + (params.get("sc_probability", 0.15) * 0.1)
             }
 
+        # Strategy Optimization for the focus driver (VER)
+        focus_driver = "VER"
+        # We need a profile for the optimizer
+        focus_profile = {
+            "base_lap_ms": 90000,
+            "pace_delta_ms": -500,
+            "variance_ms": 150,
+            "dnf_prob": 0.05
+        }
+        
+        optimization_result = self.optimizer.optimize(
+            driver_profile=focus_profile,
+            params=params,
+            iterations=500 # Smaller sim for optimization speed
+        )
+        
+        recommended_strategy = optimization_result["strategy"] if optimization_result else None
+
+        # Full Monte Carlo with the recommended strategy for all drivers (simplified)
+        driver_strategies = {d: recommended_strategy for d in driver_ids} if recommended_strategy else None
+
         win_counts = {d: 0 for d in driver_ids}
         podium_counts = {d: [0, 0, 0] for d in driver_ids}
         dnf_counts = {d: 0 for d in driver_ids}
@@ -82,13 +106,21 @@ class SimulationEngine:
         for _ in range(iterations):
             race_times = self.simulator.simulate_race(
                 driver_profiles=driver_profiles,
-                total_laps=60
+                total_laps=60,
+                driver_strategies=driver_strategies
             )
-            sorted_times = sorted(race_times.items(), key=lambda x: x[1])
+            
+            # Sort to find positions
+            sorted_times = sorted(
+                [(d, t) for d, t in race_times.items()], 
+                key=lambda x: x[1]
+            )
+            
             for rank, (d, t) in enumerate(sorted_times):
                 if t == float('inf'):
                     dnf_counts[d] += 1
                     continue
+                
                 if rank == 0: win_counts[d] += 1
                 if rank < 3: podium_counts[d][rank] += 1
 
@@ -112,6 +144,7 @@ class SimulationEngine:
             "podium_probability": podium_prob,
             "dnf_risk": dnf_risk,
             "pace_series": pace_series,
+            "strategy_recommendation": optimization_result,
             "explanations": {
                 "VER": ["High aerodynamic efficiency favors current track layout."],
                 "NOR": ["Strong sector 2 performance offset by poor start statistics."],
