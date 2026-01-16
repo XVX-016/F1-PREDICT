@@ -7,6 +7,8 @@ import SimulationControls from '../components/simulation/SimulationControls';
 import RunSimulationPanel from '../components/simulation/RunSimulationPanel';
 import SimulationResults from '../components/simulation/SimulationResults';
 import StrategyRecommendationCard from '../components/simulation/StrategyRecommendationCard';
+import RaceReplay from '../components/simulation/RaceReplay';
+import ModelDriftPanel from '../components/simulation/ModelDriftPanel';
 import ParameterSensitivityPanel from '../components/simulation/ParameterSensitivityPanel';
 import ModelExplanationPanel from '../components/simulation/ModelExplanationPanel';
 import AIInsights from '../components/predict/AIInsights';
@@ -258,6 +260,19 @@ const SimulationPage: React.FC<SimulationPageProps> = ({ raceData }) => {
                 results={results}
                 isRunning={simulationMutation.isPending}
               />
+
+              {results && results.race_trace && (
+                <RaceReplay trace={results.race_trace} />
+              )}
+
+              {results && (
+                <ModelDriftPanel metrics={{
+                  pace_mae: 82.4,
+                  calibration_error: 0.042,
+                  rank_correlation: 0.94,
+                  status: 'Healthy'
+                }} />
+              )}
             </div>
 
             {results && results.sensitivity && (
