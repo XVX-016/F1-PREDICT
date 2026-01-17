@@ -1,0 +1,49 @@
+{
+  "model_version": "lgbm_v20260117_0431",
+  "trained_at": "2026-01-17T04:31:39.857227",
+  "data_cutoff": "2026-01-17T04:26:37.610373+00:00",
+  "oof_mae": 101897.07659000726,
+  "zero_baseline_mae": 454275.1748881526,
+  "mean_baseline_mae": 317129.8213269356,
+  "improvement_vs_zero_pct": 77.56930551727918,
+  "improvement_vs_mean_pct": 67.86897045391405,
+  "residual_std_ms": 438263.7740230522,
+  "residual_p05_ms": -273873.1251271007,
+  "residual_p95_ms": 81662.06363328455,
+  "features": [
+    "avg_long_run_pace_ms",
+    "tire_deg_rate",
+    "sector_consistency",
+    "clean_air_delta",
+    "recent_form",
+    "grid_position"
+  ],
+  "n_samples": 337,
+  "n_folds": 5,
+  "feature_importance": [
+    {
+      "feature": "tire_deg_rate",
+      "importance": 457093290520189.6
+    },
+    {
+      "feature": "clean_air_delta",
+      "importance": 41635079489282.0
+    },
+    {
+      "feature": "sector_consistency",
+      "importance": 26535446187730.8
+    },
+    {
+      "feature": "avg_long_run_pace_ms",
+      "importance": 12093358545583.6
+    },
+    {
+      "feature": "recent_form",
+      "importance": 0.0
+    },
+    {
+      "feature": "grid_position",
+      "importance": 0.0
+    }
+  ]
+}
