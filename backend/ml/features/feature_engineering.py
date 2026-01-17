@@ -51,7 +51,7 @@ class FeatureEngineer:
         return {
             "avg_long_run_pace_ms": float(avg_long_run_pace),
             "tire_deg_rate": float(max(0.01, tire_deg_rate)),
-            "sector_consistency": float(sector_consistency) if not pd.isna(sector_consistency) else 200.0,
+            "sector_consistency": float(sector_std) if not pd.isna(sector_std) else 200.0,
             "clean_air_delta": float(clean_air_delta),
             "recent_form": float(recent_form),
             "grid_position": float(grid_position)

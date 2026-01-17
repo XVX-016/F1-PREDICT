@@ -43,10 +43,27 @@ class SimulationEngine:
     ) -> Dict[str, Any]:
         """
         Public entry point with sensitivity analysis.
+        
+        Args:
+            race_id: Race identifier
+            params: Simulation parameters including:
+                - use_ml: bool (default True) - ML kill switch
+                  If False, uses physics-only simulation (pace_delta = 0)
+                - seed: int - Random seed for reproducibility
+                - iterations: int - Monte Carlo iterations
         """
         # Run main simulation
         iters = params.get("iterations", self.iterations)
+        use_ml = params.get("use_ml", True)
+        
+        # Log ML state for traceability
+        logger.info(f"Running simulation: use_ml={use_ml}, iterations={iters}")
+        
         main_results = self.run_simulation_internal(race_id, params, iters)
+        
+        # Add ML mode to metadata
+        main_results["metadata"]["use_ml"] = use_ml
+        main_results["metadata"]["mode"] = "Physics + ML (Residual Pace Model)" if use_ml else "Physics Only (Deterministic)"
         
         # Generate Sensitivity
         tyre_deg = params.get("tyre_deg_multiplier", 1.0)
@@ -84,13 +101,21 @@ class SimulationEngine:
         
         driver_ids = ["VER", "NOR", "LEC", "PIA", "SAI", "HAM", "RUS", "ALO", "PER", "STR"]
         tyre_deg = params.get("tyre_deg_multiplier", 1.0)
+        use_ml = params.get("use_ml", True)  # ML kill switch
         
         driver_profiles = {}
         for i, d in enumerate(driver_ids):
             base_lap = 90000 + (i * 150)
+            
+            # ML KILL SWITCH: If use_ml=False, pace_delta is 0 (physics only)
+            if use_ml:
+                pace_delta = self._get_ml_pace_delta(d)
+            else:
+                pace_delta = 0.0  # Pure physics - no ML adjustment
+            
             driver_profiles[d] = {
                 "base_lap_ms": 90000 + (i * 150),
-                "pace_delta_ms": self._get_ml_pace_delta(d), # Use ML prediction
+                "pace_delta_ms": pace_delta,
                 "variance_ms": 150,
                 "dnf_prob": 0.03 + (params.get("sc_probability", 0.15) * 0.1)
             }
@@ -111,7 +136,13 @@ class SimulationEngine:
             iterations=500 # Smaller sim for optimization speed
         )
         
-        recommended_strategy = optimization_result["strategy"] if optimization_result else None
+        recommended_strategy = optimization_result["strategy"] if optimization_result else {
+            "name": "Fallback One-Stop",
+            "stops": 1,
+            "type": "Soft-Hard",
+            "pit_laps": [20],
+            "tyres": ["Soft", "Hard"]
+        }
 
         # Full Monte Carlo with the recommended strategy for all drivers (simplified)
         driver_strategies = {d: recommended_strategy for d in driver_ids} if recommended_strategy else None

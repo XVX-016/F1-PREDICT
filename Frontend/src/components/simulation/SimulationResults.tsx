@@ -46,20 +46,27 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
                 {/* Metric Summary */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Mean Race Time</p>
-                        <p className="text-xl font-black text-white font-mono">1:32:44.291</p>
+                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Max Verstappen Win %</p>
+                        <p className="text-xl font-black text-white font-mono">
+                            {results.win_probability['VER'] ? (results.win_probability['VER'] * 100).toFixed(1) : '0.0'}%
+                        </p>
                     </div>
                     <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Strategy Robustness</p>
-                        <p className="text-xl font-black text-green-500 font-mono">98.4%</p>
+                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Model Confidence</p>
+                        <p className="text-xl font-black text-green-500 font-mono">High</p>
                     </div>
                     <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Standard Deviation</p>
-                        <p className="text-xl font-black text-slate-300 font-mono">±4.2s</p>
+                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Sample Size</p>
+                        <p className="text-xl font-black text-slate-300 font-mono">{results.metadata.iterations.toLocaleString()}</p>
                     </div>
                     <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">SC Intersection</p>
-                        <p className="text-xl font-black text-yellow-500 font-mono">L12, L38</p>
+                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Most Likely Podium</p>
+                        <div className="flex -space-x-2 overflow-hidden mt-1">
+                            {/* Placeholder for top 3 driver avatars or codes */}
+                            <span className="text-xs font-mono text-yellow-500">VER</span>
+                            <span className="text-xs font-mono text-slate-400 ml-2">NOR</span>
+                            <span className="text-xs font-mono text-orange-400 ml-2">LEC</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@ from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/races", tags=["races"])
+router = APIRouter(tags=["races"])
 
 class SimulationRequest(BaseModel):
     tyre_deg_multiplier: float = 1.0
