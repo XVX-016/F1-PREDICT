@@ -78,10 +78,32 @@ class ModelTrainer:
                 # Store data cutoff for traceability
                 self.data_cutoff = df.get("created_at", pd.Series()).max() if "created_at" in df.columns else None
                 
-                # Add target if not present (pace delta from race results)
-                if TARGET not in df.columns:
-                    logger.warning("⚠️ No target column - computing from race results...")
+                # Add target if not present or empty
+                if TARGET not in df.columns or df[TARGET].isnull().all():
+                    logger.warning("Target column missing or empty - computing targets...")
                     df = self._compute_targets(df)
+                elif df[TARGET].isnull().any():
+                     logger.warning("Some targets missing - filling missing values...")
+                     # Fill only missing ones if needed, or recompute all
+                     df = self._compute_targets(df)
+                
+                # PREPROCESSING: Handle NaNs and Infinite values
+                original_len = len(df)
+                
+                # Replace inf/-inf with NaN
+                df = df.replace([np.inf, -np.inf], np.nan)
+                
+                # Drop rows with missing values in features or target
+                df = df.dropna(subset=FEATURES + [TARGET])
+                
+                dropped_count = original_len - len(df)
+                if dropped_count > 0:
+                    logger.warning(f"⚠️ Dropped {dropped_count} rows containing NaN/Inf values")
+                    logger.warning(f"   Remaining training samples: {len(df)}")
+                
+                if df.empty:
+                    logger.error("❌ No valid training data after dropping NaNs!")
+                    return self._handle_no_real_data()
                 
                 return df
             else:
@@ -261,10 +283,13 @@ class ModelTrainer:
         X = df[FEATURES]
         y = df[TARGET]
         
-        # Use race_id for GroupKFold if available, otherwise synthetic groups
-        if 'race_id' in df.columns:
+        # Use race_id or data_source for GroupKFold to prevent leakage
+        if 'race_id' in df.columns and df['race_id'].nunique() > 1:
             groups = df['race_id']
+        elif 'data_source' in df.columns:
+            groups = df['data_source']
         else:
+            logger.warning("⚠️ No valid grouping column found. Using synthetic groups (LEAKAGE RISK).")
             groups = pd.Series([i // 20 for i in range(len(df))])
         
         # Compute baselines
