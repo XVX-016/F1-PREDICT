@@ -31,7 +31,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +43,9 @@ app.include_router(constructors.router, prefix="/api/constructors", tags=["const
 app.include_router(races.router, prefix="/api/races", tags=["races"])
 app.include_router(status.router, prefix="/api", tags=["status"])
 app.include_router(user.router, prefix="/api/users", tags=["users"])
+
+import api.live_telemetry as telemetry
+app.include_router(telemetry.router)
 
 @app.get("/health")
 async def health_check():

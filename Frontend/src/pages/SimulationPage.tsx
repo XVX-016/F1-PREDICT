@@ -12,6 +12,7 @@ import RaceReplay from '../components/simulation/RaceReplay';
 import ModelDriftPanel from '../components/simulation/ModelDriftPanel';
 import ParameterSensitivityPanel from '../components/simulation/ParameterSensitivityPanel';
 import ModelExplanationPanel from '../components/simulation/ModelExplanationPanel';
+import StrategyComparison from '../components/simulation/StrategyComparison';
 import AIInsights from '../components/predict/AIInsights';
 // import ModelExplanationPanel from '../components/simulation/ModelExplanationPanel';
 
@@ -274,8 +275,25 @@ const SimulationPage: React.FC<SimulationPageProps> = ({ raceData }) => {
               </div>
 
               {results && results.strategy_recommendation && (
-                <div className="mb-12">
+                <div className="mb-12 space-y-6">
                   <StrategyRecommendationCard recommendation={results.strategy_recommendation} />
+
+                  {/* Strategy Comparison Block (Week 2 Feature) */}
+                  <StrategyComparison
+                    baseline={{
+                      name: "Recommended (Start Soft)",
+                      meanTime: 5420000,
+                      stdDev: 4200,
+                      winProb: 0.65
+                    }}
+                    candidate={{
+                      name: "Alt: Aggressive 2-Stop",
+                      meanTime: 5418000, // Slightly faster mean
+                      stdDev: 8500, // But higher variance
+                      winProb: 0.55 // Lower win prob due to traffic risk
+                    }}
+                    onApply={() => console.log('Applying Alt Strategy')}
+                  />
                 </div>
               )}
 
