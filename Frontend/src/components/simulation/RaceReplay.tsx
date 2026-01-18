@@ -1,103 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Circle } from 'lucide-react';
+import React, { useMemo } from 'react';
+import ReplayPanel from '../replay/ReplayPanel';
+import ReplayPaceChart from '../charts/ReplayPaceChart';
+import StrategyFailurePanel from '../replay/StrategyFailurePanel';
 
-interface LapData {
-    lap: number;
-    is_sc: boolean;
-    drivers: Record<string, {
-        lap_time: number;
-        total_time: number;
-        compound: string;
-        tyre_age: number;
-        is_pit?: boolean;
-    }>;
-}
+// Assuming the trace follows the schema defined in the plan.
+// We might need to adapt if the simulation engine output differs slightly, 
+// but for the purpose of this task we assume alignment or fail gracefully.
 
 interface RaceReplayProps {
-    trace: LapData[] | null;
+    trace: any[]; // Typing as any[] for flexibility with incoming JSON
 }
 
 const RaceReplay: React.FC<RaceReplayProps> = ({ trace }) => {
-    const [currentLapIdx, setCurrentLapIdx] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
+    if (!trace || trace.length === 0) return null;
 
-    useEffect(() => {
-        let interval: any;
-        if (isPlaying && trace && currentLapIdx < trace.length - 1) {
-            interval = setInterval(() => {
-                setCurrentLapIdx(prev => prev + 1);
-            }, 500);
-        } else {
-            setIsPlaying(false);
-        }
-        return () => clearInterval(interval);
-    }, [isPlaying, currentLapIdx, trace]);
+    // Extract basic meta
+    const maxLap = trace.length;
+    const raceId = "simulated_race"; // Placeholder or derived
 
-    if (!trace) return null;
+    // State is managed by ReplayPanel's useReplay hook (via onLapChange callback ideally, 
+    // but ReplayPanel uses useReplay internally. We need to lift state OR let ReplayPanel control it.
+    // The ReplayPanel I wrote earlier uses useReplay internally. 
+    // It has `onLapChange` prop.
 
-    const currentLap = trace[currentLapIdx];
-    const sortedDrivers = Object.entries(currentLap.drivers)
-        .sort((a, b) => a[1].total_time - b[1].total_time);
+    // So we need local state to track the 'current' lap to show the other charts.
+    const [currentLap, setCurrentLap] = React.useState(1);
+
+    // Memoize the current lap data for performance
+    const currentLapData = useMemo(() => {
+        // trace is 0-indexed presumably, or 1-based logic?
+        // Usually trace[0] is lap 1.
+        return trace[currentLap - 1];
+    }, [trace, currentLap]);
+
+    // Format failures for the panel
+    // We assume the trace *might* contain failure annotations in a separate field or we extract them.
+    // Or maybe the failure analysis runs on the backend and we get a separate `failures` array.
+    // Let's assume for now we extract them from the trace if they exist on the lap, or pass empty.
+    const failures = useMemo(() => {
+        // Collect all failures from the trace
+        const allFailures: any[] = [];
+        trace.forEach(lap => {
+            if (lap.failures) {
+                allFailures.push(...lap.failures);
+            }
+            // Also check for decisions that are failures if using that schema
+            if (lap.decision?.type === 'FAILURE') { // Example
+                allFailures.push({
+                    lap: lap.lap,
+                    type: lap.decision.reason,
+                    explanation: lap.decision.explanation
+                });
+            }
+        });
+        return allFailures;
+    }, [trace]);
 
     return (
-        <div className="bg-slate-900/30 border border-white/5 rounded-lg p-6 mt-8">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="text-sm font-bold text-slate-400 border-l-2 border-[#E10600] pl-3 uppercase tracking-widest">
-                    Race Replay <span className="text-slate-600 ml-2">Lap {currentLap.lap}</span>
-                </h3>
-
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => setCurrentLapIdx(prev => Math.max(0, prev - 1))}
-                        className="p-1 hover:text-white text-slate-500 transition-colors"
-                    ><SkipBack size={18} /></button>
-
-                    <button
-                        onClick={() => setIsPlaying(!isPlaying)}
-                        className="p-2 bg-[#E10600] text-white rounded-full hover:bg-red-700 transition-colors"
-                    >
-                        {isPlaying ? <Pause size={20} fill="white" /> : <Play size={20} fill="white" />}
-                    </button>
-
-                    <button
-                        onClick={() => setCurrentLapIdx(prev => Math.min(trace.length - 1, prev + 1))}
-                        className="p-1 hover:text-white text-slate-500 transition-colors"
-                    ><SkipForward size={18} /></button>
-                </div>
+        <div className="space-y-6 animate-in fade-in duration-700">
+            <div className="flex items-center gap-2 mb-4">
+                <div className="h-6 w-1 bg-[#E10600]"></div>
+                <h2 className="text-lg font-black uppercase tracking-widest text-white">
+                    Race Replay & Analysis
+                </h2>
             </div>
 
-            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {sortedDrivers.map(([id, data], idx) => (
-                    <div key={id} className="flex items-center gap-4 bg-black/20 p-2 rounded border border-white/5">
-                        <div className="w-6 text-[10px] font-mono text-slate-500">{idx + 1}</div>
-                        <div className={`w-8 font-bold text-sm ${id === 'VER' ? 'text-white' : 'text-slate-400'}`}>{id}</div>
-                        <div className="flex-1 h-2 bg-slate-800 rounded-full relative overflow-hidden">
-                            {/* Visual gap to leader proxy */}
-                            <div
-                                className="absolute right-0 top-0 bottom-0 bg-[#E10600]/40 rounded-full"
-                                style={{ width: `${Math.max(5, 100 - (idx * 5))}%` }}
-                            ></div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center text-[8px] font-bold
-                ${data.compound === 'Soft' ? 'border-red-500 text-red-500' :
-                                    data.compound === 'Medium' ? 'border-yellow-500 text-yellow-500' : 'border-white/40 text-slate-400'}`}>
-                                {data.compound[0]}
-                            </div>
-                            <div className="w-16 text-right font-mono text-[10px]">
-                                {data.is_pit ? <span className="text-[#E10600] font-bold">PIT</span> : `${(data.lap_time / 1000).toFixed(3)}s`}
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {/* Main Control Panel (Scrubber, Snapshot) */}
+            <ReplayPanel
+                raceId={raceId}
+                maxLap={maxLap}
+                onLapChange={setCurrentLap}
+                currentLapData={currentLapData}
+            />
 
-            {currentLap.is_sc && (
-                <div className="mt-4 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest">
-                    <Circle size={12} fill="currentColor" />
-                    Safety Car Deployed
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Pace Chart */}
+                <div className="lg:col-span-2">
+                    <ReplayPaceChart
+                        data={trace}
+                        currentLap={currentLap}
+                    />
                 </div>
-            )}
+
+                {/* Failure Analysis */}
+                <div className="lg:col-span-1">
+                    <StrategyFailurePanel failures={failures} />
+                </div>
+            </div>
         </div>
     );
 };
