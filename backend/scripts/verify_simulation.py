@@ -15,7 +15,8 @@ def test_reproducibility():
         "strategy_aggression": "Balanced",
         "weather_scenario": "Dry",
         "grid_source": "Qualifying",
-        "seed": 42
+        "seed": 42,
+        "iterations": 100
     }
     
     res1 = simulation_engine.run_simulation("test_race", base_params)
@@ -33,7 +34,7 @@ def test_reproducibility():
 def test_probability_conservation():
     print("Testing Probability Conservation...")
     res = simulation_engine.run_simulation("test_race", {"seed": 123})
-    total_win = sum(res["win_probability"].values())
+    total_win = sum(list(res["win_probability"].values()))
     
     if abs(total_win - 1.0) > 0.001:
         print(f"FAILED: Total win probability is {total_win}")

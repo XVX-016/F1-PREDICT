@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star } from 'lucide-react';
 
@@ -19,7 +18,7 @@ interface EnhancedPodiumProps {
 export default function EnhancedPodium({ drivers, className = '' }: EnhancedPodiumProps) {
   // Desired layout: 2 - 1 - 3
   const layoutOrder = [2, 1, 3];
-  const podiumConfig: Record<number, { height: string; bgColor: string; borderColor: string; icon: any; iconColor: string } > = {
+  const podiumConfig: Record<number, { height: string; bgColor: string; borderColor: string; icon: any; iconColor: string }> = {
     1: { height: 'h-60', bgColor: 'bg-gradient-to-b from-yellow-400 to-yellow-600', borderColor: 'border-yellow-300', icon: Trophy, iconColor: 'text-yellow-800' },
     2: { height: 'h-56', bgColor: 'bg-gradient-to-b from-gray-300 to-gray-500', borderColor: 'border-gray-200', icon: Medal, iconColor: 'text-gray-700' },
     3: { height: 'h-52', bgColor: 'bg-gradient-to-b from-orange-400 to-orange-600', borderColor: 'border-orange-300', icon: Star, iconColor: 'text-orange-800' }
@@ -65,7 +64,7 @@ export default function EnhancedPodium({ drivers, className = '' }: EnhancedPodi
               </div>
               {/* Avatar below bar - lowered position */}
               <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full shadow-lg bg-gray-800 flex items-center justify-center mb-8 mt-8 overflow-hidden"
-                   style={{ clipPath: 'circle(50% at 50% 50%)' }}>
+                style={{ clipPath: 'circle(50% at 50% 50%)' }}>
                 <img
                   src={candidate}
                   alt={driver.driverName}
