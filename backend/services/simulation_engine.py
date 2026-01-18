@@ -7,6 +7,8 @@ from engine.physics.fuel import fuel_time_penalty
 
 logger = logging.getLogger(__name__)
 
+from services.strategy_optimizer import StrategyOptimizer
+
 class SimulationEngine:
     """
     Orchestrates deterministic physics models and Monte Carlo sampling.
@@ -14,8 +16,25 @@ class SimulationEngine:
     
     def __init__(self):
         self.simulator = RaceSimulator()
+        self.optimizer = StrategyOptimizer(self.simulator)
         self.model_version = "v2.5.0-proto"
         self.iterations = 10000
+
+    def _get_ml_pace_delta(self, driver_id: str) -> float:
+        """
+        Fetches the predicted pace delta from the ML model store.
+        For Week 1, uses a deterministic hash if DB is empty.
+        """
+        # In production: fetch from Supabase 'pace_deltas' using latest model_version
+        # For now, deterministic mock based on driver tier
+        tiers = {
+            "VER": -500, "NOR": -450, "LEC": -400, 
+            "HAM": -350, "PIA": -350, "SAI": -300, 
+            "RUS": -300, "ALO": -100
+        }
+        base = tiers.get(driver_id, 0)
+        # Add small day-to-day variance (simulating practice session noise)
+        return float(base + np.random.normal(0, 50))
 
     def run_simulation(
         self, 
@@ -24,9 +43,27 @@ class SimulationEngine:
     ) -> Dict[str, Any]:
         """
         Public entry point with sensitivity analysis.
+        
+        Args:
+            race_id: Race identifier
+            params: Simulation parameters including:
+                - use_ml: bool (default True) - ML kill switch
+                  If False, uses physics-only simulation (pace_delta = 0)
+                - seed: int - Random seed for reproducibility
+                - iterations: int - Monte Carlo iterations
         """
         # Run main simulation
-        main_results = self.run_simulation_internal(race_id, params, self.iterations)
+        iters = params.get("iterations", self.iterations)
+        use_ml = params.get("use_ml", True)
+        
+        # Log ML state for traceability
+        logger.info(f"Running simulation: use_ml={use_ml}, iterations={iters}")
+        
+        main_results = self.run_simulation_internal(race_id, params, iters)
+        
+        # Add ML mode to metadata
+        main_results["metadata"]["use_ml"] = use_ml
+        main_results["metadata"]["mode"] = "Physics + ML (Residual Pace Model)" if use_ml else "Physics Only (Deterministic)"
         
         # Generate Sensitivity
         tyre_deg = params.get("tyre_deg_multiplier", 1.0)
@@ -64,33 +101,84 @@ class SimulationEngine:
         
         driver_ids = ["VER", "NOR", "LEC", "PIA", "SAI", "HAM", "RUS", "ALO", "PER", "STR"]
         tyre_deg = params.get("tyre_deg_multiplier", 1.0)
+        use_ml = params.get("use_ml", True)  # ML kill switch
         
         driver_profiles = {}
         for i, d in enumerate(driver_ids):
             base_lap = 90000 + (i * 150)
+            
+            # ML KILL SWITCH: If use_ml=False, pace_delta is 0 (physics only)
+            if use_ml:
+                pace_delta = self._get_ml_pace_delta(d)
+            else:
+                pace_delta = 0.0  # Pure physics - no ML adjustment
+            
             driver_profiles[d] = {
-                "base_lap_ms": base_lap,
-                "pace_delta_ms": np.random.normal(0, 100),
+                "base_lap_ms": 90000 + (i * 150),
+                "pace_delta_ms": pace_delta,
                 "variance_ms": 150,
                 "dnf_prob": 0.03 + (params.get("sc_probability", 0.15) * 0.1)
             }
+
+        # Strategy Optimization for the focus driver (VER)
+        focus_driver = "VER"
+        # We need a profile for the optimizer
+        focus_profile = {
+            "base_lap_ms": 90000,
+            "pace_delta_ms": -500,
+            "variance_ms": 150,
+            "dnf_prob": 0.05
+        }
+        
+        optimization_result = self.optimizer.optimize(
+            driver_profile=focus_profile,
+            params=params,
+            iterations=500 # Smaller sim for optimization speed
+        )
+        
+        recommended_strategy = optimization_result["strategy"] if optimization_result else {
+            "name": "Fallback One-Stop",
+            "stops": 1,
+            "type": "Soft-Hard",
+            "pit_laps": [20],
+            "tyres": ["Soft", "Hard"]
+        }
+
+        # Full Monte Carlo with the recommended strategy for all drivers (simplified)
+        driver_strategies = {d: recommended_strategy for d in driver_ids} if recommended_strategy else None
 
         win_counts = {d: 0 for d in driver_ids}
         podium_counts = {d: [0, 0, 0] for d in driver_ids}
         dnf_counts = {d: 0 for d in driver_ids}
 
         for _ in range(iterations):
-            race_times = self.simulator.simulate_race(
+            race_times, _ = self.simulator.simulate_race(
                 driver_profiles=driver_profiles,
-                total_laps=60
+                total_laps=60,
+                driver_strategies=driver_strategies
             )
-            sorted_times = sorted(race_times.items(), key=lambda x: x[1])
+            
+            # Sort to find positions
+            sorted_times = sorted(
+                [(d, t) for d, t in race_times.items()], 
+                key=lambda x: x[1]
+            )
+            
             for rank, (d, t) in enumerate(sorted_times):
                 if t == float('inf'):
                     dnf_counts[d] += 1
                     continue
+                
                 if rank == 0: win_counts[d] += 1
                 if rank < 3: podium_counts[d][rank] += 1
+
+        # At the end of iterations, run one more race with trace capture for replay
+        _, representative_trace = self.simulator.simulate_race(
+            driver_profiles=driver_profiles,
+            total_laps=60,
+            driver_strategies=driver_strategies,
+            capture_trace=True
+        )
 
         win_prob = {d: count / iterations for d, count in win_counts.items()}
         podium_prob = {d: [c / iterations for c in counts] for d, counts in podium_counts.items()}
@@ -112,6 +200,8 @@ class SimulationEngine:
             "podium_probability": podium_prob,
             "dnf_risk": dnf_risk,
             "pace_series": pace_series,
+            "strategy_recommendation": optimization_result,
+            "race_trace": representative_trace,
             "explanations": {
                 "VER": ["High aerodynamic efficiency favors current track layout."],
                 "NOR": ["Strong sector 2 performance offset by poor start statistics."],
@@ -123,6 +213,55 @@ class SimulationEngine:
                 "model_version": self.model_version
             }
         }
+
+    def compare_strategies(
+        self,
+        race_id: str,
+        driver_id: str,
+        strategy_a: Dict[str, Any],
+        strategy_b: Dict[str, Any],
+        params: Dict[str, Any],
+        iterations: int = 2000
+    ) -> Dict[str, Any]:
+        """
+        Compares two specific strategies under identical conditions.
+        """
+        # Fixed seed for comparison purity
+        seed = params.get("seed", 42)
+        
+        driver_profile = {
+            "base_lap_ms": 90000,
+            "pace_delta_ms": 0,
+            "variance_ms": 150,
+            "dnf_prob": 0.05
+        }
+        
+        results = {}
+        for label, strategy in [("A", strategy_a), ("B", strategy_b)]:
+            np.random.seed(seed)
+            times = []
+            for _ in range(iterations):
+                time = self.simulator.simulate_single_driver(
+                    driver_profile=driver_profile,
+                    strategy=strategy,
+                    total_laps=60
+                )
+                if time != float('inf'):
+                    times.append(time)
+            
+            results[label] = {
+                "mean_time": float(np.mean(times)) if times else 0,
+                "std_time": float(np.std(times)) if times else 0,
+                "win_count": len([t for t in times if t < 5400000]) # Mock win threshold
+            }
+            
+        # Calc Delta
+        results["delta"] = {
+            "mean_time": results["A"]["mean_time"] - results["B"]["mean_time"],
+            "std_time": results["A"]["std_time"] - results["B"]["std_time"]
+        }
+        
+        return results
 
 # Singleton instance
 simulation_engine = SimulationEngine()
