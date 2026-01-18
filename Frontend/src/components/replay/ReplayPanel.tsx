@@ -1,9 +1,6 @@
 import { useEffect } from "react";
 // Lucide icons would require installation, using simple text buttons if not available or assume installed
-// Assuming typical project setup. If fails, I will revert to text.
-// Given "production-grade", I'll use standard elements if I can't confirm library.
-// But the user prompt had <Play />. I'll use text for safety unless I check package.json.
-// Actually, I'll use simple styled buttons.
+
 
 interface LapState {
     lap: number;

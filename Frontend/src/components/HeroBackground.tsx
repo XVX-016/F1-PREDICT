@@ -14,7 +14,8 @@ export default function HeroBackground({ currentPage }: HeroBackgroundProps) {
     useEffect(() => {
         // Mapping page to blur and image values
         const configMap: Record<string, { blur: number; image: string }> = {
-            'home': { blur: 0, image: '/hero/hero-home.jpg' },
+            'home': { blur: 0, image: '/hero/home-bg-new.jpg' },
+            'simulation': { blur: 4, image: '/hero/simulation-bg-new.jpg' },
             'predict': { blur: 6, image: '/hero/predict-bg.jpg' },
             'intelligence': { blur: 8, image: '/hero/hero-intelligence.jpg' },
             'schedule': { blur: 8, image: '/hero/hero-schedule.jpg' },
