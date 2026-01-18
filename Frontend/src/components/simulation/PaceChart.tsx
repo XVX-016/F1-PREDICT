@@ -45,15 +45,15 @@ const PaceChart: React.FC<PaceChartProps> = ({ paceSeries, width = 800, height =
         g.append("g")
             .attr("transform", `translate(0,${innerHeight})`)
             .call(xAxis)
-            .attr("font-family", "monospace")
-            .attr("font-size", "10px")
-            .attr("color", "#4b5563");
+            .attr("font-family", "JetBrains Mono, monospace")
+            .attr("font-size", "9px")
+            .attr("color", "#6B7280");
 
         g.append("g")
             .call(yAxis)
-            .attr("font-family", "monospace")
-            .attr("font-size", "10px")
-            .attr("color", "#4b5563");
+            .attr("font-family", "JetBrains Mono, monospace")
+            .attr("font-size", "9px")
+            .attr("color", "#6B7280");
 
         // Zero line
         g.append("line")
@@ -61,9 +61,8 @@ const PaceChart: React.FC<PaceChartProps> = ({ paceSeries, width = 800, height =
             .attr("x2", innerWidth)
             .attr("y1", yScale(0))
             .attr("y2", yScale(0))
-            .attr("stroke", "#4b5563")
-            .attr("stroke-dasharray", "4,4")
-            .attr("opacity", 0.5);
+            .attr("stroke", "#1f1f26")
+            .attr("stroke-width", 2);
 
         // Grid lines (horizontal only)
         g.append("g")
@@ -106,8 +105,9 @@ const PaceChart: React.FC<PaceChartProps> = ({ paceSeries, width = 800, height =
                     .attr("x", legendX + 10)
                     .attr("y", legendY + 4)
                     .text(driverId)
-                    .attr("fill", "white")
-                    .attr("font-size", "10px")
+                    .attr("fill", "#9AA1AC")
+                    .attr("font-family", "JetBrains Mono, monospace")
+                    .attr("font-size", "9px")
                     .attr("font-weight", "bold");
             }
         });

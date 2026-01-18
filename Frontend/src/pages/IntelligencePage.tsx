@@ -1,12 +1,24 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Activity, Shield, ChevronRight, Terminal as TerminalIcon } from 'lucide-react';
+import { Activity, ChevronRight, AlertCircle, Info } from 'lucide-react';
 import { useTelemetryStore } from '../stores/useTelemetryStore';
 import { useTelemetry } from '../hooks/useTelemetry';
+import { useRaceStatus } from '../hooks/useRaceStatus';
+import { formatLabel } from '../utils/formatters';
+import DashboardCard from '../components/common/DashboardCard';
+import { StrategyFanChart } from '../components/intelligence/StrategyFanChart';
+import { TyreDegradation } from '../components/intelligence/TyreHeatmap';
+import { LapTrend } from '../components/intelligence/LapTrend';
+import { FuelModel } from '../components/intelligence/FuelModel';
+import { TelemetryFlags } from '../components/intelligence/TelemetryFlags';
+import { LiveGapTicker } from '../components/intelligence/LiveGapTicker';
 
 const IntelligencePage = () => {
-    // Ensure connection is active
-    useTelemetry('abu_dhabi_2024', true);
+    // Check if race is active
+    const { data: raceStatus } = useRaceStatus();
+    const isRaceActive = raceStatus?.status === 'LIVE';
+
+    // Ensure connection is active if race is LIVE
+    useTelemetry('abu_dhabi', isRaceActive);
 
     const { isConnected, snapshot } = useTelemetryStore();
     const [selectedStrategy, setSelectedStrategy] = useState('one-stop');
@@ -24,185 +36,158 @@ const IntelligencePage = () => {
             if (driver) {
                 setContextDriver(driver);
                 setIsSimulating(true);
-                // Trigger Deep Pull Simulation here
-                setTimeout(() => setIsSimulating(false), 2000); // Mock simulation delay
+                setTimeout(() => setIsSimulating(false), 2000);
             }
         }
     }, []);
 
+
+
     return (
-        <div className="min-h-screen relative pt-14">
-            {/* Simulation Disclaimer Strip */}
-            <div className="w-full bg-slateDark/90 border-b border-white/5 py-1.5 px-8 flex justify-between items-center z-[100] relative">
+        <div className="min-h-screen relative pt-14 bg-[#0b0b0e]">
+            {/* Status Header Strip */}
+            <div className="w-full bg-[#121217] border-b border-[#1f1f26] py-2 px-8 flex justify-between items-center z-[100] relative">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#E10600] animate-pulse"></span>
-                        <span className="text-[10px] font-black tracking-[0.2em] text-white uppercase">Simulation Mode</span>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isRaceActive && isConnected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-600'}`}></span>
+                        <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase font-mono">
+                            {formatLabel(isRaceActive && isConnected ? 'SYSTEM_ACTIVE' : 'LIVE_LINK_OFFLINE')}
+                        </span>
                     </div>
-                    <div className="h-4 w-[1px] bg-slate-700"></div>
-                    <p className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">
-                        Strategy robustness scores derived from <span className="text-[#E10600] font-bold">deterministic lap-time delta models</span>.
-                    </p>
+                    <div className="h-3 w-[1px] bg-[#1f1f26]"></div>
+                    <div className="flex items-center gap-2">
+                        <AlertCircle size={10} className="text-amber-500" />
+                        <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                            Robustness: <span className="text-white">Deterministic Delta V2</span>
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-4">
-                    <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest px-2 py-0.5 border border-slate-800 rounded-xs bg-black/20">MODEL OUTPUT</span>
-                    <span className="hidden md:block text-[9px] font-mono text-slate-600 uppercase">INDEPENDENT TECHNICAL ANALYSIS</span>
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                        <span className="text-slate-700">Ref:</span>
+                        <span>{isRaceActive ? 'Live Telemetry' : 'Precomputed Model'}</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="pt-16 pb-12 px-6 overflow-x-hidden">
-                <div className="max-w-7xl mx-auto space-y-8">
-                    {/* Header Section */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="pt-6 pb-12 px-6">
+                <div className="max-w-7xl mx-auto space-y-6">
+                    {/* Page Title Section */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-red-600 pl-6 py-2">
                         <div>
-                            <h1 className="text-4xl font-bold tracking-tighter text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
-                                STRATEGY <span className="text-red-600">INTEL</span>
+                            <h1 className="text-4xl font-black tracking-tight text-white uppercase font-mono leading-none">
+                                Strategy <span className="text-red-600">Intel Node</span>
                             </h1>
-                            <p className="text-gray-500 mt-2 font-mono uppercase tracking-widest text-xs">
-                                {contextDriver ? `Target Analysis: ${contextDriver} // Lap ${snapshot?.state?.lap || '18'}` : 'Race Intelligence Pit Wall // Monte Carlo Analysis Engine'}
-                            </p>
-                        </div>
-
-                        <div className="flex gap-4">
-                            <motion.div
-                                className={`px-6 py-2 rounded-lg font-mono text-xs font-bold border transition-all duration-300 flex items-center gap-2 ${isConnected ? 'bg-red-900/20 border-red-500 text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-white/5 border-white/10 text-gray-500'
-                                    }`}
-                            >
-                                <span className={`inline-block w-2 h-2 rounded-full ${isConnected ? 'bg-red-500 animate-pulse' : 'bg-gray-700'}`}></span>
-                                {isConnected ? 'LIVE TELEMETRY ACTIVE' : 'TELEMETRY DISCONNECTED'}
-                            </motion.div>
+                            <div className="flex items-center gap-2 mt-2">
+                                <p className="text-slate-500 font-mono uppercase tracking-[0.2em] text-[10px]">
+                                    {contextDriver ? `Target Analysis: ${contextDriver} // Lap ${snapshot?.state?.lap || '18'}` : 'Pit Wall Analysis // Monte Carlo N20K'}
+                                </p>
+                                <div className="group relative">
+                                    <Info size={12} className="text-slate-700 hover:text-slate-400 cursor-help" />
+                                    <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-[#121217] border border-[#1f1f26] text-[9px] font-mono text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[200]">
+                                        Real-time strategic forecasting derived from live telemetry and historical models.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Dashboard Grid */}
+                    {/* Main Intelligence Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        {/* Main Visualization Center */}
-                        <div className="lg:col-span-8 space-y-6">
-                            {/* Strategy Fan Chart Placeholder */}
-                            <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 aspect-video relative group overflow-hidden">
-                                {isSimulating && (
-                                    <div className="absolute inset-0 bg-black/80 z-20 flex flex-col items-center justify-center backdrop-blur-sm">
-                                        <Activity className="w-8 h-8 text-red-500 animate-pulse mb-4" />
-                                        <p className="text-red-500 font-mono text-sm uppercase tracking-widest animate-pulse">Running Monte Carlo Simulation...</p>
-                                        <p className="text-gray-500 font-mono text-xs mt-2">Target: {contextDriver}</p>
-                                    </div>
-                                )}
-                                <div className="absolute top-4 left-6 z-10">
-                                    <h3 className="text-sm font-mono text-gray-400 uppercase tracking-tighter flex items-center gap-2">
-                                        <Activity className="w-4 h-4 text-red-500" />
-                                        Strategy Stability Distribution
-                                    </h3>
+
+                        {/* TOP ROW: Live Telemetry (Conditional) */}
+                        {isRaceActive ? (
+                            <>
+                                <div className="lg:col-span-8 flex flex-col gap-6">
+                                    <LapTrend
+                                        meanDeltaMs={142.5}
+                                        stdDevMs={12.4}
+                                        trendSlopeMsPerLap={-2.1}
+                                    />
                                 </div>
-                                <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-white/5 rounded-xl">
-                                    <p className="text-gray-600 font-mono text-sm uppercase">D3.js Strategy Stability Graph Incoming</p>
-                                    {/* D3 Fan Chart will be injected here */}
+                                <div className="lg:col-span-4 flex flex-col gap-6">
+                                    <LiveGapTicker
+                                        gaps={[
+                                            { driver: 'VER', gapMs: 0 },
+                                            { driver: 'NOR', gapMs: 4142.5 },
+                                            { driver: 'LEC', gapMs: 8921.1 },
+                                            { driver: 'HAM', gapMs: 12441.8 },
+                                            { driver: 'PIA', gapMs: 14221.3 },
+                                            { driver: 'SAI', gapMs: 16855.9 }
+                                        ]}
+                                    />
+                                    <TelemetryFlags
+                                        clearAir={true}
+                                        undercutRisk={false}
+                                        trafficAhead={true}
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <div className="lg:col-span-12 bg-[#121217] border border-[#1f1f26] rounded-md p-12 flex flex-col items-center justify-center text-center space-y-4">
+                                <Activity size={48} className="text-slate-800" />
+                                <div>
+                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">No Live Session Active</h3>
+                                    <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-2">
+                                        Live telemetry features are offline. Displaying precomputed analysis based on historical data.
+                                    </p>
                                 </div>
                             </div>
+                        )}
 
-                            {/* Control Panel */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                                    <h3 className="text-sm font-mono text-gray-400 uppercase tracking-tighter mb-4">Strategy Selector</h3>
-                                    <div className="space-y-2">
-                                        {['Aggressive 2-Stop', 'Optimal 1-Stop', 'Defensive 1-Stop'].map((strat) => (
-                                            <button
-                                                key={strat}
-                                                className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 font-mono text-sm flex justify-between items-center group ${selectedStrategy === strat.toLowerCase().replace(' ', '-')
-                                                    ? 'bg-red-600/10 border-red-600/50 text-white'
-                                                    : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
-                                                    }`}
-                                                onClick={() => setSelectedStrategy(strat.toLowerCase().replace(' ', '-'))}
-                                            >
-                                                {strat}
-                                                <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${selectedStrategy === strat.toLowerCase().replace(' ', '-') ? 'translate-x-1 text-red-500' : 'text-gray-600 group-hover:translate-x-1'
-                                                    }`} />
-                                            </button>
-                                        ))}
+                        {/* MIDDLE ROW: Stability Analysis (Always Visible) */}
+                        <div className="lg:col-span-12">
+                            <DashboardCard title="Stability Analysis" subtitle="Monte Carlo Confidence Distribution">
+                                <div className="h-[320px] relative">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        {isSimulating ? (
+                                            <div className="flex flex-col items-center justify-center">
+                                                <Activity className="w-8 h-8 text-red-600 animate-pulse mb-4" />
+                                                <p className="text-red-600 font-mono text-[10px] uppercase tracking-[0.2em] animate-pulse">Running Monte Carlo Simulation...</p>
+                                            </div>
+                                        ) : (
+                                            <div className="w-full h-full p-2">
+                                                <StrategyFanChart data={Array.from({ length: 57 }, (_, i) => ({
+                                                    lap: i + 1,
+                                                    expectedTime: 90 + Math.sin(i / 10) * 2 + i * 0.1,
+                                                    p10: 88 + Math.sin(i / 10) * 2 + i * 0.1,
+                                                    p90: 92 + Math.sin(i / 10) * 2 + i * 0.1,
+                                                    p25: 89 + Math.sin(i / 10) * 2 + i * 0.1,
+                                                    p75: 91 + Math.sin(i / 10) * 2 + i * 0.1
+                                                }))} />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-
-                                <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                                    <h3 className="text-sm font-mono text-gray-400 uppercase tracking-tighter mb-4">Sim Settings</h3>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <div className="flex justify-between text-[10px] font-mono text-gray-500 uppercase mb-1">
-                                                <span>Iterations</span>
-                                                <span>20,000</span>
-                                            </div>
-                                            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                                                <div className="h-full bg-red-600 w-4/5"></div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="flex justify-between text-[10px] font-mono text-gray-500 uppercase mb-1">
-                                                <span>Confidence Interval</span>
-                                                <span>95%</span>
-                                            </div>
-                                            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                                                <div className="h-full bg-red-600 w-[95%]"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </DashboardCard>
                         </div>
 
-                        {/* Side Sidebar: Telemetry & Rankings */}
-                        <div className="lg:col-span-4 space-y-6">
-                            {/* Live Telemetry Terminal */}
-                            <div className="bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col h-[400px]">
-                                <div className="p-4 border-b border-white/10 flex justify-between items-center">
-                                    <h3 className="text-sm font-mono text-white uppercase tracking-tighter flex items-center gap-2">
-                                        <TerminalIcon className="w-4 h-4 text-green-500" />
-                                        Physics Terminal
-                                    </h3>
-                                    <span className="text-[10px] font-mono text-green-500/50 animate-pulse">SYSTEM_ACTIVE</span>
-                                </div>
-                                <div className="flex-1 p-4 font-mono text-[11px] overflow-hidden space-y-1">
-                                    <p className="text-green-500/70">[09:21:44] INITIALIZING MONTE CARLO SAMPLED ENGINE...</p>
-                                    <p className="text-gray-500">[09:21:45] LOADING TYRE_MODEL_V2.1 (EXPONENTIAL_DECAY)</p>
-                                    <p className="text-gray-500">[09:21:45] LOADING FUEL_BURN_MODEL (LINEAR_PENALTY)</p>
-                                    <p className="text-white"> &gt; UPDATING LIVE_RACE_STATE: LAP_18/57</p>
-                                    <p className="text-red-500"> &gt; WARNING: SC_PROBABILITY INCREASED (0.12 -&gt; 0.28)</p>
-                                    <p className="text-gray-500">[09:21:46] SAMPLING STRATEGY_OPTIMIZER...</p>
-                                    <div className="mt-4 border-t border-white/5 pt-4">
-                                        <p className="text-white font-bold tracking-widest uppercase">Live Metrics</p>
-                                        <div className="grid grid-cols-2 gap-2 mt-2">
-                                            <div className="bg-white/5 p-2 rounded">
-                                                <p className="text-[9px] text-gray-500">REF_PACE</p>
-                                                <p className="text-xs text-white">1:31.442</p>
-                                            </div>
-                                            <div className="bg-white/5 p-2 rounded">
-                                                <p className="text-[9px] text-gray-500">FUEL_REM</p>
-                                                <p className="text-xs text-white">42.2kg</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Strategy Robustness Rankings */}
-                            <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                                <h3 className="text-sm font-mono text-gray-400 uppercase tracking-tighter mb-4 flex items-center gap-2">
-                                    <Shield className="w-4 h-4 text-blue-500" />
-                                    Strategy Robustness
-                                </h3>
-                                <div className="space-y-4">
+                        {/* BOTTOM ROW: Strategic Details (Always Visible - Precomputed if offline) */}
+                        <div className="lg:col-span-3">
+                            <TyreDegradation healthPercent={68.4} currentLap={18} compound="HARD" />
+                        </div>
+                        <div className="lg:col-span-3">
+                            <FuelModel fuelRemainingKg={42.22} liftCoastDeltaMs={12.5} targetLapTimeSec={91.44} />
+                        </div>
+                        <div className="lg:col-span-3">
+                            <DashboardCard title="Strategy Robustness">
+                                <div className="space-y-5">
                                     {[
                                         { name: 'Optimal 1-Stop', score: 0.94, risk: 'Low' },
-                                        { name: 'Aggressive 2-Stop', score: 0.82, risk: 'Medium' },
+                                        { name: 'Aggressive 2-Stop', score: 0.82, risk: 'Moderate' },
                                         { name: 'Alt Compound Mix', score: 0.61, risk: 'High' }
                                     ].map((item) => (
-                                        <div key={item.name}>
-                                            <div className="flex justify-between text-xs font-mono mb-1">
+                                        <div key={item.name} className="space-y-1.5">
+                                            <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest font-black">
                                                 <span className="text-white">{item.name}</span>
-                                                <span className={item.risk === 'Low' ? 'text-green-500' : item.risk === 'Medium' ? 'text-yellow-500' : 'text-red-500'}>
+                                                <span className={item.risk === 'Low' ? 'text-green-500' : item.risk === 'Moderate' ? 'text-amber-500' : 'text-red-600'}>
                                                     {item.risk} Risk
                                                 </span>
                                             </div>
-                                            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                            <div className="h-1 bg-black rounded-full overflow-hidden border border-[#1f1f26]">
                                                 <div
-                                                    className={`h-full transition-all duration-1000 ${item.risk === 'Low' ? 'bg-green-500' : item.risk === 'Medium' ? 'bg-yellow-500' : 'bg-red-500'
+                                                    className={`h-full transition-all duration-1000 ${item.risk === 'Low' ? 'bg-green-600' :
+                                                        item.risk === 'Moderate' ? 'bg-amber-500' : 'bg-red-600'
                                                         }`}
                                                     style={{ width: `${item.score * 100}%` }}
                                                 ></div>
@@ -210,7 +195,27 @@ const IntelligencePage = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </DashboardCard>
+                        </div>
+                        <div className="lg:col-span-3">
+                            <DashboardCard title="Strategy Selector">
+                                <div className="grid grid-cols-1 gap-3">
+                                    {['Aggressive 2-Stop', 'Optimal 1-Stop', 'Defensive 1-Stop'].map((strat) => (
+                                        <button
+                                            key={strat}
+                                            className={`w-full text-left px-4 py-3 border transition-all duration-150 font-mono text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group ${selectedStrategy === strat.toLowerCase().replace(' ', '-')
+                                                ? 'bg-red-600/10 border-red-600/50 text-red-600'
+                                                : 'bg-black/20 border-[#1f1f26] text-slate-400 hover:border-slate-700'
+                                                }`}
+                                            onClick={() => setSelectedStrategy(strat.toLowerCase().replace(' ', '-'))}
+                                        >
+                                            {strat}
+                                            <ChevronRight className={`w-3 h-3 transition-transform duration-200 ${selectedStrategy === strat.toLowerCase().replace(' ', '-') ? 'translate-x-1 text-red-600' : 'text-slate-700 group-hover:translate-x-1'
+                                                }`} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </DashboardCard>
                         </div>
                     </div>
                 </div>

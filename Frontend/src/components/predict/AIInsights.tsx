@@ -44,26 +44,26 @@ export default function AIInsights({ predictions, explanation, confidence = 'med
     };
 
     return (
-        <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 backdrop-blur-sm border border-purple-500/30 rounded-xl overflow-hidden">
+        <div className="bg-[#121217] border border-[#1f1f26] rounded-md overflow-hidden">
             {/* Header - Always Visible */}
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+                className="w-full p-4 flex items-center justify-between hover:bg-[#1f1f26] transition-colors"
             >
                 <div className="flex items-center gap-3">
-                    <Brain className="w-5 h-5 text-purple-400" />
-                    <span className="font-bold text-white tracking-tight uppercase" style={{ fontFamily: 'Orbitron', fontSize: '11px' }}>
-                        Physics Engine Insights
+                    <Brain className="w-5 h-5 text-red-600" />
+                    <span className="font-bold text-white tracking-widest uppercase text-[10px]">
+                        Physics_Engine_Attribution
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-mono text-gray-400">
-                        {isExpanded ? 'Collapse' : 'Expand'} Logic
+                    <span className="text-[10px] uppercase font-mono text-gray-500 tracking-widest">
+                        {isExpanded ? 'Collapse' : 'Expand'}
                     </span>
                     {isExpanded ? (
-                        <ChevronUp className="w-4 h-4 text-gray-400" />
+                        <ChevronUp className="w-4 h-4 text-gray-500" />
                     ) : (
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
                     )}
                 </div>
             </button>
@@ -75,14 +75,14 @@ export default function AIInsights({ predictions, explanation, confidence = 'med
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="border-t border-purple-500/30"
+                        transition={{ duration: 0.15 }}
+                        className="border-t border-[#1f1f26]"
                     >
                         <div className="p-6 space-y-6">
                             {/* Confidence Level */}
                             <div className="flex items-center justify-between">
-                                <span className="text-gray-300 font-mono text-xs uppercase">Sim Confidence Level:</span>
-                                <span className={`font-bold font-mono text-xs ${getConfidenceColor(confidence)}`}>
+                                <span className="text-gray-500 font-mono text-[10px] uppercase tracking-widest">Model_Calibration_State</span>
+                                <span className={`font-black font-mono text-[10px] uppercase ${getConfidenceColor(confidence)} bg-black/40 px-2 py-0.5 border border-[#1f1f26] rounded-xs`}>
                                     {getConfidenceLabel(confidence)}
                                 </span>
                             </div>
@@ -130,20 +130,20 @@ export default function AIInsights({ predictions, explanation, confidence = 'med
 
                             {/* Explanation */}
                             {explanation && (
-                                <div className="bg-red-900/10 border border-red-500/20 rounded-lg p-4 font-mono">
-                                    <h4 className="text-[10px] font-bold text-red-400 mb-2 uppercase tracking-widest flex items-center gap-2">
+                                <div className="bg-red-600/5 border border-red-600/20 rounded p-4 font-mono">
+                                    <h4 className="text-[10px] font-bold text-red-600 mb-2 uppercase tracking-widest flex items-center gap-2">
                                         <AlertCircle className="w-3 h-3" />
-                                        Strategic Intelligence
+                                        Deterministic Attribution
                                     </h4>
-                                    <p className="text-[10px] text-gray-400 leading-relaxed uppercase">
+                                    <p className="text-[10px] text-gray-500 leading-relaxed uppercase tracking-tight">
                                         {explanation}
                                     </p>
                                 </div>
                             )}
 
                             {/* Disclaimer */}
-                            <div className="text-[9px] text-gray-600 italic border-t border-white/5 pt-4 uppercase font-mono">
-                                ⚠️ Simulation data derived from Deterministic Physics Engine v2.1. Stochastic variance applies.
+                            <div className="text-[9px] text-gray-700 border-t border-[#1f1f26] pt-4 uppercase font-mono tracking-widest">
+                                Source: LGBM v2.5.0 + MC(10k) | No predictive warranty implied.
                             </div>
                         </div>
                     </motion.div>

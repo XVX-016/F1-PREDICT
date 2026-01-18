@@ -1,90 +1,103 @@
 """
-Race Simulator - Core race simulation (no ML)
-Driver-agnostic: only knows base lap time, pace deltas, pit loss, variance, SC probability
+Race Simulator - Core race simulation logic
+Anchored in Track and Driver domain models.
 """
 import numpy as np
 from typing import Dict, List, Any, Optional, Tuple
 import logging
+from models.domain import TrackModel, DriverModel, StrategyResult
 
 logger = logging.getLogger(__name__)
 
 class RaceSimulator:
     """
-    Core race simulator - deterministic + stochastic math, not ML
+    Stochastic race engine.
+    Computes lap-by-lap physics for N drivers concurrently.
     """
-    
-    def __init__(self):
-        self.pit_loss_time_ms = 20000  # 20 seconds pit stop loss
-        self.sc_probability = 0.15  # 15% chance of safety car
-        self.sc_lap_loss = 5000  # 5 seconds lost per SC lap
     
     def simulate_race(
         self,
-        driver_profiles: Dict[str, Dict[str, Any]],
-        total_laps: int = 60,
-        driver_strategies: Optional[Dict[str, Any]] = None,
+        track: TrackModel,
+        driver_profiles: Dict[str, DriverModel],
+        driver_strategies: Dict[str, StrategyResult],
+        tyre_deg_multiplier: float = 1.0,
+        sc_prob_override: Optional[float] = None,
         capture_trace: bool = False
     ) -> Tuple[Dict[str, float], Optional[List[Dict[str, Any]]]]:
         """
-        Simulate a single race with lap-by-lap precision.
+        Simulates a full race distance based on track-first properties.
         """
-        race_times = {d: 0.0 for d in driver_profiles}
-        driver_stint_idx = {d: 0 for d in driver_profiles}
-        driver_tyre_age = {d: 0 for d in driver_profiles}
+        total_laps = track.laps
+        pit_loss_ms = track.pit_loss_seconds * 1000
+        sc_prob = sc_prob_override if sc_prob_override is not None else track.sc_probability_base
+        
+        race_times = {d_id: 0.0 for d_id in driver_profiles}
+        driver_stint_idx = {d_id: 0 for d_id in driver_profiles}
+        driver_tyre_age = {d_id: 0 for d_id in driver_profiles}
         active_drivers = set(driver_profiles.keys())
         trace = [] if capture_trace else None
-        
-        # Pre-set default strategies if none provided
-        if not driver_strategies:
-            driver_strategies = {d: {
-                "stints": [{"compound": "Medium", "end_lap": 30}, {"compound": "Hard", "end_lap": total_laps}]
-            } for d in driver_profiles}
 
         for lap in range(1, total_laps + 1):
-            # Check for Safety Car on this lap
-            is_sc = np.random.rand() < (self.sc_probability / total_laps) # Per-lap SC chance
+            # Per-lap Safety Car rollup
+            is_sc = np.random.rand() < (sc_prob / total_laps)
             
             lap_data = {"lap": lap, "is_sc": is_sc, "drivers": {}} if capture_trace else None
             
-            for driver_id in list(active_drivers):
+            # Sort drivers by current total time to handle traffic interaction
+            current_order = sorted(active_drivers, key=lambda x: race_times[x])
+            
+            for rank, driver_id in enumerate(current_order):
                 profile = driver_profiles[driver_id]
                 strategy = driver_strategies[driver_id]
                 
-                # Check for DNF
-                if np.random.rand() < (profile.get("dnf_prob", 0.05) / total_laps):
+                # 1. Random DNF Check (ML + Driver Base)
+                if np.random.rand() < (profile.dnf_rate / total_laps):
                     race_times[driver_id] = float('inf')
                     active_drivers.remove(driver_id)
                     continue
                 
-                # Get current stint info
+                # 2. Get Strategy/Tyre Info
                 stint_idx = driver_stint_idx[driver_id]
-                current_stint = strategy["stints"][stint_idx]
-                compound = current_stint["compound"]
+                current_stint = strategy.stints[stint_idx]
+                compound = current_stint.compound
                 
-                # ... physics logic ... (keep existing)
-                alpha = 0.05 if compound == "Soft" else (0.03 if compound == "Medium" else 0.02)
-                beta = 0.5
-                gamma = 0.1
+                # 3. Physics: Tyre Degradation
+                # Use track-specific wear factors
+                wear_base = getattr(track.tyre_wear_factors, compound)
+                # Modified by driver management and global multiplier
+                deg_rate = wear_base * (1.1 - profile.tyre_management) * tyre_deg_multiplier
                 
-                base_lap = profile["base_lap_ms"]
-                pace_delta = profile.get("pace_delta_ms", 0.0)
-                t_deg = alpha * driver_tyre_age[driver_id] + beta * (1 - np.exp(-gamma * driver_tyre_age[driver_id]))
-                f_burn = -0.03 * lap
+                # Thermal/Stiffness model (simplified)
+                age = driver_tyre_age[driver_id]
+                t_deg_ms = deg_rate * (age ** 1.1) * 20 # 20ms base deg scaling
                 
-                lap_time = base_lap + pace_delta + (t_deg * 1000) + (f_burn * 1000) + np.random.normal(0, profile.get("variance_ms", 100))
-
-                # Multi-driver interaction model (Traffic / Dirty Air)
-                traffic_penalty = 0.0
-                rank = sorted(race_times.values()).index(race_times[driver_id])
+                # 4. Physics: Fuel Burn
+                # Standard depletion model
+                f_burn_ms = -35 * lap # 35ms lap time improvement per lap due to weight reduction
+                
+                # 5. ML/Pace Offset
+                # profile.pace_base_ms is the combined ML + Driver capability
+                
+                # 6. Environmental Randomness
+                variance = 80 + (track.weather_variance * 50)
+                noise = np.random.normal(0, variance)
+                
+                # 7. Traffic / Overtaking Interaction
+                traffic_ms = 0.0
                 if rank > 0:
-                     # Probabilistic traffic loss if behind someone
-                    if np.random.rand() < 0.3:
-                        traffic_penalty = 400 # 0.4s loss in dirty air
-                
-                lap_time += traffic_penalty
-                
-                if is_sc:
-                    lap_time += self.sc_lap_loss
+                    leader_id = current_order[rank-1]
+                    gap = race_times[driver_id] - race_times[leader_id]
+                    if gap < 1500: # Within 1.5s (dirty air / DRS zone)
+                        # Overtaking difficulty reduces the chance of clear lap
+                        dirty_air_prob = 0.6 * track.overtaking_difficulty
+                        if np.random.rand() < dirty_air_prob:
+                            traffic_ms = 400 + (np.random.rand() * 400)
+
+                # 8. SC Impact
+                sc_impact_ms = 8000 if is_sc else 0.0 # 8s per lap loss under SC
+
+                # Final Lap Calculation
+                lap_time = profile.pace_base_ms + t_deg_ms + f_burn_ms + noise + traffic_ms + sc_impact_ms
                 
                 race_times[driver_id] += lap_time
                 driver_tyre_age[driver_id] += 1
@@ -94,12 +107,13 @@ class RaceSimulator:
                         "lap_time": float(lap_time),
                         "total_time": float(race_times[driver_id]),
                         "compound": compound,
-                        "tyre_age": driver_tyre_age[driver_id]
+                        "tyre_age": age,
+                        "rank": rank + 1
                     }
 
-                # Check for pit stop
-                if lap == current_stint["end_lap"] and lap < total_laps:
-                    race_times[driver_id] += self.pit_loss_time_ms
+                # 9. Pit Stop Check
+                if lap == current_stint.end_lap and lap < total_laps:
+                    race_times[driver_id] += pit_loss_ms
                     driver_stint_idx[driver_id] += 1
                     driver_tyre_age[driver_id] = 0
                     if capture_trace:
@@ -112,25 +126,21 @@ class RaceSimulator:
 
     def simulate_single_driver(
         self,
-        driver_profile: Dict[str, Any],
-        strategy: Dict[str, Any],
-        total_laps: int = 60,
-        sc_prob: float = 0.15
+        track: TrackModel,
+        driver_profile: DriverModel,
+        strategy: StrategyResult,
+        tyre_deg_multiplier: float = 1.0,
+        sc_prob_override: Optional[float] = None
     ) -> float:
         """
-        Simulate a race for a single driver with a specific strategy.
-        Used by the Optimizer.
+        Isolated simulation for strategy optimization.
         """
         race_times, _ = self.simulate_race(
+            track=track,
             driver_profiles={"DRIVER": driver_profile},
-            total_laps=total_laps,
             driver_strategies={"DRIVER": strategy},
+            tyre_deg_multiplier=tyre_deg_multiplier,
+            sc_prob_override=sc_prob_override,
             capture_trace=False
         )
         return race_times["DRIVER"]
-
-
-
-
-
-
