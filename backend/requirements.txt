@@ -20,3 +20,4 @@ supabase>=2.0.0
 
 # Logging and utilities
 python-dotenv>=1.0.0
+redis>=5.0.0
