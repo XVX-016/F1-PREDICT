@@ -1,67 +1,34 @@
-import { Activity } from 'lucide-react';
-import { useTelemetry } from '../../hooks/useTelemetry';
+type Gap = {
+    driver: string
+    gapMs: number
+}
 
-export const LiveGapTicker: React.FC<{ raceId: string }> = ({ raceId }) => {
-    const { snapshot } = useTelemetry(raceId, true);
+type LiveGapTickerProps = {
+    gaps?: Gap[]
+}
 
-    // Mock gaps if no snapshot for demonstration
-    const drivers = snapshot?.drivers || {
-        'VER': { gap: 0.000, tyre_age: 12, compound: 'HARD', last_lap: '1:31.442' },
-        'NOR': { gap: 4.142, tyre_age: 12, compound: 'HARD', last_lap: '1:31.851' },
-        'LEC': { gap: 8.921, tyre_age: 15, compound: 'MEDIUM', last_lap: '1:32.112' },
-        'HAM': { gap: 12.441, tyre_age: 14, compound: 'MEDIUM', last_lap: '1:32.440' }
-    };
-
+export function LiveGapTicker({ gaps }: LiveGapTickerProps) {
     return (
-        <div className="bg-red-600/10 border-y border-red-500/20 py-2 overflow-hidden whitespace-nowrap bg-black backdrop-blur-md">
-            <div className="flex items-center gap-8 animate-marquee">
-                <div className="flex items-center gap-2 text-red-500 font-mono text-[10px] font-bold uppercase tracking-widest border-r border-white/10 pr-8">
-                    <Activity className="w-3 h-3 animate-pulse" />
-                    Live Interval Data
-                </div>
+        <div className="bg-[#121217] border border-[#1f1f26] p-4 h-[180px] flex flex-col">
+            <h3 className="text-xs uppercase tracking-widest text-slate-400 mb-2 font-mono font-black">
+                Live Gap Ticker
+            </h3>
 
-                {Object.entries(drivers).map(([id, data]) => (
-                    <div key={id} className="flex items-center gap-3 font-mono">
-                        <span className="text-white font-black">{id}</span>
-                        <span className="text-gray-500">+{data.gap.toFixed(3)}s</span>
-                        <div className={`text-[9px] px-1 rounded ${data.compound === 'SOFT' ? 'bg-red-500/20 text-red-500' :
-                            data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                                'bg-white/10 text-white/50'
-                            }`}>
-                            {data.compound[0]}
+            <div className="flex-1 overflow-y-auto font-mono text-[10px] space-y-1 no-scrollbar">
+                {gaps && gaps.length > 0 ? (
+                    gaps.map((g, i) => (
+                        <div key={i} className="flex justify-between border-b border-white/5 pb-1">
+                            <span className="text-slate-400 font-bold">{g.driver}</span>
+                            <span className="text-white font-black">
+                                {g.gapMs > 0 ? '+' : ''}
+                                {g.gapMs.toFixed(1)} ms
+                            </span>
                         </div>
-                    </div>
-                ))}
-
-                {/* Second set for seamless loop */}
-                {Object.entries(drivers).map(([id, data]) => (
-                    <div key={`${id}-copy`} className="flex items-center gap-3 font-mono">
-                        <span className="text-white font-black">{id}</span>
-                        <span className="text-gray-500">+{data.gap.toFixed(3)}s</span>
-                        <div className={`text-[9px] px-1 rounded ${data.compound === 'SOFT' ? 'bg-red-500/20 text-red-500' :
-                            data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                                'bg-white/10 text-white/50'
-                            }`}>
-                            {data.compound[0]}
-                        </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <p className="text-slate-600 uppercase tracking-widest">No live gap data</p>
+                )}
             </div>
-
-            <style>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .animate-marquee {
-                    display: flex;
-                    width: max-content;
-                    animation: marquee 30s linear infinite;
-                }
-                .animate-marquee:hover {
-                    animation-play-state: paused;
-                }
-            `}</style>
         </div>
-    );
-};
+    )
+}

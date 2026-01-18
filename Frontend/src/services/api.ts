@@ -47,23 +47,15 @@ export const api = {
     },
 
     simulateRace: async (raceId: string, params: any): Promise<any> => {
-        // Map camelCase to snake_case for Python Backend
-        const backendParams = {
-            tyre_deg_multiplier: params.tyreDegMultiplier,
-            sc_probability: params.scProbability,
-            strategy_aggression: params.strategyAggression,
-            weather_scenario: params.weatherScenario,
-            grid_source: params.gridSource,
-            seed: params.seed,
-            iterations: params.iterations // if present
-        };
-
         const response = await fetch(`${API_BASE_URL}/api/races/${raceId}/simulate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(backendParams),
+            body: JSON.stringify(params),
         });
-        if (!response.ok) throw new Error('Simulation failed');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Simulation failed');
+        }
         return response.json();
     },
 

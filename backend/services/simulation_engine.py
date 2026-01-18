@@ -1,13 +1,12 @@
 import numpy as np
 import logging
+import time
 from typing import Dict, List, Any, Optional
 from engine.simulation.simulator import RaceSimulator
-from engine.physics.tyre import tyre_lap_time
-from engine.physics.fuel import fuel_time_penalty
+from services.strategy_optimizer import StrategyOptimizer
+from models.domain import TrackModel, DriverModel, StrategyResult, StrategyStint, SimulationRequest, SimulationResponse, TrackTyreWearFactors
 
 logger = logging.getLogger(__name__)
-
-from services.strategy_optimizer import StrategyOptimizer
 
 class SimulationEngine:
     """
@@ -17,251 +16,143 @@ class SimulationEngine:
     def __init__(self):
         self.simulator = RaceSimulator()
         self.optimizer = StrategyOptimizer(self.simulator)
-        self.model_version = "v2.5.0-proto"
-        self.iterations = 10000
+        self.model_version = "v3.0.0-engineering"
 
-    def _get_ml_pace_delta(self, driver_id: str) -> float:
+    def _get_track_context(self, track_id: str) -> TrackModel:
         """
-        Fetches the predicted pace delta from the ML model store.
-        For Week 1, uses a deterministic hash if DB is empty.
+        Fetches track metadata. Hardcoded for Phase 1.
         """
-        # In production: fetch from Supabase 'pace_deltas' using latest model_version
-        # For now, deterministic mock based on driver tier
-        tiers = {
-            "VER": -500, "NOR": -450, "LEC": -400, 
-            "HAM": -350, "PIA": -350, "SAI": -300, 
-            "RUS": -300, "ALO": -100
+        # In production: fetch from Supabase 'tracks' table
+        tracks = {
+            "abu_dhabi": TrackModel(
+                id="abu_dhabi",
+                name="Yas Marina Circuit",
+                laps=58,
+                lap_length_km=5.281,
+                pit_loss_seconds=22.5,
+                sc_probability_base=0.18,
+                tyre_wear_factors=TrackTyreWearFactors(soft=0.08, medium=0.04, hard=0.02),
+                overtaking_difficulty=0.75,
+                weather_variance=0.1
+            ),
+            "bahrain": TrackModel(
+                id="bahrain",
+                name="Sakhir International Circuit",
+                laps=57,
+                lap_length_km=5.412,
+                pit_loss_seconds=23.1,
+                sc_probability_base=0.12,
+                tyre_wear_factors=TrackTyreWearFactors(soft=0.12, medium=0.06, hard=0.03),
+                overtaking_difficulty=0.4,
+                weather_variance=0.05
+            )
         }
-        base = tiers.get(driver_id, 0)
-        # Add small day-to-day variance (simulating practice session noise)
-        return float(base + np.random.normal(0, 50))
+        return tracks.get(track_id, tracks["abu_dhabi"])
 
-    def run_simulation(
-        self, 
-        race_id: str, 
-        params: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _get_driver_profiles(self, track_id: str, use_ml: bool) -> Dict[str, DriverModel]:
         """
-        Public entry point with sensitivity analysis.
-        
-        Args:
-            race_id: Race identifier
-            params: Simulation parameters including:
-                - use_ml: bool (default True) - ML kill switch
-                  If False, uses physics-only simulation (pace_delta = 0)
-                - seed: int - Random seed for reproducibility
-                - iterations: int - Monte Carlo iterations
+        Aggregates driver capabilities.
         """
-        # Run main simulation
-        iters = params.get("iterations", self.iterations)
-        use_ml = params.get("use_ml", True)
-        
-        # Log ML state for traceability
-        logger.info(f"Running simulation: use_ml={use_ml}, iterations={iters}")
-        
-        main_results = self.run_simulation_internal(race_id, params, iters)
-        
-        # Add ML mode to metadata
-        main_results["metadata"]["use_ml"] = use_ml
-        main_results["metadata"]["mode"] = "Physics + ML (Residual Pace Model)" if use_ml else "Physics Only (Deterministic)"
-        
-        # Generate Sensitivity
-        tyre_deg = params.get("tyre_deg_multiplier", 1.0)
-        params_plus = params.copy()
-        params_plus["tyre_deg_multiplier"] = tyre_deg + 0.1
-        
-        plus_results = self.run_simulation_internal(race_id, params_plus, iterations=1000)
-        
-        deltas = {}
-        for d in main_results["win_probability"].keys():
-            diff = plus_results["win_probability"].get(d, 0) - main_results["win_probability"].get(d, 0)
-            deltas[d] = float(diff)
-
-        main_results["sensitivity"] = [{
-            "parameter": "tyre_deg_multiplier",
-            "baseline": tyre_deg,
-            "modified": tyre_deg + 0.1,
-            "deltas": deltas
-        }]
-        
-        return main_results
-
-    def run_simulation_internal(
-        self, 
-        race_id: str, 
-        params: Dict[str, Any],
-        iterations: int
-    ) -> Dict[str, Any]:
-        """
-        Internal simulation core.
-        """
-        seed = params.get("seed")
-        if seed is not None and seed != -1:
-            np.random.seed(seed)
-        
+        # In production: fetch from ML model store + driver database
         driver_ids = ["VER", "NOR", "LEC", "PIA", "SAI", "HAM", "RUS", "ALO", "PER", "STR"]
-        tyre_deg = params.get("tyre_deg_multiplier", 1.0)
-        use_ml = params.get("use_ml", True)  # ML kill switch
-        
-        driver_profiles = {}
+        profiles = {}
         for i, d in enumerate(driver_ids):
-            base_lap = 90000 + (i * 150)
-            
-            # ML KILL SWITCH: If use_ml=False, pace_delta is 0 (physics only)
+            # ML Residual Pace (ms offset)
+            # If use_ml=False, we only use physics-based field spread
+            ml_offset = 0.0
             if use_ml:
-                pace_delta = self._get_ml_pace_delta(d)
-            else:
-                pace_delta = 0.0  # Pure physics - no ML adjustment
-            
-            driver_profiles[d] = {
-                "base_lap_ms": 90000 + (i * 150),
-                "pace_delta_ms": pace_delta,
-                "variance_ms": 150,
-                "dnf_prob": 0.03 + (params.get("sc_probability", 0.15) * 0.1)
-            }
+                # Mock ML output: VER is fastest, field spread is ~2s
+                ml_offset = (i * 150) - 500 # VER is -500ms vs field base
+                ml_offset += np.random.normal(0, 30) # Inference noise
+                
+            profiles[d] = DriverModel(
+                id=d,
+                name=d, # Placeholder
+                team="FIELD", # Placeholder
+                pace_base_ms=90000 + ml_offset,
+                tyre_management=0.85 if d=="HAM" else (0.95 if d=="VER" else 0.75),
+                racecraft=0.9 if d=="VER" else 0.8,
+                dnf_rate=0.02
+            )
+        return profiles
 
-        # Strategy Optimization for the focus driver (VER)
-        focus_driver = "VER"
-        # We need a profile for the optimizer
-        focus_profile = {
-            "base_lap_ms": 90000,
-            "pace_delta_ms": -500,
-            "variance_ms": 150,
-            "dnf_prob": 0.05
-        }
+    def run_simulation(self, request: SimulationRequest) -> SimulationResponse:
+        """
+        Primary entry point for Monte Carlo execution.
+        """
+        logger.info(f"SimulationEngine: Starting run for track={request.track_id}, iterations={request.iterations}")
         
-        optimization_result = self.optimizer.optimize(
-            driver_profile=focus_profile,
-            params=params,
-            iterations=500 # Smaller sim for optimization speed
+        track = self._get_track_context(request.track_id)
+        driver_profiles = self._get_driver_profiles(request.track_id, request.use_ml)
+        
+        # 1. Optimize Strategy for Focus Driver (VER)
+        focus_driver = "VER"
+        logger.info(f"SimulationEngine: Optimizing strategy for {focus_driver}...")
+        recommended_strategy = self.optimizer.optimize(
+            track=track,
+            driver_profile=driver_profiles[focus_driver],
+            params=request.dict(),
+            iterations=400 # Reduced for better web responsiveness
+        )
+        logger.info(f"SimulationEngine: Strategy optimized: {recommended_strategy.name}")
+
+        # 2. Run Main Monte Carlo Simulation
+        win_counts = {d: 0 for d in driver_profiles}
+        dnf_counts = {d: 0 for d in driver_profiles}
+        
+        logger.info(f"SimulationEngine: Starting MC loop ({request.iterations} iters)...")
+        
+        # Use simple strategy for field, recommended for focus
+        field_strategy = StrategyResult(
+            name="Field Default",
+            stints=[
+                StrategyStint(compound="medium", end_lap=track.laps // 2),
+                StrategyStint(compound="hard", end_lap=track.laps)
+            ],
+            expected_time_loss=0, risk_score=0, robustness=0
         )
         
-        recommended_strategy = optimization_result["strategy"] if optimization_result else {
-            "name": "Fallback One-Stop",
-            "stops": 1,
-            "type": "Soft-Hard",
-            "pit_laps": [20],
-            "tyres": ["Soft", "Hard"]
-        }
+        driver_strategies = {d: field_strategy for d in driver_profiles}
+        driver_strategies[focus_driver] = recommended_strategy
 
-        # Full Monte Carlo with the recommended strategy for all drivers (simplified)
-        driver_strategies = {d: recommended_strategy for d in driver_ids} if recommended_strategy else None
-
-        win_counts = {d: 0 for d in driver_ids}
-        podium_counts = {d: [0, 0, 0] for d in driver_ids}
-        dnf_counts = {d: 0 for d in driver_ids}
-
+        start_time = time.time()
+        iterations = request.iterations
         for _ in range(iterations):
             race_times, _ = self.simulator.simulate_race(
+                track=track,
                 driver_profiles=driver_profiles,
-                total_laps=60,
-                driver_strategies=driver_strategies
+                driver_strategies=driver_strategies,
+                tyre_deg_multiplier=request.tyre_deg_multiplier,
+                sc_prob_override=request.sc_probability
             )
             
-            # Sort to find positions
-            sorted_times = sorted(
-                [(d, t) for d, t in race_times.items()], 
-                key=lambda x: x[1]
-            )
+            # Aggregate Rankings
+            winners = sorted([d for d in race_times if race_times[d] != float('inf')], 
+                            key=lambda x: race_times[x])
             
-            for rank, (d, t) in enumerate(sorted_times):
-                if t == float('inf'):
+            if winners:
+                win_counts[winners[0]] += 1
+            
+            for d in driver_profiles:
+                if race_times[d] == float('inf'):
                     dnf_counts[d] += 1
-                    continue
-                
-                if rank == 0: win_counts[d] += 1
-                if rank < 3: podium_counts[d][rank] += 1
+            
+        compute_ms = int((time.time() - start_time) * 1000)
 
-        # At the end of iterations, run one more race with trace capture for replay
-        _, representative_trace = self.simulator.simulate_race(
-            driver_profiles=driver_profiles,
-            total_laps=60,
-            driver_strategies=driver_strategies,
-            capture_trace=True
-        )
-
-        win_prob = {d: count / iterations for d, count in win_counts.items()}
-        podium_prob = {d: [c / iterations for c in counts] for d, counts in podium_counts.items()}
-        dnf_risk = {d: count / iterations for d, count in dnf_counts.items()}
-        
-        # Pace Series (simplified for internal)
-        pace_series = {}
-        for d in driver_ids:
-            base_delta = -0.5 if d == "VER" else (driver_ids.index(d) * 0.1)
-            series = []
-            for lap in range(1, 61):
-                fuel_impact = -0.03 * lap
-                tyre_impact = 0.04 * tyre_deg * (lap % 20)
-                series.append(float(base_delta + fuel_impact + tyre_impact + np.random.normal(0, 0.05)))
-            pace_series[d] = series
-
-        return {
-            "win_probability": win_prob,
-            "podium_probability": podium_prob,
-            "dnf_risk": dnf_risk,
-            "pace_series": pace_series,
-            "strategy_recommendation": optimization_result,
-            "race_trace": representative_trace,
-            "explanations": {
-                "VER": ["High aerodynamic efficiency favors current track layout."],
-                "NOR": ["Strong sector 2 performance offset by poor start statistics."],
-                "LEC": ["Maximum cooling required; potential performance drop in traffic."]
-            },
-            "metadata": {
+        # 3. Final Response Construction
+        return SimulationResponse(
+            win_probability={d: count / iterations for d, count in win_counts.items()},
+            dnf_risk={d: count / iterations for d, count in dnf_counts.items()},
+            strategy_recommendation=recommended_strategy,
+            metadata={
                 "iterations": iterations,
-                "seed": seed if seed is not None else -1,
-                "model_version": self.model_version
+                "model_version": self.model_version,
+                "use_ml": request.use_ml,
+                "mode": "PHYSICS_ML_HYBRID" if request.use_ml else "PHYSICS_LITERAL",
+                "compute_ms": compute_ms,
+                "seed": request.dict().get("seed", -1)
             }
-        }
-
-    def compare_strategies(
-        self,
-        race_id: str,
-        driver_id: str,
-        strategy_a: Dict[str, Any],
-        strategy_b: Dict[str, Any],
-        params: Dict[str, Any],
-        iterations: int = 2000
-    ) -> Dict[str, Any]:
-        """
-        Compares two specific strategies under identical conditions.
-        """
-        # Fixed seed for comparison purity
-        seed = params.get("seed", 42)
-        
-        driver_profile = {
-            "base_lap_ms": 90000,
-            "pace_delta_ms": 0,
-            "variance_ms": 150,
-            "dnf_prob": 0.05
-        }
-        
-        results = {}
-        for label, strategy in [("A", strategy_a), ("B", strategy_b)]:
-            np.random.seed(seed)
-            times = []
-            for _ in range(iterations):
-                time = self.simulator.simulate_single_driver(
-                    driver_profile=driver_profile,
-                    strategy=strategy,
-                    total_laps=60
-                )
-                if time != float('inf'):
-                    times.append(time)
-            
-            results[label] = {
-                "mean_time": float(np.mean(times)) if times else 0,
-                "std_time": float(np.std(times)) if times else 0,
-                "win_count": len([t for t in times if t < 5400000]) # Mock win threshold
-            }
-            
-        # Calc Delta
-        results["delta"] = {
-            "mean_time": results["A"]["mean_time"] - results["B"]["mean_time"],
-            "std_time": results["A"]["std_time"] - results["B"]["std_time"]
-        }
-        
-        return results
+        )
 
 # Singleton instance
 simulation_engine = SimulationEngine()
