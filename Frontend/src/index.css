@@ -5,16 +5,21 @@
 @tailwind utilities;
 
 :root {
-  --bg-graphite: #121416;
-  --bg-carbon: #0B0E11;
-  --bg-slate-dark: #1C1E20;
-  --bg-slate-mid: #2A2F38;
+  --bg-console: #0b0b0e;
+  --bg-card: #121217;
+  --border-console: #1f1f26;
+
   --accent-red: #E10600;
+  --accent-green: #00D100;
+  --accent-amber: #FFB800;
+
   --text-primary: #E6E8EB;
   --text-secondary: #9AA1AC;
+  --text-muted: #6B7280;
+
   --font-ui: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --transition-standard: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -151,7 +156,7 @@ input::placeholder {
   }
 
   html {
-    background-color: var(--bg-graphite);
+    background-color: var(--bg-console);
   }
 }
 
@@ -670,7 +675,7 @@ textarea {
   }
 
   body {
-    background-color: var(--bg-graphite);
+    background-color: var(--bg-console);
     color: var(--text-primary);
   }
 }
@@ -685,6 +690,37 @@ textarea {
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
+
+/* -------------------------------------------------------------------------- */
+/* SaaS Dashboard Refinements (User Requested)                                */
+/* -------------------------------------------------------------------------- */
+
+/* The "Pit Wall" Glass Effect */
+.glass-card-user {
+  background: rgba(25, 25, 25, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+/* Solid card for data tables */
+.solid-card {
+  background: #161616;
+  border: 1px solid #2D2D2D;
+  border-radius: 12px;
+}
+
+/* Typography Tweaks */
+.font-brand {
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Gradient Text for Hero */
+.text-gradient {
+  background: linear-gradient(to right, #ffffff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
