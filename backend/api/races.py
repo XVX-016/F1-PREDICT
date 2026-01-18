@@ -11,7 +11,7 @@ from database.supabase_client import get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/races", tags=["races"])
+router = APIRouter(tags=["races"])
 
 class SimulationRequest(BaseModel):
     tyre_deg_multiplier: float = 1.0
@@ -34,6 +34,25 @@ async def get_races(season: int = 2026):
     except Exception as e:
         logger.error(f"Error fetching races: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch races")
+
+@router.post("/{race_id}/simulate/compare")
+async def compare_strategies(
+    race_id: str,
+    request: Dict[str, Any]
+):
+    """Compares two specific race strategies."""
+    try:
+        results = simulation_engine.compare_strategies(
+            race_id=race_id,
+            driver_id=request.get("driver_id", "VER"),
+            strategy_a=request["strategy_a"],
+            strategy_b=request["strategy_b"],
+            params=request.get("params", {})
+        )
+        return results
+    except Exception as e:
+        logger.error(f"Error comparing strategies: {e}")
+        raise HTTPException(status_code=500, detail="Failed to compare strategies")
 
 @router.post("/{race_id}/simulate")
 async def simulate_race(race_id: str, request: SimulationRequest):

@@ -2,12 +2,12 @@
 
 Detailed instructions for setting up and working on the F1 Prediction Platform.
 
-## 📋 Prerequisites
+## Prerequisites
 - Python 3.11+
 - Node.js 18+
 - Supabase Account
 
-## 🛠️ Step-by-Step Setup
+## Step-by-Step Setup
 
 ### 1. Backend Configuration
 ```bash
@@ -36,20 +36,20 @@ cd backend
 python setup.py
 ```
 
-## 🧪 Testing
+## Testing
 We use `pytest` for backend verification.
 ```bash
 cd backend
 pytest  # Run all tests
 ```
 
-## 📜 Project Structure
+## Project Structure
 - `backend/`: FastAPI source code
 - `Frontend/`: React application
 - `docs/`: Technical documentation
 - `setup.py`: End-to-end data pipeline script
 
-## 🔍 Troubleshooting
+## Troubleshooting
 - **Port 8000 busy**: `uvicorn main:app --port 8001`
 - **Missing Deps**: Run `pip install -r requirements.txt` again.
 - **Docker health check fail**: Ensure your `.env` variables are correctly passed to the container.
