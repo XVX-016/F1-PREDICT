@@ -22,7 +22,7 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[9999] h-14 backdrop-blur-sm bg-[#0B0E11]/90 border-b border-white/5">
+    <header className="fixed top-0 left-0 right-0 z-[9999] h-14 backdrop-blur-sm bg-gradient-to-b from-black/80 to-transparent border-b border-white/5">
       {/* Subtle Carbon Fiber Overlay */}
       <div className="absolute inset-0 carbon-fiber opacity-[0.05] pointer-events-none"></div>
 
