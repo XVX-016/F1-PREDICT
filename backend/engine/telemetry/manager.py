@@ -48,7 +48,18 @@ class TelemetryManager:
                 "timestamp": "live-mock"
             }
             
-        state = json.loads(self.redis.get(f"race:{race_id}:state") or "{}")
+        state_data = self.redis.get(f"race:{race_id}:state")
+        state = json.loads(state_data) if state_data else {}
+        
+        # Ensure minimal state exists to prevent frontend crashes
+        if not state:
+            state = {
+                "lap": 0,
+                "track_status": "Waiting",
+                "weather": "Unknown",
+                "sc_probability": 0.0
+            }
+
         # In a real implementation Housekeeping would find all driver keys
         # For simplicity, we assume we have a list of active drivers
         return {"state": state, "timestamp": "live"}

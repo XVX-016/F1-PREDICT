@@ -1,112 +1,176 @@
 # F1 Race Intelligence & Strategy Engine
 
-A high-fidelity Formula 1 race intelligence platform that models tyre degradation, fuel burn, pit loss, and safety car risk using deterministic physics and Monte Carlo simulation — visualized through real-time D3 dashboards.
+A **physics-first race simulation and decision-support system** for Formula 1 strategy analysis.
+The platform models tyre degradation, fuel burn, pit loss, and safety car risk using deterministic physics and Monte Carlo simulation, visualized through real-time D3 dashboards.
 
-This project replaces traditional betting-style prediction systems with an engineering-grade race strategy analysis workflow inspired by real F1 pit walls.
+This project intentionally avoids betting, odds, or outcome gambling.
+It is designed as an **engineering-grade analysis tool**, inspired by real Formula 1 pit wall workflows.
 
-## What This Is
+---
 
-This platform answers a single question:
+## Problem Statement
 
-> “Given live race conditions, what strategy minimizes total race time while remaining robust to uncertainty?”
+This system answers a single question:
 
-It does this by combining:
-- Deterministic physics models (tyre wear, fuel burn, pit loss)
-- Probabilistic Monte Carlo simulation (safety car, weather transitions)
-- Real-time telemetry ingestion
-- Interactive D3-based strategy visualization
+> **Given current race conditions, which strategy minimizes expected race time while remaining robust under uncertainty?**
 
-There is **no betting, no odds, and no financial abstraction** — only race engineering.
+This is not a prediction problem — it is a **decision-making under uncertainty** problem.
 
-## Core Concepts
+---
 
-### Deterministic Layer
-Models physics-driven effects such as:
-- Tyre degradation (compound-specific exponential decay)
-- Fuel burn and mass reduction
-- Pit stop time loss and traffic penalties
+## Design Philosophy
 
-### Probabilistic Layer
-Introduces uncertainty using Monte Carlo simulation:
-- Safety car probability by lap window
-- Weather transitions
-- Strategy robustness under variance
+### 1. Physics First
 
-### Visualization Layer
-Transforms simulation output into intuitive engineering views:
-- Live gap evolution
-- Pace degradation curves
-- Strategy risk vs reward maps
+All simulations are anchored in deterministic models of:
+
+* Tyre degradation (compound-specific, non-linear)
+* Fuel burn and mass reduction
+* Pit stop time loss and traffic penalties
+
+These models enforce physical constraints such as:
+
+* Monotonic lap time increase within a stint
+* Compound ordering consistency
+* Bounded pit loss distributions
+
+---
+
+### 2. Probabilistic, Not Predictive
+
+Uncertainty is modeled explicitly using Monte Carlo simulation:
+
+* Safety car probabilities by lap window
+* Weather transitions
+* Strategy robustness under variance
+
+The system does **not** predict race winners.
+It evaluates **strategy distributions**.
+
+---
+
+### 3. Reproducibility by Construction
+
+All stochastic components support:
+
+* Explicit random seed locking
+* Deterministic replay of simulations
+* Identical inputs producing identical outputs
+
+This allows controlled experiments and strategy comparison under identical conditions.
+
+---
+
+### 4. Transparency Over Black-Box AI
+
+Machine learning (where enabled) is:
+
+* Bounded
+* Optional
+* Fully traceable
+
+Physics-only execution remains a first-class mode.
+
+---
 
 ## System Architecture
 
 ```mermaid
 flowchart LR
-    A[Live F1 Telemetry<br/>UDP / APIs] --> B[Redis<br/>Live State Store]
+    A[Live F1 Telemetry<br/>FastF1 / Ergast] --> B[Redis<br/>Live State Store]
     B --> C[WebSocket Stream]
 
     C --> D[React Frontend]
-    D --> E[User Interaction<br/>Driver / Strategy Selection]
+    D --> E[Strategy Interaction]
 
     E --> F[Python Simulation Engine<br/>FastAPI]
-    F --> G[Monte Carlo Strategy Results]
+    F --> G[Monte Carlo Evaluation]
 
     G --> D
-    D --> H[D3.js Visualizations<br/>Gap Ticker / Pace Curves]
+    D --> H[D3.js Engineering Visualizations]
 
     H --> I[Strategy Analyst]
 ```
 
-## Feature Showcase
+---
 
-### 🔴 Live Gap Ticker (D3.js)
-A real-time D3 visualization updating every ~60ms that shows:
-- Relative gaps to the race leader
-- Directional delta (closing / falling back)
-- Smooth diff-based animation (no jitter)
+## Core Simulation Layers
 
-**Color encoding:**
-- Green → gap closing
-- Red → gap increasing
-- Neutral → stable
+### Deterministic Layer
 
-This acts as the primary entry point into deeper strategy analysis.
+Models physics-driven effects:
 
-### 🧠 Deep Pull Architecture
-Clicking a driver does not fetch static data. Instead, it:
-1. Captures the live race snapshot
-2. Routes the user into a contextual simulation view
-3. Triggers on-demand Monte Carlo computation
-4. Visualizes strategy outcomes dynamically
+* Tyre degradation curves
+* Fuel mass evolution
+* Pit lane loss and traffic penalties
 
-This mirrors real-world pit wall workflows: **observe → hypothesize → simulate → decide**.
+This layer guarantees physical plausibility.
 
-## Technology Stack
+---
 
-### Frontend
-- **React + TypeScript**: Core UI framework
-- **Zustand**: Global state management
-- **D3.js**: High-performance visualization
-- **Framer Motion**: Micro-interactions
+### Probabilistic Layer
 
-### Backend
-- **FastAPI**: Simulation services
-- **Python**: NumPy, Pandas for physics modeling
-- **Redis**: Live telemetry state storage
-- **WebSockets**: Real-time data streaming
+Introduces uncertainty:
 
-### Design System
-- Matte graphite base
-- Carbon fiber texture accents
-- Minimal neon (used only for deltas and alerts)
+* Safety car probability models
+* Weather volatility
+* Execution noise
 
-## About
+Strategies are evaluated on **expected time and variance**, not point estimates.
 
-This project was built as a personal exploration into race strategy engineering, inspired by Formula 1 telemetry systems and pit wall decision-making.
+---
 
-It prioritizes:
-- Physics over heuristics
-- Transparency over black-box AI
-- Robustness over single-point predictions
+### Visualization Layer
 
-The goal is not to predict outcomes — but to understand *why* strategies succeed or fail.
+Transforms raw simulation output into engineering views:
+
+* Gap evolution
+* Pace degradation curves
+* Risk vs reward surfaces
+* Strategy comparison under identical seeds
+
+---
+
+## Verification & Validation
+
+This project prioritizes **evidence over claims**.
+
+Verification includes:
+
+* Debug scripts that print raw telemetry and feature vectors
+* Automated tests enforcing physics invariants
+* Seed reproducibility tests
+* Probability conservation checks
+
+If these checks fail, the system degrades safely or refuses execution.
+
+---
+
+## Limitations
+
+* Multi-driver interaction effects are approximated
+* Strategy space is discretized
+* Real-time telemetry availability depends on upstream sources
+
+These constraints are explicit and tested.
+
+---
+
+## Intended Use
+
+This project is:
+
+* A research prototype for race strategy analysis
+* A systems engineering case study in trustworthy simulation
+* A demonstration of physics-constrained ML integration
+
+It is **not** a betting system or fan prediction app.
+
+---
+
+## Conclusion
+
+F1 Race Intelligence is an experiment in **engineering trust into simulation systems**, not maximizing headline accuracy metrics.
+
+---
+
