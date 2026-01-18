@@ -1,29 +1,21 @@
 """
-Race API endpoints - Phase 6 (Enhanced)
-Exposes simulation-first probabilities, fantasy markets, and feature attribution.
+Race API endpoints
+Exposes track-first simulation and real strategy optimization.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Optional, Dict, Any
 import logging
+from typing import Dict, Any, Optional
 from services.simulation_engine import simulation_engine
 from database.supabase_client import get_db
+from models.domain import SimulationRequest, SimulationResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["races"])
 
-class SimulationRequest(BaseModel):
-    tyre_deg_multiplier: float = 1.0
-    sc_probability: float = 0.15
-    strategy_aggression: str = "Balanced"
-    weather_scenario: str = "Dry"
-    grid_source: str = "Qualifying"
-    seed: Optional[int] = None
-
 @router.get("/")
 async def get_races(season: int = 2026):
-    """Get race calendar for a specific season (default 2026)"""
+    """Get race calendar."""
     try:
         db = get_db()
         response = db.table("races").select("*").order("round").execute()
@@ -35,69 +27,29 @@ async def get_races(season: int = 2026):
         logger.error(f"Error fetching races: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch races")
 
-@router.post("/{race_id}/simulate/compare")
-async def compare_strategies(
-    race_id: str,
-    request: Dict[str, Any]
-):
-    """Compares two specific race strategies."""
-    try:
-        results = simulation_engine.compare_strategies(
-            race_id=race_id,
-            driver_id=request.get("driver_id", "VER"),
-            strategy_a=request["strategy_a"],
-            strategy_b=request["strategy_b"],
-            params=request.get("params", {})
-        )
-        return results
-    except Exception as e:
-        logger.error(f"Error comparing strategies: {e}")
-        raise HTTPException(status_code=500, detail="Failed to compare strategies")
-
-@router.post("/{race_id}/simulate")
+@router.post("/{race_id}/simulate", response_model=SimulationResponse)
 async def simulate_race(race_id: str, request: SimulationRequest):
     """
-    Executes a high-fidelity Monte Carlo simulation (10,000 iterations).
+    Executes a high-fidelity Monte Carlo simulation (default 10k iterations).
     """
     try:
-        logger.info(f"Triggering simulation for race {race_id} with seed {request.seed}")
-        results = simulation_engine.run_simulation(race_id, request.dict())
+        # Force the track_id from path if needed, or assume request matches
+        request.track_id = race_id # Simplification for Phase 1
+        logger.info(f"Triggering track-first simulation for {race_id}")
+        results = simulation_engine.run_simulation(request)
         return results
     except Exception as e:
-        logger.error(f"Simulation failed for race {race_id}: {e}")
+        logger.error(f"Simulation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Simulation failed: {str(e)}")
-
-@router.get("/{race_id}/probabilities")
-async def get_race_probabilities(race_id: str):
-    """Returns baseline probabilities for a race."""
-    try:
-        # Use simulation engine for baseline if no cached data exists
-        # In this context, we just return the "latest" or a default run
-        return simulation_engine.run_simulation(race_id, {"seed": 42})
-    except Exception as e:
-        logger.error(f"Error fetching probabilities: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch probabilities")
 
 @router.get("/{race_id}/markets")
 async def get_race_markets(race_id: str):
-    """Returns fantasy markets derived from physics engine."""
-    try:
-        return {
-            "race_id": race_id,
-            "markets": [
-                {"driver_id": "VER", "driver_name": "Max Verstappen", "market_type": "WINNER", "probability": 0.45, "odds": 2.2},
-                {"driver_id": "NOR", "driver_name": "Lando Norris", "market_type": "WINNER", "probability": 0.25, "odds": 4.0}
-            ]
-        }
-    except Exception as e:
-        logger.error(f"Error fetching markets: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch markets")
-
-@router.get("/{race_id}/pace-deltas")
-async def get_pace_deltas(race_id: str):
-    """Returns raw ML pace deltas (debug endpoint)."""
-    db = get_db()
-    res = db.table("pace_deltas").select("*").eq("race_id", race_id).execute()
-    if not res.data:
-        raise HTTPException(status_code=404, detail="Pace deltas not found")
-    return res.data
+    """Returns fantasy markets derived from the simulation node."""
+    # This could eventually call simulation_engine for live odds
+    return {
+        "race_id": race_id,
+        "markets": [
+            {"driver_id": "VER", "market_type": "WINNER", "probability": 0.45, "odds": 2.2},
+            {"driver_id": "NOR", "market_type": "WINNER", "probability": 0.25, "odds": 4.0}
+        ]
+    }

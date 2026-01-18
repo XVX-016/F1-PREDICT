@@ -50,15 +50,15 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
         g.append("g")
             .attr("transform", `translate(0,${innerHeight})`)
             .call(xAxis)
-            .attr("font-family", "monospace")
-            .attr("font-size", "10px")
-            .attr("color", "#4b5563");
+            .attr("font-family", "JetBrains Mono, monospace")
+            .attr("font-size", "9px")
+            .attr("color", "#6B7280");
 
         g.append("g")
             .call(yAxis)
-            .attr("font-family", "monospace")
-            .attr("font-size", "10px")
-            .attr("color", "#4b5563");
+            .attr("font-family", "JetBrains Mono, monospace")
+            .attr("font-size", "9px")
+            .attr("color", "#6B7280");
 
         // Grid Lines
         g.append("g")
@@ -79,34 +79,16 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
             .y1(d => yScale(d.p75))
             .curve(d3.curveBasis);
 
-        // Filter - Ferrari Red Glow
-        const filter = svg.append("defs")
-            .append("filter")
-            .attr("id", "glow")
-            .attr("x", "-20%")
-            .attr("y", "-20%")
-            .attr("width", "140%")
-            .attr("height", "140%");
-
-        filter.append("feGaussianBlur")
-            .attr("stdDeviation", "4")
-            .attr("result", "blur");
-
-        filter.append("feComposite")
-            .attr("in", "SourceGraphic")
-            .attr("in2", "blur")
-            .attr("operator", "over");
-
         // Outer Fan (P10-P90)
         g.append("path")
             .datum(data)
-            .attr("fill", "rgba(220, 38, 38, 0.1)")
+            .attr("fill", "rgba(225, 6, 0, 0.05)")
             .attr("d", area90);
 
         // Inner Fan (P25-P75)
         g.append("path")
             .datum(data)
-            .attr("fill", "rgba(220, 38, 38, 0.2)")
+            .attr("fill", "rgba(225, 6, 0, 0.15)")
             .attr("d", area50);
 
         // Expected Path (The Main Line)
@@ -118,10 +100,9 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
         g.append("path")
             .datum(data)
             .attr("fill", "none")
-            .attr("stroke", "#dc2626")
-            .attr("stroke-width", 3)
-            .attr("d", line)
-            .attr("filter", "url(#glow)");
+            .attr("stroke", "#E10600")
+            .attr("stroke-width", 2)
+            .attr("d", line);
 
         // Horizontal threshold line (Current Gap/Target)
         g.append("line")
@@ -129,9 +110,8 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
             .attr("x2", innerWidth)
             .attr("y1", yScale(data[0].expectedTime))
             .attr("y2", yScale(data[0].expectedTime))
-            .attr("stroke", "white")
-            .attr("stroke-dasharray", "4,4")
-            .attr("opacity", 0.2);
+            .attr("stroke", "#1f1f26")
+            .attr("stroke-width", 1.5);
 
     }, [data, width, height]);
 
