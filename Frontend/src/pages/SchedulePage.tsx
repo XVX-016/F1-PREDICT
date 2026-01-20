@@ -102,45 +102,12 @@ export default function SchedulePage({ }: SchedulePageProps) {
     return true;
   });
 
-
-
-  /* MAPPING LOGIC */
-  const TRACK_IMAGE_MAP: Record<string, string> = {
-    'Bahrain': 'f1_2024_bhr_outline.png',
-    'Saudi Arabia': 'f1_2024_sau_outline.png',
-    'Australia': 'f1_2024_aus_outline.png',
-    'Japan': 'f1_2024_jap_outline.png',
-    'China': 'f1_2024_chn_outline.png',
-    'USA': 'f1_2024_usa_outline.png', // Miami/Austin/Vegas need specific handling if names distinct
-    'Miami': 'f1_2024_mia_outline.png',
-    'Las Vegas': 'f1_2024_lve_outline.png',
-    'Italy': 'f1_2024_ita_outline.png', // Imola/Monza
-    'Monaco': 'f1_2024_mco_outline.png',
-    'Spain': 'f1_2024_spn_outline.png',
-    'Canada': 'f1_2024_can_outline.png',
-    'Austria': 'f1_2024_aut_outline.png',
-    'United Kingdom': 'f1_2024_bel_outline.png',
-    'Hungary': 'f1_2024_hun_outline.png',
-    'Belgium': 'f1_2024_bel_outline.png',
-    'Netherlands': 'f1_2024_nld_outline.png',
-    'Azerbaijan': 'f1_2024_aze_outline.png',
-    'Singapore': 'f1_2024_sgp_outline.png',
-    'Mexico': 'f1_2024_mex_outline.png',
-    'Brazil': 'f1_2024_bra_outline.png',
-    'Qatar': 'f1_2024_qat_outline.png',
-    'UAE': 'f1_2024_abu_outline.png'
-  };
-
-  const getTrackImage = (race: RaceItem) => {
-    // Specific overrides for USA/Italy multiple tracks
-    if (race.city?.includes('Miami')) return '/circuits/f1_2024_mia_outline.png';
-    if (race.city?.includes('Las Vegas')) return '/circuits/f1_2024_lve_outline.png';
-    if (race.circuitName?.includes('Imola')) return '/circuits/f1_2024_ero_outline.png';
-
-    const normalizedCountry = race.country.trim();
-    const filename = TRACK_IMAGE_MAP[normalizedCountry];
-    return filename ? `/circuits/${filename}` : null;
-  };
+  const groupedRaces = filteredRaces.reduce((acc: Record<string, RaceItem[]>, race) => {
+    const month = new Date(race.date).toLocaleString('en-US', { month: 'long' });
+    if (!acc[month]) acc[month] = [];
+    acc[month].push(race);
+    return acc;
+  }, {});
 
   return (
     <PageContainer>
@@ -185,7 +152,7 @@ export default function SchedulePage({ }: SchedulePageProps) {
         ))}
       </div>
 
-      {/* Race Layout Grid */}
+      {/* Race List Container */}
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3, 4].map(i => <RaceCardSkeleton key={i} />)}
@@ -196,68 +163,25 @@ export default function SchedulePage({ }: SchedulePageProps) {
           <p className="text-gray-400">{error}</p>
         </div>
       ) : (
-        <div className="space-y-12">
-          {/* Logic to split Next vs Upcoming */}
-          {(() => {
-            const upcomingRaces = filteredRaces.filter(r => r.status !== 'completed');
-            const nextRace = upcomingRaces[0];
-            const otherUpcoming = upcomingRaces.slice(1);
-            const completedRaces = filteredRaces.filter(r => r.status === 'completed');
-
-            return (
-              <>
-                {/* NEXT RACE HERO Section */}
-                {selectedFilter !== 'completed' && nextRace && (
-                  <div className="mb-12">
-                    <h2 className="text-2xl font-black text-white uppercase italic tracking-wider mb-6">Next</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <RaceCard
-                        race={nextRace}
-                        trackImage={getTrackImage(nextRace)}
-                        onViewDetails={(r) => setSelectedRace(r)}
-                        isHero={true}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* UPCOMING GRID Section */}
-                {selectedFilter !== 'completed' && otherUpcoming.length > 0 && (
-                  <div>
-                    <h2 className="text-2xl font-black text-white uppercase italic tracking-wider mb-6">Upcoming</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-x-4 md:gap-y-6">
-                      {otherUpcoming.map(race => (
-                        <RaceCard
-                          key={race.id}
-                          race={race}
-                          trackImage={getTrackImage(race)}
-                          onViewDetails={(r) => setSelectedRace(r)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* COMPLETED/PAST RACES (if filter is All or Completed) */}
-                {(selectedFilter === 'all' || selectedFilter === 'completed') && completedRaces.length > 0 && (
-                  <div className="mt-12">
-                    <h2 className="text-2xl font-black text-white uppercase italic tracking-wider mb-6">Completed</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {completedRaces.map(race => (
-                        <RaceCard
-                          key={race.id}
-                          race={race}
-                          trackImage={getTrackImage(race)}
-                          onViewDetails={(r) => setSelectedRace(r)}
-                          compact={true}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            );
-          })()}
+        <div className="space-y-16">
+          {Object.entries(groupedRaces).map(([month, monthRaces]) => (
+            <div key={month} className="space-y-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-black text-white uppercase italic tracking-wider">{month}</h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
+              </div>
+              <div className="space-y-4">
+                {monthRaces.map((race) => (
+                  <RaceCard
+                    key={race.id}
+                    race={race}
+                    getCountryFlag={getCountryFlag}
+                    onViewDetails={(r) => setSelectedRace(r)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
