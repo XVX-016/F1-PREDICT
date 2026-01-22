@@ -1,4 +1,3 @@
-import { MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface RaceCardProps {
@@ -38,7 +37,6 @@ export default function RaceCard({
     isHero = false,
     compact = false
 }: RaceCardProps) {
-    const isPast = race.status === 'completed';
 
     // Format Dates (e.g. 06 - MAR 08)
     const raceDate = new Date(race.date);

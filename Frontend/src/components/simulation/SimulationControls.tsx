@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Wind, Layers, CircuitBoard, MapPin } from 'lucide-react';
 
-interface SimulationRequest {
-    track_id: string;
-    tyre_deg_multiplier: number;
-    sc_probability: number;
-    strategy_aggression: 'defensive' | 'balanced' | 'aggressive';
-    weather_scenario: 'dry' | 'damp' | 'wet';
-    use_ml: boolean;
-    iterations: number;
-}
+import { SimulationRequest } from '../../types/domain';
 
 interface SimulationControlsProps {
     params: SimulationRequest;
@@ -47,20 +39,33 @@ const ControlSection = ({
 };
 
 const SimulationControls: React.FC<SimulationControlsProps> = ({ params, onChange, availableTracks }) => {
-    const updateParam = (key: keyof SimulationRequest, value: any) => {
+    const updateTopParam = (key: keyof SimulationRequest, value: any) => {
         onChange({ ...params, [key]: value });
     };
 
+    const updateNestedParam = (key: string, value: any) => {
+        onChange({
+            ...params,
+            params: {
+                ...params.params,
+                [key]: value
+            }
+        });
+    };
+
+    // Helper for current params
+    const cParams = params.params || {};
+
     return (
         <div className="space-y-3">
-            {/* Track Selection - New Section */}
+            {/* Track Selection */}
             {availableTracks && (
                 <ControlSection title="Venue" icon={MapPin} defaultOpen={true}>
                     <div className="space-y-2">
                         <label className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">Select Circuit</label>
                         <select
                             value={params.track_id}
-                            onChange={(e) => updateParam('track_id', e.target.value)}
+                            onChange={(e) => updateTopParam('track_id', e.target.value)}
                             className="w-full bg-black border border-[#1f1f26] text-[10px] font-mono text-white p-2 rounded-xs focus:outline-none focus:border-red-600 uppercase"
                         >
                             {Object.entries(availableTracks).map(([id, track]) => (
@@ -73,17 +78,16 @@ const SimulationControls: React.FC<SimulationControlsProps> = ({ params, onChang
 
             {/* Race Conditions */}
             <ControlSection title="Conditions" icon={Wind}>
-                {/* Weather Scenario */}
                 <div className="space-y-2">
                     <label className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">Weather Profile</label>
                     <div className="flex gap-1">
                         {(['dry', 'damp', 'wet'] as const).map((w) => (
                             <button
                                 key={w}
-                                onClick={() => updateParam('weather_scenario', w)}
-                                className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest border font-mono transition-all ${params.weather_scenario === w
-                                        ? 'bg-blue-900/40 border-blue-500 text-blue-400'
-                                        : 'bg-black border-[#1f1f26] text-slate-600 hover:border-slate-700 font-normal'
+                                onClick={() => updateNestedParam('weather_scenario', w)}
+                                className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest border font-mono transition-all ${cParams.weather_scenario === w
+                                    ? 'bg-blue-900/40 border-blue-500 text-blue-400'
+                                    : 'bg-black border-[#1f1f26] text-slate-600 hover:border-slate-700 font-normal'
                                     }`}
                             >
                                 {w}
@@ -92,19 +96,18 @@ const SimulationControls: React.FC<SimulationControlsProps> = ({ params, onChang
                     </div>
                 </div>
 
-                {/* Safety Car */}
                 <div className="space-y-2 pt-2">
                     <div className="flex justify-between items-center text-[10px] font-mono">
                         <label className="text-slate-500 uppercase tracking-widest">Safety Car Risk</label>
-                        <span className="text-white font-black">{Math.round(params.sc_probability * 100)}%</span>
+                        <span className="text-white font-black">{Math.round((cParams.sc_probability || 0) * 100)}%</span>
                     </div>
                     <input
                         type="range"
                         min="0"
                         max="1"
                         step="0.01"
-                        value={params.sc_probability}
-                        onChange={(e) => updateParam('sc_probability', parseFloat(e.target.value))}
+                        value={cParams.sc_probability || 0}
+                        onChange={(e) => updateNestedParam('sc_probability', parseFloat(e.target.value))}
                         className="w-full h-1 bg-[#1f1f26] appearance-none cursor-pointer accent-red-600 rounded-full"
                     />
                 </div>
@@ -112,34 +115,32 @@ const SimulationControls: React.FC<SimulationControlsProps> = ({ params, onChang
 
             {/* Strategy Variables */}
             <ControlSection title="Variables" icon={Layers} defaultOpen={true}>
-                {/* Tyre Degradation */}
                 <div className="space-y-2">
                     <div className="flex justify-between items-center text-[10px] font-mono">
                         <label className="text-slate-500 uppercase tracking-widest">Tyre Deg Factor</label>
-                        <span className="text-white font-black">{params.tyre_deg_multiplier.toFixed(2)}x</span>
+                        <span className="text-white font-black">{(cParams.tyre_deg_multiplier || 1.0).toFixed(2)}x</span>
                     </div>
                     <input
                         type="range"
                         min="0.5"
                         max="1.5"
                         step="0.01"
-                        value={params.tyre_deg_multiplier}
-                        onChange={(e) => updateParam('tyre_deg_multiplier', parseFloat(e.target.value))}
+                        value={cParams.tyre_deg_multiplier || 1.0}
+                        onChange={(e) => updateNestedParam('tyre_deg_multiplier', parseFloat(e.target.value))}
                         className="w-full h-1 bg-[#1f1f26] appearance-none cursor-pointer accent-red-600 rounded-full"
                     />
                 </div>
 
-                {/* Strategy Aggression */}
                 <div className="space-y-2 pt-2">
                     <label className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">Strategy Mode</label>
                     <div className="grid grid-cols-3 gap-1">
                         {(['defensive', 'balanced', 'aggressive'] as const).map((mode) => (
                             <button
                                 key={mode}
-                                onClick={() => updateParam('strategy_aggression', mode)}
-                                className={`py-1.5 text-[8px] font-black uppercase tracking-widest border font-mono transition-all ${params.strategy_aggression === mode
-                                        ? 'bg-red-900/40 border-red-500 text-red-500'
-                                        : 'bg-black border-[#1f1f26] text-slate-600 hover:border-slate-700 font-normal'
+                                onClick={() => updateNestedParam('strategy_aggression', mode)}
+                                className={`py-1.5 text-[8px] font-black uppercase tracking-widest border font-mono transition-all ${cParams.strategy_aggression === mode
+                                    ? 'bg-red-900/40 border-red-500 text-red-500'
+                                    : 'bg-black border-[#1f1f26] text-slate-600 hover:border-slate-700 font-normal'
                                     }`}
                             >
                                 {mode}
@@ -154,7 +155,7 @@ const SimulationControls: React.FC<SimulationControlsProps> = ({ params, onChang
                 <div className="flex justify-between items-center">
                     <label className="text-[9px] font-mono text-slate-500 uppercase tracking-widest leading-none">ML Residuals</label>
                     <button
-                        onClick={() => updateParam('use_ml', !params.use_ml)}
+                        onClick={() => updateTopParam('use_ml', !params.use_ml)}
                         className={`px-2 py-0.5 text-[8px] font-mono border uppercase tracking-wider ${params.use_ml ? 'text-green-400 border-green-500/30 bg-green-500/10' : 'text-slate-600 border-[#1f1f26] bg-black'}`}
                     >
                         {params.use_ml ? 'Active' : 'Disabled'}
@@ -163,19 +164,23 @@ const SimulationControls: React.FC<SimulationControlsProps> = ({ params, onChang
 
                 <div className="space-y-2 pt-2">
                     <div className="flex justify-between items-center text-[9px] font-mono text-slate-500 uppercase tracking-widest">
-                        <span>Monte Carlo (N)</span>
+                        <span>Deterministic Seed</span>
                     </div>
-                    <select
-                        value={params.iterations}
-                        onChange={(e) => updateParam('iterations', parseInt(e.target.value))}
-                        className="w-full bg-black border border-[#1f1f26] text-[10px] font-mono text-white p-2 rounded-xs focus:outline-none focus:border-red-600 uppercase"
-                    >
-                        <option value={100}>100 (DEBUG)</option>
-                        <option value={1000}>1k (Rapid)</option>
-                        <option value={5000}>5k (Standard)</option>
-                        <option value={10000}>10k (Engineering)</option>
-                        <option value={20000}>20k (Deep)</option>
-                    </select>
+                    <div className="flex gap-1">
+                        <input
+                            type="number"
+                            value={params.seed || ''}
+                            onChange={(e) => updateTopParam('seed', e.target.value ? parseInt(e.target.value) : undefined)}
+                            placeholder="RANDOM"
+                            className="flex-1 bg-black border border-[#1f1f26] text-[10px] font-mono text-white p-2 rounded-xs focus:outline-none focus:border-red-600 uppercase"
+                        />
+                        <button
+                            onClick={() => updateTopParam('seed', Math.floor(Math.random() * 1000000))}
+                            className="bg-[#1f1f26] text-slate-400 px-3 hover:text-white transition-colors"
+                        >
+                            🎲
+                        </button>
+                    </div>
                 </div>
             </ControlSection>
         </div>
