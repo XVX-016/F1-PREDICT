@@ -7,17 +7,20 @@
 /* Phase 5: Professional Decision-Support Theme */
 :root {
   /* Background */
-  --bg-page: #F4F5F7;
-  --bg-card: #FFFFFF;
-  --bg-panel: #ECEFF1;
-  --border-subtle: #E0E0E0;
-  --border-strong: #BDBDBD;
+  /* Background */
+  --bg-page: #0B0E11;
+  /* Dark by default to prevent white flash */
+  --bg-console: #0B0E11;
+  --bg-card: #1C1C1E;
+  --bg-panel: #141821;
+  --border-subtle: #2A2A2A;
+  --border-strong: #444444;
 
-  /* Text */
-  --text-primary: #111111;
-  --text-secondary: #424242;
-  --text-muted: #757575;
-  --text-caption: #9E9E9E;
+  /* Text - Inverted for Dark Mode */
+  --text-primary: #FFFFFF;
+  --text-secondary: #E0E0E0;
+  --text-muted: #9E9E9E;
+  --text-caption: #757575;
 
   /* Accent */
   --accent-red: #E10600;
