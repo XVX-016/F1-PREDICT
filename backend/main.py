@@ -46,8 +46,12 @@ app.include_router(user.router, prefix="/api/users", tags=["users"])
 
 import api.live_telemetry as telemetry
 import api.ws_race as ws_race
+import api.compare as compare
+import api.sc_hazard as sc_hazard
 app.include_router(telemetry.router)
 app.include_router(ws_race.router)
+app.include_router(compare.router)
+app.include_router(sc_hazard.router, prefix="/api")
 
 @app.get("/health")
 async def health_check():

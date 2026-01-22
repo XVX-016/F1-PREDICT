@@ -1,11 +1,11 @@
 """
 Race Simulator - Core race simulation logic
-Anchored in Track and Driver domain models.
+Physics-first, deterministic, trace-capable.
 """
 import numpy as np
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Literal
 import logging
-from models.domain import TrackModel, DriverModel, StrategyResult
+from models.domain import TrackModel, DriverModel, StrategyResult, LapFrame, SimulationEvent
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +22,21 @@ class RaceSimulator:
         driver_strategies: Dict[str, StrategyResult],
         tyre_deg_multiplier: float = 1.0,
         sc_prob_override: Optional[float] = None,
-        capture_trace: bool = False
-    ) -> Tuple[Dict[str, float], Optional[List[Dict[str, Any]]]]:
+        capture_trace: bool = False,
+        seed: Optional[int] = None,
+        injected_events: List[SimulationEvent] = None
+    ) -> Tuple[Dict[str, float], Optional[List[LapFrame]]]:
         """
         Simulates a full race distance based on track-first properties.
+        Supports:
+        - Seed locking (Deterministic Replay)
+        - LapFrame outputs (Unified Schema)
+        - Physics-first ordering
+        - Counterfactual Event Injection
         """
+        # Seed Management (Scope-Locked)
+        rng = np.random.default_rng(seed) if seed is not None else np.random.default_rng()
+        
         total_laps = track.laps
         pit_loss_ms = track.pit_loss_seconds * 1000
         sc_prob = sc_prob_override if sc_prob_override is not None else track.sc_probability_base
@@ -35,13 +45,50 @@ class RaceSimulator:
         driver_stint_idx = {d_id: 0 for d_id in driver_profiles}
         driver_tyre_age = {d_id: 0 for d_id in driver_profiles}
         active_drivers = set(driver_profiles.keys())
-        trace = [] if capture_trace else None
+        
+        # Event Processing
+        event_map: Dict[int, List[SimulationEvent]] = {}
+        if injected_events:
+            for e in injected_events:
+                event_map.setdefault(e.lap, []).append(e)
+        
+        # State modifiers from events
+        current_weather_impact = 1.0
+        previous_lap_was_sc = False # Track restart laps for skill application
+        
+        # Trace collection
+        trace: List[LapFrame] = [] if capture_trace else None
 
         for lap in range(1, total_laps + 1):
-            # Per-lap Safety Car rollup
-            is_sc = np.random.rand() < (sc_prob / total_laps)
+            # 1. Gather Lap Events
+            lap_events = event_map.get(lap, [])
+            # Resolve Event Precedence: FAILURE > SC > VSC > WEATHER
+            # Reset lap flags
+            is_sc = False
+            is_vsc = False
             
-            lap_data = {"lap": lap, "is_sc": is_sc, "drivers": {}} if capture_trace else None
+            # 1. Check for injected events
+            for e in lap_events:
+                if e.type == "FAILURE":
+                    if e.driver_id and e.driver_id in active_drivers:
+                        active_drivers.remove(e.driver_id)
+                        race_times[e.driver_id] = float('inf')
+                elif e.type == "WEATHER":
+                    # Weather impact persists
+                    current_weather_impact = 1.0 + (e.intensity * 0.5) 
+                elif e.type == "SC":
+                    is_sc = True
+                elif e.type == "VSC":
+                    is_vsc = True
+
+            # 2. Natural Probability SC (only if not already an injected event)
+            if not (is_sc or is_vsc):
+                is_sc = rng.random() < (sc_prob / total_laps)
+            
+            # 3. Final Precedence Enforcement
+            if is_sc:
+                # SC overrides VSC
+                is_vsc = False
             
             # Sort drivers by current total time to handle traffic interaction
             current_order = sorted(active_drivers, key=lambda x: race_times[x])
@@ -50,78 +97,144 @@ class RaceSimulator:
                 profile = driver_profiles[driver_id]
                 strategy = driver_strategies[driver_id]
                 
-                # 1. Random DNF Check (ML + Driver Base)
-                if np.random.rand() < (profile.dnf_rate / total_laps):
+                # 2. Random DNF Check (Natural)
+                if rng.random() < (profile.dnf_rate / total_laps):
                     race_times[driver_id] = float('inf')
-                    active_drivers.remove(driver_id)
+                    if driver_id in active_drivers:
+                        active_drivers.remove(driver_id)
                     continue
                 
-                # 2. Get Strategy/Tyre Info
+                # 3. Get Strategy/Tyre Info
                 stint_idx = driver_stint_idx[driver_id]
                 current_stint = strategy.stints[stint_idx]
                 compound = current_stint.compound
                 
-                # 3. Physics: Tyre Degradation
-                # Use track-specific wear factors
+                # 4. Physics: Tyre Degradation
                 wear_base = getattr(track.tyre_wear_factors, compound)
-                # Modified by driver management and global multiplier
-                deg_rate = wear_base * (1.1 - profile.tyre_management) * tyre_deg_multiplier
+                # Weather also increases degradation
+                deg_rate = wear_base * (1.1 - profile.tyre_management) * tyre_deg_multiplier * current_weather_impact
                 
-                # Thermal/Stiffness model (simplified)
                 age = driver_tyre_age[driver_id]
-                t_deg_ms = deg_rate * (age ** 1.1) * 20 # 20ms base deg scaling
+                t_deg_ms = deg_rate * (age ** 1.1) * 20 
                 
-                # 4. Physics: Fuel Burn
-                # Standard depletion model
-                f_burn_ms = -35 * lap # 35ms lap time improvement per lap due to weight reduction
-                
-                # 5. ML/Pace Offset
-                # profile.pace_base_ms is the combined ML + Driver capability
+                # 5. Physics: Fuel Burn
+                f_burn_ms = -35 * lap 
                 
                 # 6. Environmental Randomness
                 variance = 80 + (track.weather_variance * 50)
-                noise = np.random.normal(0, variance)
+                if current_weather_impact > 1.0:
+                    variance *= current_weather_impact # more rain = more variance
+                
+                # SC/VSC High-Variance injection (Phase 3: Causal Stochasticity)
+                if is_sc:
+                    variance = 800 # ±0.8s chaos as requested
+                elif is_vsc:
+                    variance = 300 # ±0.3s chaos for VSC
+                
+                noise = rng.normal(0, variance)
+                
+                # Leader Penalty (Restart Vulnerability)
+                if is_sc and rank == 0:
+                    noise += 500 # 500ms penalty for leading during SC
                 
                 # 7. Traffic / Overtaking Interaction
                 traffic_ms = 0.0
-                if rank > 0:
+                if rank > 0 and not (is_sc or is_vsc): # No normal overtaking under SC/VSC
                     leader_id = current_order[rank-1]
                     gap = race_times[driver_id] - race_times[leader_id]
-                    if gap < 1500: # Within 1.5s (dirty air / DRS zone)
-                        # Overtaking difficulty reduces the chance of clear lap
+                    if gap < 1500: 
                         dirty_air_prob = 0.6 * track.overtaking_difficulty
-                        if np.random.rand() < dirty_air_prob:
-                            traffic_ms = 400 + (np.random.rand() * 400)
+                        if rng.random() < dirty_air_prob:
+                            traffic_ms = 400 + (rng.random() * 400)
 
-                # 8. SC Impact
-                sc_impact_ms = 8000 if is_sc else 0.0 # 8s per lap loss under SC
+                # 8. SC / VSC Impact (with Field Compression)
+                sc_impact_ms = 0.0
+                if is_sc:
+                    sc_impact_ms = 12000 
+                elif is_vsc:
+                    sc_impact_ms = 5000 
+                
+                # Weather base impact
+                weather_base_ms = (current_weather_impact - 1.0) * 8000 
+
+                # 9. Restart Skill Physics (Applied on the first green lap after SC/VSC)
+                restart_delta_ms = 0.0
+                if previous_lap_was_sc and not (is_sc or is_vsc):
+                    # This is the restart lap
+                    skill = profile.restart_skill
+                    
+                    # Reaction Time (stochastic per driver)
+                    reaction_ms = rng.normal(skill.reaction_mu, skill.reaction_sigma) * 1000
+                    
+                    # Tyre Warmup Penalty
+                    warmup_penalty_ms = (1.0 - skill.tyre_warmup_factor) * 500
+                    
+                    # Aggression Gain (probabilistic position gain attempt)
+                    # This translates to time if successful, capped by risk_penalty
+                    aggression_gain_ms = 0.0
+                    if rng.random() < skill.aggression * 0.3: # 30% of aggression score = overtake attempt
+                        if rng.random() > skill.risk_penalty: # Success without incident
+                            aggression_gain_ms = -300 # Gained ~0.3s
+                        # else: incident could cause penalty, but we don't model DNF here to keep it simple
+                    
+                    # Net Restart Delta
+                    restart_delta_ms = reaction_ms + warmup_penalty_ms + aggression_gain_ms
 
                 # Final Lap Calculation
-                lap_time = profile.pace_base_ms + t_deg_ms + f_burn_ms + noise + traffic_ms + sc_impact_ms
+                lap_time = profile.pace_base_ms + t_deg_ms + f_burn_ms + noise + traffic_ms + sc_impact_ms + weather_base_ms + restart_delta_ms
                 
-                race_times[driver_id] += lap_time
+                # Apply the lap time
+                new_race_time = race_times[driver_id] + lap_time
+                
+                # FIELD COMPRESSION (State Reset)
+                if (is_sc or is_vsc) and rank > 0:
+                    leader_id = current_order[rank-1]
+                    # Snapping to previous driver with some stochastic gap
+                    gap_to_leader = new_race_time - race_times[leader_id]
+                    max_gap = 500 if is_sc else 1000 
+                    
+                    if gap_to_leader > max_gap:
+                        # Force bunching
+                         new_race_time = race_times[leader_id] + max_gap
+                    
+                    # Add extra noise to compressed field to allow reshuffling
+                    if is_sc:
+                         new_race_time += rng.normal(0, 100) # ±0.1s jitter to avoid perfect trains
+                
+                race_times[driver_id] = new_race_time
                 driver_tyre_age[driver_id] += 1
                 
-                if capture_trace:
-                    lap_data["drivers"][driver_id] = {
-                        "lap_time": float(lap_time),
-                        "total_time": float(race_times[driver_id]),
-                        "compound": compound,
-                        "tyre_age": age,
-                        "rank": rank + 1
-                    }
-
                 # 9. Pit Stop Check
+                pit_this_lap = False
                 if lap == current_stint.end_lap and lap < total_laps:
                     race_times[driver_id] += pit_loss_ms
                     driver_stint_idx[driver_id] += 1
                     driver_tyre_age[driver_id] = 0
-                    if capture_trace:
-                        lap_data["drivers"][driver_id]["is_pit"] = True
-            
-            if capture_trace:
-                trace.append(lap_data)
-                    
+                    pit_this_lap = True
+
+                if capture_trace:
+                    frame = LapFrame(
+                        lap=lap,
+                        driver_id=driver_id,
+                        
+                        # RAW (Simulated observation)
+                        lap_time_ms=float(lap_time),
+                        compound=compound,
+                        position=rank + 1,
+                        
+                        # DERIVED (Simulated truth)
+                        tyre_wear=float(t_deg_ms), # Proxy for wear state
+                        fuel_remaining_kg=100.0 - (lap * 1.5), # Approx
+                        pit_this_lap=pit_this_lap,
+                        
+                        source="SIMULATION",
+                        explanation="PIT" if pit_this_lap else ("SC" if is_sc else None)
+                    )
+                    trace.append(frame)
+
+            # End of lap: update previous_lap_was_sc for next lap's restart skill check
+            previous_lap_was_sc = is_sc or is_vsc
+
         return race_times, trace
 
     def simulate_single_driver(
@@ -130,7 +243,9 @@ class RaceSimulator:
         driver_profile: DriverModel,
         strategy: StrategyResult,
         tyre_deg_multiplier: float = 1.0,
-        sc_prob_override: Optional[float] = None
+        sc_prob_override: Optional[float] = None,
+        seed: Optional[int] = None,
+        injected_events: List[SimulationEvent] = None
     ) -> float:
         """
         Isolated simulation for strategy optimization.
@@ -141,6 +256,8 @@ class RaceSimulator:
             driver_strategies={"DRIVER": strategy},
             tyre_deg_multiplier=tyre_deg_multiplier,
             sc_prob_override=sc_prob_override,
-            capture_trace=False
+            capture_trace=False,
+            seed=seed,
+            injected_events=injected_events
         )
         return race_times["DRIVER"]

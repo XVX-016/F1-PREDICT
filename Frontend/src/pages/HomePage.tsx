@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRaces, Race as ApiRace } from '../hooks/useApi';
-import { api } from '../services/api';
 import { Race } from '../types/predictions';
-import { ArrowUpRight, Activity, Zap, BarChart3 } from 'lucide-react';
+import { Activity, Zap, BarChart3 } from 'lucide-react';
 
 export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
   const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(2025);
