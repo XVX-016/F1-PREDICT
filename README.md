@@ -59,9 +59,18 @@ All stochastic components support:
 
 This allows controlled experiments and strategy comparison under identical conditions.
 
+
 ---
 
-### 4. Transparency Over Black-Box AI
+### 4. Stateless & Public
+**F1-PREDICT is a stateless analytical web tool.**
+* It does not store users, sessions, or personal data.
+* All outputs are deterministic functions of inputs and model state.
+* Authentication is intentionally omitted to guarantee scientific auditability and remove identity-dependent state.
+
+---
+
+### 5. Transparency Over Black-Box AI
 
 Machine learning (where enabled) is:
 
