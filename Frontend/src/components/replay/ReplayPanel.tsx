@@ -2,27 +2,6 @@ import { useEffect } from "react";
 // Lucide icons would require installation, using simple text buttons if not available or assume installed
 
 
-interface LapState {
-    lap: number;
-    gap_to_leader_ms: number;
-    car_state: {
-        tyre_compound: string;
-        tyre_age_laps: number;
-        fuel_kg: number;
-    };
-    pace_model: {
-        predicted_lap_ms: number;
-        uncertainty: {
-            p05_ms: number;
-            p95_ms: number;
-        };
-    };
-    decision?: {
-        action: string;
-        explanation: string;
-        confidence: number;
-    }
-}
 
 interface ReplayPanelProps {
     raceId: string;

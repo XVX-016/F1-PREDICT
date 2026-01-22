@@ -7,7 +7,7 @@ import logging
 from typing import Dict, Any, Optional
 from services.simulation_engine import simulation_engine
 from database.supabase_client import get_db
-from models.domain import SimulationRequest, SimulationResponse
+from models.domain import SimulationRequest, SimulationResponse, RaceTimeline
 
 logger = logging.getLogger(__name__)
 
@@ -33,14 +33,50 @@ async def simulate_race(race_id: str, request: SimulationRequest):
     Executes a high-fidelity Monte Carlo simulation (default 10k iterations).
     """
     try:
-        # Force the track_id from path if needed, or assume request matches
-        request.track_id = race_id # Simplification for Phase 1
+        request.track_id = race_id
         logger.info(f"Triggering track-first simulation for {race_id}")
         results = simulation_engine.run_simulation(request)
         return results
     except Exception as e:
         logger.error(f"Simulation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Simulation failed: {str(e)}")
+
+@router.get("/{race_id}/timeline", response_model=RaceTimeline)
+async def get_race_timeline(race_id: str, source: str = "REPLAY"):
+    """
+    Fetches the full race timeline from Redis or Simulation cache.
+    """
+    try:
+        # For now, we fetch from Redis (REPLAY source)
+        # In a real app, this would query the race:{race_id}:replay:lap:* keys
+        from scripts.fastf1_to_redis import get_redis_client
+        import json
+        r = get_redis_client()
+        
+        # Get metadata
+        meta_json = r.get(f"race:{race_id}:meta")
+        if not meta_json:
+            raise HTTPException(status_code=404, detail="Race metadata not found")
+        meta = json.loads(meta_json)
+        
+        # Get all laps
+        laps = []
+        # Pattern: race:{race_id}:replay:lap:{lap}
+        # We can use keys or a smarter way, but for now scan/keys is fine for small f1 data
+        keys = r.keys(f"race:{race_id}:replay:lap:*")
+        for k in sorted(keys, key=lambda x: int(x.split(":")[-1])):
+            lap_data = r.hgetall(k)
+            for driver, frame_json in lap_data.items():
+                laps.append(json.loads(frame_json))
+        
+        return RaceTimeline(
+            meta=meta,
+            laps=laps,
+            summary={"total_time_ms": 0} # Placeholder
+        )
+    except Exception as e:
+        logger.error(f"Failed to fetch timeline: {e}")
+        raise HTTPException(status_code=500, detail=f"Timeline fetch failed: {str(e)}")
 
 @router.get("/{race_id}/markets")
 async def get_race_markets(race_id: str):
