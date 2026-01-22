@@ -78,10 +78,10 @@ const DriversPage = lazyWithTimeout(() => import('./pages/DriversPage'));
 const TelemetryPage = lazyWithTimeout(() => import('./pages/TelemetryPage'));
 const SchedulePage = lazyWithTimeout(() => import('./pages/SchedulePage'));
 const TeamsPage = lazyWithTimeout(() => import('./pages/TeamsPage'));
-const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPage'));
+const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPagePro'));
 const ResultsPage = lazyWithTimeout(() => import('./pages/ResultsPage'));
 const ProfilePage = lazyWithTimeout(() => import('./pages/ProfilePage'));
-const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'));
+const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePagePro'));
 const SignUpPage = lazyWithTimeout(() => import('./pages/SignUpPage'));
 const SignInPage = lazyWithTimeout(() => import('./pages/SignInPage'));
 const AuthCallback = lazyWithTimeout(() => import('./pages/AuthCallback'));
@@ -151,7 +151,7 @@ function App() {
                 case 'teams':
                   return <TeamsPage />;
                 case 'simulation':
-                  return <SimulationPage raceData={raceData} onPageChange={setCurrentPage} />;
+                  return <SimulationPage />;
                 case 'results':
                   return <ResultsPage />;
                 case 'profile':
