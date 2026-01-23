@@ -1,58 +1,69 @@
-import { useConstructors } from "../hooks/useApi";
 import PageContainer from "../components/layout/PageContainer";
+import { SEASON_2026_TEAMS } from "../data/season2026";
 
 const TeamsPage = () => {
-  const { data: teams, isLoading, error } = useConstructors();
-
-  if (isLoading) return <div className="min-h-screen text-white pt-32 text-center">Loading teams...</div>;
-  if (error) return <div className="min-h-screen text-white pt-32 text-center text-red-500">Error: {(error as any)?.message || 'Failed to load teams'}</div>;
-
   return (
     <PageContainer>
       <header className="border-l-4 border-[#E10600] pl-6 py-2 mb-12">
-        <h1 className="text-4xl font-black uppercase tracking-tighter text-white">F1 Teams 2025</h1>
-        <p className="text-slate-400 font-mono text-xs mt-1 uppercase tracking-widest">Constructor Presence</p>
+        <h1 className="text-4xl font-black uppercase tracking-tighter text-white">F1 Teams <span className="text-[#E10600]">2026</span></h1>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {teams?.map((team) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
+        {[...SEASON_2026_TEAMS].sort((a, b) => a.name.localeCompare(b.name)).map((team) => (
           <div
             key={team.id}
-            className="relative rounded-xl shadow-xl flex flex-col justify-between overflow-hidden min-h-[220px] h-[220px] md:h-[240px] w-full"
-            style={{ background: team.color || '#333', minWidth: '1cm' }}
+            className="relative rounded-xl overflow-hidden min-h-[240px] transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl group flex flex-col justify-between"
+            style={{
+              backgroundColor: team.color
+            }}
           >
-            {/* Top row: Team name and logo */}
-            <div className="flex justify-between items-start px-8 pt-4">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-1">{team.name}</h2>
-                <div className="flex gap-6 mt-1">
-                  {team.drivers?.map(driver => (
-                    <div key={driver.id} className="flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full overflow-hidden border-2 border-white flex items-center justify-center bg-black/10">
-                        {driver.image_url ? (
-                          <img src={driver.image_url} alt={driver.name} className="w-full h-full object-cover object-top" />
-                        ) : (
-                          <span className="text-xs">{driver.number}</span>
-                        )}
-                      </span>
-                      <span className="text-base">{driver.country_code}</span>
-                      <span>
-                        <span className="font-bold uppercase text-xs" style={{ letterSpacing: '0.1em' }}>{driver.name}</span>
-                      </span>
+            {/* Abstract Background Pattern */}
+            <div className="absolute inset-0 z-0 opacity-10 pointer-events-none" style={{
+              backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+              backgroundSize: '8px 8px'
+            }}></div>
+
+            {/* Content Layer */}
+            <div className="p-6 relative z-10 w-full">
+              {/* Header: Name & Drivers - Left Aligned */}
+              <div className="flex flex-col items-start w-full">
+                <h2 className="text-3xl font-black uppercase tracking-tight text-white drop-shadow-md text-left">
+                  {team.name}
+                </h2>
+                {/* Drivers: Small PFP + Name */}
+                <div className="flex items-center gap-4 mt-2 justify-start">
+                  {team.drivers.map((driver) => (
+                    <div key={driver.id} className="flex items-center gap-2 flex-row">
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 bg-black/20">
+                        <img
+                          src={driver.image}
+                          alt={driver.name}
+                          className="w-full h-full object-cover object-top"
+                        />
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <span className="text-white text-xs font-bold uppercase leading-none">{driver.name.split(' ')[0]}</span>
+                        <span className="text-white/80 text-[10px] font-bold uppercase leading-none">{driver.name.split(' ').slice(1).join(' ')}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/10">
-                {team.logo_url && <img src={team.logo_url} alt={team.name + ' logo'} className="w-8 h-8 object-contain" />}
-              </div>
             </div>
-            {/* Car image */}
-            <div className="flex justify-start items-end flex-1 w-full pb-1 pl-8">
-              {team.car_image_url && (
-                <img src={team.car_image_url} alt={team.name + ' car'} className="w-[95%] max-w-[520px] h-auto object-contain drop-shadow-xl" />
-              )}
+
+            {/* Car Image - Anchored Bottom Left - Adjusted for spacing */}
+            <div className="absolute bottom-4 left-4 w-full z-10 pointer-events-none">
+              <img
+                src={team.carImage}
+                alt={`${team.name} Car`}
+                className="w-[85%] max-w-[400px] object-contain drop-shadow-2xl transform transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none'; // Hide if missing
+                }}
+              />
             </div>
+
+            {/* Faded overlay for readability if needed (optional) */}
           </div>
         ))}
       </div>
@@ -60,4 +71,4 @@ const TeamsPage = () => {
   );
 };
 
-export default TeamsPage; 
+export default TeamsPage;

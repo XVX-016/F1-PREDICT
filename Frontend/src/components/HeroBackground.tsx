@@ -20,9 +20,9 @@ export default function HeroBackground({ currentPage }: HeroBackgroundProps) {
             'intelligence': { blur: 8, image: '/hero/hero-intelligence.jpg' },
             'schedule': { blur: 8, image: '/hero/hero-schedule.jpg' },
             'results': { blur: 10, image: '/hero/hero-results.jpg' },
-            'profile': { blur: 15, image: '' },
-            'teams': { blur: 12, image: '' },
-            'driver': { blur: 8, image: '' },
+            'profile': { blur: 15, image: '/hero/home-bg-new.jpg' },
+            'teams': { blur: 12, image: '/hero/hero-schedule.jpg' },
+            'driver': { blur: 8, image: '/hero/hero-schedule.jpg' },
         };
 
         const config = configMap[currentPage] ?? configMap['home'];

@@ -14,7 +14,7 @@ const CONTENT_FILTERS = [
 const AVAILABLE_YEARS = Array.from({ length: 2025 - 1950 + 1 }, (_, i) => 2025 - i);
 
 export default function ResultsPage() {
-  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedYear, setSelectedYear] = useState(2025);
   const [activeContentFilter, setActiveContentFilter] = useState('races');
 
   const { data: archiveRaces } = useQuery({
@@ -89,7 +89,9 @@ export default function ResultsPage() {
       <div className="mb-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
           <header className="border-l-4 border-[#E10600] pl-6 py-2">
-            <h1 className="text-4xl font-black uppercase tracking-tighter text-white">Results Archive</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tighter">
+              <span className="text-[#E10600]">Results</span> <span className="text-black">Archive</span>
+            </h1>
             <p className="text-slate-400 font-mono text-xs mt-1 uppercase tracking-widest">Historical Telemetry & Outcomes</p>
           </header>
 
@@ -145,11 +147,11 @@ export default function ResultsPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slateDark/40 border-b border-slateMid/40">
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Round</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Grand Prix</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Winner</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Podium</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Technical</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Round</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Grand Prix</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Winner</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Podium</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Technical</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slateMid/20">
@@ -157,7 +159,7 @@ export default function ResultsPage() {
                       const result = archiveResults?.[r.round];
                       return (
                         <tr key={i} className="hover:bg-slateDark/40 transition-colors group cursor-pointer">
-                          <td className="py-5 px-6 font-mono text-xs text-slate-500">R{r.round.padStart(2, '0')}</td>
+                          <td className="py-5 px-6 font-mono text-xs text-white">R{r.round.padStart(2, '0')}</td>
                           <td className="py-5 px-6">
                             <p className="text-sm font-bold text-textPrimary uppercase tracking-tight">{r.raceName}</p>
                             <p className="text-[10px] text-textSecondary uppercase tracking-widest">{r.date ? new Date(r.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}</p>
@@ -174,7 +176,7 @@ export default function ResultsPage() {
                           <td className="py-5 px-6">
                             <div className="flex gap-2">
                               {result?.podium?.map((p: any, idx: number) => (
-                                <span key={idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600]/10 border-[#E10600]/20 text-[#E10600]' : 'bg-slateDark/50 border-slateMid/20 text-textSecondary'
+                                <span key={idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600] border-[#E10600] text-white' : 'bg-slateDark/50 border-slateMid/20 text-white'
                                   }`}>
                                   {p.Driver?.code || p.Driver?.familyName.slice(0, 3).toUpperCase()}
                                 </span>
@@ -199,10 +201,10 @@ export default function ResultsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slateDark/40 border-b border-slateMid/40">
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest">Pos</th>
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest">Driver</th>
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest">Team</th>
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest text-right">Points</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Pos</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Driver</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Team</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Points</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slateMid/20">
@@ -214,7 +216,7 @@ export default function ResultsPage() {
                         {d.Driver?.givenName} {d.Driver?.familyName}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-xs text-textSecondary uppercase tracking-wider">
+                    <td className="py-4 px-6 text-xs text-white uppercase tracking-wider">
                       {d.Constructors?.[0]?.name}
                     </td>
                     <td className="py-4 px-6 text-right font-mono text-sm text-textPrimary">{d.points}</td>
@@ -228,23 +230,23 @@ export default function ResultsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slateDark/40 border-b border-slateMid/40">
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest">Pos</th>
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest">Constructor</th>
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest">Wins</th>
-                  <th className="py-4 px-6 text-[10px] font-semibold text-textSecondary uppercase tracking-widest text-right">Points</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Pos</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Constructor</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-[#E10600] uppercase tracking-widest">Wins</th>
+                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Points</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slateMid/20">
                 {teamStandings?.map((t: any, i: number) => (
                   <tr key={i} className="hover:bg-slateDark/40 transition-colors">
-                    <td className="py-4 px-6 font-mono text-sm font-bold text-textPrimary">{t.position}</td>
+                    <td className="py-4 px-6 font-mono text-sm font-bold text-white">{t.position}</td>
                     <td className="py-4 px-6">
-                      <span className="text-sm font-semibold text-textPrimary uppercase tracking-wide">
+                      <span className="text-sm font-semibold text-white uppercase tracking-wide">
                         {t.Constructor?.name}
                       </span>
                     </td>
-                    <td className="py-4 px-6 font-mono text-xs text-textSecondary">{t.wins}</td>
-                    <td className="py-4 px-6 text-right font-mono text-sm text-textPrimary">{t.points}</td>
+                    <td className="py-4 px-6 font-mono text-xs text-[#E10600] font-bold">{t.wins}</td>
+                    <td className="py-4 px-6 text-right font-mono text-sm text-white">{t.points}</td>
                   </tr>
                 ))}
               </tbody>
