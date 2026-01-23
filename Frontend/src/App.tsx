@@ -78,13 +78,10 @@ const DriversPage = lazyWithTimeout(() => import('./pages/DriversPage'));
 const TelemetryPage = lazyWithTimeout(() => import('./pages/TelemetryPage'));
 const SchedulePage = lazyWithTimeout(() => import('./pages/SchedulePage'));
 const TeamsPage = lazyWithTimeout(() => import('./pages/TeamsPage'));
-const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPagePro'));
+const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPage'));
 const ResultsPage = lazyWithTimeout(() => import('./pages/ResultsPage'));
-const ProfilePage = lazyWithTimeout(() => import('./pages/ProfilePage'));
-const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePagePro'));
-const SignUpPage = lazyWithTimeout(() => import('./pages/SignUpPage'));
-const SignInPage = lazyWithTimeout(() => import('./pages/SignInPage'));
-const AuthCallback = lazyWithTimeout(() => import('./pages/AuthCallback'));
+const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'));
+
 const AboutPage = lazyWithTimeout(() => import('./pages/AboutPage'));
 
 function App() {
@@ -154,16 +151,9 @@ function App() {
                   return <SimulationPage />;
                 case 'results':
                   return <ResultsPage />;
-                case 'profile':
-                  return <ProfilePage />;
+
                 case 'intelligence':
                   return <IntelligencePage />;
-                case 'signup':
-                  return <SignUpPage onPageChange={setCurrentPage} />;
-                case 'signin':
-                  return <SignInPage onPageChange={setCurrentPage} />;
-                case 'auth-callback':
-                  return <AuthCallback onComplete={setCurrentPage} />;
                 case 'about':
                   return <AboutPage />;
                 default:

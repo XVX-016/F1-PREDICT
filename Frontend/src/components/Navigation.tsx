@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+
 
 interface NavigationProps {
   currentPage: string;
@@ -18,7 +18,7 @@ const navItems = [
 ];
 
 export default function Navigation({ currentPage, onPageChange }: NavigationProps) {
-  const { isAuthenticated } = useAuth();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -37,8 +37,8 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
           </span>
         </div>
 
-        {/* Navigation - Desktop */}
-        <ul className="hidden md:flex gap-8 text-sm font-semibold tracking-wide text-slate-200 uppercase">
+        {/* Navigation - Desktop (Centered) */}
+        <ul className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-8 text-sm font-semibold tracking-wide text-slate-200 uppercase">
           {navItems.map(item => (
             <li key={item.id}>
               <button
@@ -54,24 +54,14 @@ export default function Navigation({ currentPage, onPageChange }: NavigationProp
           ))}
         </ul>
 
-        {/* Auth / Action */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => onPageChange(isAuthenticated ? 'profile' : 'signin')}
-            className={`px-5 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-200 bg-[#141821] border border-white/10 rounded-sm hover:border-[#E10600] transition-all ${isAuthenticated ? 'border-[#E10600]/40' : ''
-              }`}
-          >
-            {isAuthenticated ? 'Profile' : 'Sign In'}
-          </button>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden text-slate-400 hover:text-white"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden text-slate-400 hover:text-white ml-auto"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </nav>
 
       {/* Mobile Menu Overlay */}

@@ -20,7 +20,7 @@ export const ModelAssumptionsAccordion: React.FC<ModelAssumptionsAccordionProps>
     return (
         <div className="bg-[var(--bg-card)] rounded-lg border border-[var(--border-subtle)] shadow-[var(--shadow-card)]">
             <div className="px-4 py-3 border-b border-[var(--border-subtle)]">
-                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Model Assumptions</h3>
+                <h3 className="text-lg font-semibold text-[var(--text-primary)]">Model Assumptions</h3>
                 <p className="text-xs text-[var(--text-caption)] mt-0.5">
                     Expand to understand what the model believes. This is how we earn trust.
                 </p>
