@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'; // No /api suffix here, appended later or logic adjusted
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface RaceStatus {
     raceId: string;
@@ -21,8 +20,9 @@ export const useRaceStatus = () => {
         queryKey: ['raceStatus'],
         queryFn: async () => {
             try {
-                const { data } = await axios.get(`${API_BASE_URL}/api/race-status`);
-                return data;
+                const response = await fetch(`${API_BASE_URL}/api/race-status`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                return await response.json();
             } catch (error) {
                 // Return fallback status if backend offline
                 return {
