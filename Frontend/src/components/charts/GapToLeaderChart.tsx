@@ -1,53 +1,45 @@
 import { useEffect, useRef, useMemo } from 'react';
 import * as d3 from 'd3';
-import { useLapPaceSeries, useFullLapPaceSeries, LapPacePoint } from '../../selectors/useLapPaceSeries';
+import { useGapSeries, useFullGapSeries } from '../../selectors/useGapSeries';
 import { useRaceStore } from '../../stores/raceStore';
 import { useShallow } from 'zustand/react/shallow';
 
 /**
- * Lap Time / Pace Chart
+ * Gap to Leader Chart
  * 
- * Phase 2A: Shows baseline vs counterfactual lap pace
- * - Solid line = baseline
- * - Dashed line = counterfactual
+ * Shows gap evolution for the selected driver.
+ * - Uses stepAfter curve (gaps change at lap completion)
+ * - Highlights safety car periods
  * 
  * RULES:
- * - Uses useLapPaceSeries selector (cursor-driven)
+ * - Uses useGapSeries selector (cursor-driven)
  * - No animations - chart only updates when cursor moves
- * - Domains calculated from full series to prevent axis jitter
  */
-export default function LapTimeChart() {
+export default function GapToLeaderChart() {
     const svgRef = useRef<SVGSVGElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Cursor-driven data
-    const visibleData = useLapPaceSeries();
-    const fullData = useFullLapPaceSeries();
+    const visibleData = useGapSeries();
+    const fullData = useFullGapSeries();
 
     // Store state
     const selectedDriverId = useRaceStore(useShallow(s => s.selectedDriverId));
     const simulationState = useRaceStore(useShallow(s => s.simulationState));
     const dataSource = useRaceStore(useShallow(s => s.dataSource));
-    const cfDescription = useRaceStore(useShallow(s => s.simulationResult?.meta.counterfactualDescription));
 
-    // Calculate stable domains from FULL series (include both baseline and CF)
+    // Calculate stable domains from FULL series
     const domains = useMemo(() => {
         if (!fullData || fullData.length === 0) {
-            return { x: [1, 58], y: [75000, 95000] };
+            return { x: [1, 58], y: [0, 30000] };
         }
 
         const xMax = d3.max(fullData, d => d.lap) || 58;
-
-        // Consider both baseline and counterfactual for Y domain
-        const allValues = fullData.flatMap(d =>
-            [d.baseline, d.counterfactual].filter((v): v is number => v !== undefined)
-        );
-        const yMin = d3.min(allValues) || 75000;
-        const yMax = d3.max(allValues) || 95000;
+        const yMax = d3.max(fullData, d => d.gapBaseline) || 30000;
 
         return {
             x: [1, xMax],
-            y: [yMin - 500, yMax + 500] // Padding
+            y: [0, yMax + 2000] // Padding
         };
     }, [fullData]);
 
@@ -55,8 +47,8 @@ export default function LapTimeChart() {
     useEffect(() => {
         if (!svgRef.current || !containerRef.current) return;
 
-        // Gate: Empty State
-        if (simulationState === "empty" || !visibleData) {
+        // Gate: Empty State or no data
+        if (simulationState === "empty" || !visibleData || visibleData.length === 0) {
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
             return;
@@ -79,6 +71,12 @@ export default function LapTimeChart() {
             .domain(domains.y as [number, number])
             .range([height - margin.bottom, margin.top]);
 
+        // Line Generator
+        const line = d3.line<{ lap: number; gapBaseline: number }>()
+            .x(d => x(d.lap))
+            .y(d => y(d.gapBaseline))
+            .curve(d3.curveStepAfter);
+
         // Grid
         svg.append("g")
             .attr("class", "grid")
@@ -86,58 +84,35 @@ export default function LapTimeChart() {
             .call(d3.axisBottom(x).ticks(10).tickSize(-height + margin.top + margin.bottom).tickFormat(() => ""))
             .attr("opacity", 0.1);
 
-        // Baseline Line Generator
-        const baselineLine = d3.line<LapPacePoint>()
-            .x(d => x(d.lap))
-            .y(d => y(d.baseline))
-            .curve(d3.curveMonotoneX);
+        // Safety Car Highlighting
+        visibleData.forEach(d => {
+            if (d.isSafetyCar) {
+                svg.append("rect")
+                    .attr("x", x(d.lap - 0.5))
+                    .attr("y", margin.top)
+                    .attr("width", x(d.lap + 0.5) - x(d.lap - 0.5))
+                    .attr("height", height - margin.top - margin.bottom)
+                    .attr("fill", "#FFCC00")
+                    .attr("opacity", 0.1);
+            }
+        });
 
-        // Counterfactual Line Generator
-        const cfLine = d3.line<LapPacePoint>()
-            .defined(d => d.counterfactual !== undefined)
-            .x(d => x(d.lap))
-            .y(d => y(d.counterfactual!))
-            .curve(d3.curveMonotoneX);
-
-        // Baseline Line (Solid - F1 Red)
+        // Gap Line (Red)
         svg.append("path")
             .datum(visibleData)
             .attr("fill", "none")
             .attr("stroke", "#E10600")
             .attr("stroke-width", 2)
-            .attr("d", baselineLine as any);
+            .attr("d", line as any);
 
-        // Counterfactual Line (Dashed - Cyan)
-        const cfData = visibleData.filter(d => d.counterfactual !== undefined);
-        if (cfData.length > 0) {
-            svg.append("path")
-                .datum(cfData)
-                .attr("fill", "none")
-                .attr("stroke", "#00CED1")
-                .attr("stroke-width", 2)
-                .attr("stroke-dasharray", "6,4")
-                .attr("opacity", 0.8)
-                .attr("d", cfLine as any);
-        }
-
-        // Current Lap Markers
+        // Current point marker
         const currentDatum = visibleData[visibleData.length - 1];
         if (currentDatum) {
-            // Baseline marker
             svg.append("circle")
                 .attr("cx", x(currentDatum.lap))
-                .attr("cy", y(currentDatum.baseline))
+                .attr("cy", y(currentDatum.gapBaseline))
                 .attr("r", 4)
                 .attr("fill", "#E10600");
-
-            // Counterfactual marker
-            if (currentDatum.counterfactual !== undefined) {
-                svg.append("circle")
-                    .attr("cx", x(currentDatum.lap))
-                    .attr("cy", y(currentDatum.counterfactual))
-                    .attr("r", 4)
-                    .attr("fill", "#00CED1");
-            }
         }
 
         // X Axis
@@ -149,7 +124,7 @@ export default function LapTimeChart() {
         // Y Axis (formatted as seconds)
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(y).ticks(5).tickFormat(d => (Number(d) / 1000).toFixed(1) + "s"))
+            .call(d3.axisLeft(y).ticks(5).tickFormat(d => "+" + (Number(d) / 1000).toFixed(1) + "s"))
             .attr("color", "#666");
 
     }, [visibleData, domains, simulationState]);
@@ -159,8 +134,8 @@ export default function LapTimeChart() {
         return (
             <div className="h-full flex items-center justify-center text-gray-500 font-mono text-xs">
                 <div className="text-center">
-                    <div className="text-2xl mb-2">⏱</div>
-                    <div>Run simulation to view pace</div>
+                    <div className="text-2xl mb-2">📊</div>
+                    <div>Run simulation to view gaps</div>
                 </div>
             </div>
         );
@@ -169,7 +144,7 @@ export default function LapTimeChart() {
     if (!selectedDriverId) {
         return (
             <div className="h-full flex items-center justify-center text-gray-500 font-mono text-xs">
-                Select a driver to view pace metrics
+                Select a driver to view gaps
             </div>
         );
     }
@@ -177,21 +152,6 @@ export default function LapTimeChart() {
     return (
         <div ref={containerRef} className="h-full w-full relative">
             <svg ref={svgRef} className="w-full h-full text-white" />
-
-            {/* Legend */}
-            <div className="absolute bottom-2 left-14 flex items-center gap-4 text-[9px] font-mono">
-                <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-0.5 bg-[#E10600]" />
-                    <span className="text-gray-400">Baseline</span>
-                </div>
-                {cfDescription && (
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-4 h-0.5 bg-[#00CED1]" style={{ backgroundImage: 'repeating-linear-gradient(90deg, #00CED1, #00CED1 6px, transparent 6px, transparent 10px)' }} />
-                        <span className="text-gray-400">{cfDescription}</span>
-                    </div>
-                )}
-            </div>
-
             {dataSource === "sample" && (
                 <div className="absolute top-2 right-2 px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[9px] font-bold uppercase rounded border border-yellow-500/20">
                     Sample Data

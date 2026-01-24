@@ -112,6 +112,7 @@ class SimulationRequest(BaseModel):
     iterations: int = 10000
     seed: Optional[int] = None
     use_ml: bool = True
+    capture_trace: bool = False
     
     # Core Parameters
     params: Dict[str, Any] = Field(
@@ -141,3 +142,4 @@ class SimulationResponse(BaseModel):
     event_attribution: Dict[str, Dict[str, float]] = Field(default_factory=dict) # {event_id: {impact_win_prob: 0.05}}
     
     metadata: Dict[str, Any]
+    trace: Optional[List[LapFrame]] = None

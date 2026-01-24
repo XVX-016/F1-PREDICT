@@ -121,6 +121,9 @@ class SimulationEngine:
         # Store all valid race times for distribution analysis
         all_race_times: Dict[str, List[float]] = {d: [] for d in driver_profiles}
         
+        # Trace collection for visualization
+        final_trace: Optional[List[Any]] = None
+        
         logger.info(f"SimulationEngine: Starting MC loop ({request.iterations} iters)...")
         
         # Use simple strategy for field, recommended for focus
@@ -143,16 +146,22 @@ class SimulationEngine:
             # Deterministic seed per iteration if base_seed exists
             iter_seed = (base_seed + i) if base_seed is not None else None
             
-            race_times, _ = self.simulator.simulate_race(
+            # Capture trace only for the first iteration if requested
+            do_capture = request.capture_trace and i == 0
+            
+            race_times, trace = self.simulator.simulate_race(
                 track=track,
                 driver_profiles=driver_profiles,
                 driver_strategies=driver_strategies,
                 tyre_deg_multiplier=request.params.get("tyre_deg_multiplier", 1.0),
                 sc_prob_override=request.params.get("sc_probability"),
                 seed=iter_seed,
-                capture_trace=False,
+                capture_trace=do_capture,
                 injected_events=request.events
             )
+            
+            if do_capture:
+                final_trace = trace
             
             # Aggregate Rankings and Times
             valid_finishers = [(d, t) for d, t in race_times.items() if t != float('inf')]
@@ -257,7 +266,8 @@ class SimulationEngine:
                 "seed": base_seed,
                 "params": request.params,
                 "events": [e.dict() for e in request.events]
-            }
+            },
+            trace=final_trace
         )
     def run_comparison(self, request: SimulationRequest, strategies: List[StrategyResult]) -> List[SimulationResponse]:
         """
