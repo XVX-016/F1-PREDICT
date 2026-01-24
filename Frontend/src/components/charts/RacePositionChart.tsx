@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import { useRacePositionSeries, useFullRacePositionSeries } from '../../selectors/useRacePositionSeries';
 import { useRaceStore } from '../../stores/raceStore';
 import { useShallow } from 'zustand/react/shallow';
+import { Flag } from 'lucide-react';
 
 /**
  * Race Position Chart
@@ -121,8 +122,8 @@ export default function RacePositionChart() {
     if (simulationState === "empty") {
         return (
             <div className="h-full flex items-center justify-center text-gray-500 font-mono text-xs">
-                <div className="text-center">
-                    <div className="text-2xl mb-2">🏎️</div>
+                <div className="text-center flex flex-col items-center gap-2">
+                    <Flag className="w-8 h-8 opacity-20" />
                     <div>Run simulation to view positions</div>
                 </div>
             </div>
