@@ -30,7 +30,8 @@ import {
     RacePositionChart,
     LapTimeChart,
     GapToLeaderChart,
-    PitStopTimeline
+    PitStopTimeline,
+    StrategyTimeline
 } from './SimulationPage.components';
 
 export default function SimulationPage() {
@@ -99,7 +100,7 @@ export default function SimulationPage() {
                                     <GapToLeaderChart />
                                 </Tab>
                                 <Tab id="strategy" label="Strategy">
-                                    <PitStopTimeline />
+                                    <StrategyTimeline />
                                 </Tab>
                             </div>
                         </div>

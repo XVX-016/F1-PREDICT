@@ -423,8 +423,9 @@ import LapTimeChart from '../components/charts/LapTimeChart';
 import RacePositionChart from '../components/charts/RacePositionChart';
 import GapToLeaderChart from '../components/charts/GapToLeaderChart';
 import PitStopTimeline from '../components/charts/PitStopTimeline';
+import StrategyTimeline from '../components/charts/StrategyTimeline';
 
-export { LapTimeChart, RacePositionChart, GapToLeaderChart, PitStopTimeline };
+export { LapTimeChart, RacePositionChart, GapToLeaderChart, PitStopTimeline, StrategyTimeline };
 
 export const RaceOutcomeTable = () => <div className="h-32 bg-black/20 mb-4 rounded border border-white/5"></div>;
 export const PodiumPrediction = () => <div className="h-20 bg-black/20 rounded border border-white/5"></div>;
