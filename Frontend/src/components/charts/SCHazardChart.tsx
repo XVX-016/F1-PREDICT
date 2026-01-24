@@ -73,9 +73,10 @@ export const SCHazardChart: React.FC<SCHazardChartProps> = ({ envelope }) => {
                         type="monotone"
                         dataKey="historicalRate"
                         name="Historical Circuit Average"
-                        stroke="rgba(255,255,255,0.2)"
-                        strokeDasharray="4 4"
-                        fill="rgba(255,255,255,0.05)"
+                        stroke="rgba(255,255,255,0.15)"
+                        strokeWidth={1}
+                        strokeDasharray="3 3"
+                        fill="rgba(255,255,255,0.02)"
                         fillOpacity={1}
                         animationDuration={1500}
                     />
@@ -84,7 +85,7 @@ export const SCHazardChart: React.FC<SCHazardChartProps> = ({ envelope }) => {
                         dataKey="inferredRate"
                         name="Context-Adjusted Hazard"
                         stroke="#E10600"
-                        strokeWidth={2}
+                        strokeWidth={2.5}
                         fill="url(#hazardGradient)"
                         fillOpacity={1}
                         animationDuration={1500}
@@ -106,8 +107,8 @@ export const SCHazardChart: React.FC<SCHazardChartProps> = ({ envelope }) => {
                 </div>
             )}
 
-            <p className="text-[9px] text-white/10 mt-4 uppercase tracking-[0.3em] text-center font-mono">
-                Hazard function: Prob(first SC | lap=l) adjusted for grid & weather
+            <p className="text-[9px] text-white/20 mt-4 uppercase tracking-[0.1em] text-center font-mono italic">
+                Context-adjusted hazard incorporates circuit history, grid density, and surface conditions.
             </p>
         </div>
     );

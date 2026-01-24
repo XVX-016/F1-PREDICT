@@ -24,7 +24,7 @@ const PriorCard = ({ prior }: { prior: SupportingPrior }) => (
 
         <div className="flex flex-col gap-1.5">
             <div className="flex justify-between items-center text-[8px] font-mono text-white/10 uppercase tracking-tighter">
-                <span>Simulation Weight</span>
+                <span>Influence on race outcome modeling</span>
                 <span className={prior.confidence === 'HIGH' ? 'text-[#4ade80]' : prior.confidence === 'MEDIUM' ? 'text-[#ffb347]' : 'text-[#ff4e4e]'}>
                     {prior.confidence}
                 </span>

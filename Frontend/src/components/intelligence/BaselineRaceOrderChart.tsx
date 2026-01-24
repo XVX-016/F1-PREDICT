@@ -11,7 +11,7 @@ interface BaselineRaceOrderChartProps {
  * Shows expected green-flag race order with uncertainty bands and full grid support.
  */
 export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ envelope }) => {
-    const { data, validity, source, computedAt, reason } = envelope;
+    const { data, validity, source, reason } = envelope;
 
     if (validity === 'UNAVAILABLE') {
         return (
@@ -33,18 +33,45 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
         return a.delta - b.delta;
     });
 
+    const maxDeltaForDomain = Math.max(
+        ...data.map(d => d.delta || 0),
+        0.8 // hollow bar baseline
+    );
+
+    const getBarColor = (delta: number | null) => {
+        if (delta === null) return 'none';
+
+        // Linear scale for color: Cool Gray (#4A5568) to Warm Red (#E53E3E)
+        // Adjust normalization target based on actual max delta or a reasonable upper bound
+        const normMax = Math.max(maxDeltaForDomain, 1.2);
+        const t = Math.min(delta / normMax, 1);
+
+        const r = Math.round(74 + (229 - 74) * t);
+        const g = Math.round(85 + (62 - 85) * t);
+        const b = Math.round(104 + (62 - 104) * t);
+
+        return `rgb(${r}, ${g}, ${b})`;
+    };
+
     const CustomTooltip = ({ active, payload }: any) => {
         if (active && payload && payload.length) {
             const d = payload[0].payload as BaselineOrderItem;
             return (
                 <div className="bg-[#1e1e24] border border-white/10 rounded p-3 shadow-2xl">
-                    <p className="text-sm font-bold text-white uppercase mb-1">{d.driverId}</p>
+                    <div className="flex justify-between items-start gap-4 mb-2">
+                        <p className="text-sm font-bold text-white uppercase">{d.driverId}</p>
+                        <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter ${d.status === 'ESTIMATED' ? 'bg-[#4ade80]/10 text-[#4ade80]' : 'bg-white/5 text-white/30'}`}>
+                            {d.status}
+                        </span>
+                    </div>
+
                     <div className="flex justify-between gap-4 items-center">
                         <span className="text-[10px] text-white/40 uppercase">Confidence</span>
                         <span className={`text-[10px] font-bold ${d.confidence === 'HIGH' ? 'text-[#4ade80]' : d.confidence === 'MEDIUM' ? 'text-[#ffb347]' : 'text-[#ff4e4e]'}`}>
                             {d.confidence}
                         </span>
                     </div>
+
                     {d.delta !== null ? (
                         <>
                             <div className="flex justify-between gap-4 items-center mt-1">
@@ -57,10 +84,12 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
                             </div>
                         </>
                     ) : (
-                        <p className="text-[10px] text-[#ff4e4e] font-mono mt-2 italic">No baseline for this circuit</p>
+                        <div className="mt-2 pt-2 border-t border-white/5">
+                            <p className="text-[10px] text-white/40 italic">Baseline unavailable for this circuit</p>
+                        </div>
                     )}
                     {d.sampleSize && (
-                        <p className="text-[8px] text-white/10 mt-2 text-right">N={d.sampleSize} laps</p>
+                        <p className="text-[8px] text-white/10 mt-2 text-right uppercase tracking-widest font-mono">Samples: {d.sampleSize}</p>
                     )}
                 </div>
             );
@@ -85,8 +114,8 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
-                <ResponsiveContainer width="100%" height={sortedData.length * 25}>
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <ResponsiveContainer width="100%" height={sortedData.length * 28}>
                     <BarChart
                         data={sortedData}
                         layout="vertical"
@@ -95,10 +124,10 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
                         <XAxis
                             type="number"
-                            domain={[0, 'dataMax + 0.5']}
+                            domain={[0, maxDeltaForDomain + 0.1]}
                             stroke="rgba(255,255,255,0.1)"
                             tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}
-                            label={{ value: 'Δ LAP TIME (S)', position: 'insideBottom', offset: -5, fill: 'rgba(255,255,255,0.2)', fontSize: 9, tracking: '0.1em' }}
+                            label={{ value: 'Δ LAP TIME (S)', position: 'insideBottom', offset: -5, fill: 'rgba(255,255,255,0.2)', fontSize: 9 }}
                         />
                         <YAxis
                             type="category"
@@ -110,18 +139,19 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
 
                         <Bar
-                            dataKey="delta"
-                            barSize={10}
+                            dataKey={(row) => row.delta ?? 0.8}
+                            barSize={12}
                             radius={[0, 1, 1, 0]}
                             isAnimationActive={true}
                         >
                             {sortedData.map((entry, index) => (
                                 <Cell
                                     key={`cell-${index}`}
-                                    fill={entry.delta === null ? 'none' : entry.color}
-                                    stroke={entry.delta === null ? 'rgba(255,255,255,0.1)' : 'none'}
+                                    fill={getBarColor(entry.delta)}
+                                    stroke={entry.delta === null ? 'rgba(255,255,255,0.2)' : 'none'}
+                                    strokeWidth={entry.delta === null ? 1 : 0}
                                     strokeDasharray={entry.delta === null ? '2 2' : '0'}
-                                    fillOpacity={entry.confidence === 'LOW' ? 0.3 : entry.confidence === 'MEDIUM' ? 0.7 : 1}
+                                    fillOpacity={entry.confidence === 'LOW' ? 0.45 : entry.confidence === 'MEDIUM' ? 0.75 : 1}
                                 />
                             ))}
                         </Bar>
@@ -129,19 +159,29 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
                 </ResponsiveContainer>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex justify-between items-center">
-                <p className="text-[8px] text-white/20 uppercase tracking-[0.2em] font-mono">
-                    Hollow bars = 0.0s baseline (estimate unavailable)
-                </p>
-                <div className="flex gap-4">
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full border border-white/20 border-dashed"></span>
-                        <span className="text-[8px] text-white/30 uppercase font-mono">No Baseline</span>
+            <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
+                <div className="flex flex-wrap gap-x-6 gap-y-2">
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-sm bg-[#4A5568]"></div>
+                        <span className="text-[9px] text-white/40 uppercase font-bold tracking-widest">Base Pace (L0)</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-white/20"></span>
-                        <span className="text-[8px] text-white/30 uppercase font-mono">Low Conf</span>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-sm bg-[#E53E3E]"></div>
+                        <span className="text-[9px] text-white/40 uppercase font-bold tracking-widest">Max Delta (+1.2s)</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-sm border border-white/30 border-dashed"></div>
+                        <span className="text-[9px] text-white/40 uppercase font-bold tracking-widest">Hollow: No Estimate</span>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <p className="text-[9px] text-white/30 uppercase tracking-[0.1em] italic">
+                        * Hollow bars indicate drivers without reliable baseline estimates for this circuit.
+                    </p>
+                    <p className="text-[9px] text-white/30 uppercase tracking-[0.1em] italic">
+                        * Color indicates relative pace delta, not performance rating.
+                    </p>
                 </div>
             </div>
         </div>
