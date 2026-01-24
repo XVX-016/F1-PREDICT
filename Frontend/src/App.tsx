@@ -3,11 +3,11 @@ import Navigation from './components/Navigation';
 import HeroBackground from './components/HeroBackground';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
-
-
 import { NotificationProvider } from './contexts/NotificationContext';
 import { initializeJolpicaApi } from './api/jolpica';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useRaceStatus } from './hooks/useRaceStatus';
+import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 
 // Initialize TanStack Query Client
 const queryClient = new QueryClient({
@@ -19,6 +19,41 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Backend Status Indicator Component
+const BackendStatusIndicator = () => {
+  const { data: status, isLoading, isError } = useRaceStatus();
+
+  // Check if offline
+  // status might be undefined if error, or match our fallback mocks
+  const isOffline = isError || (status?.raceId === 'offline-demo') || (status?.name === 'Backend Initializing...');
+
+  if (!isOffline && !isLoading) return null;
+
+  return (
+    <div className={`fixed bottom-4 right-4 z-[9999] px-4 py-2 rounded-full border backdrop-blur-md text-xs font-bold flex items-center gap-2 shadow-2xl transition-all duration-500 ${isOffline
+        ? 'bg-red-500/10 border-red-500 text-red-500'
+        : 'bg-[#E10600]/10 border-[#E10600] text-[#E10600]'
+      }`}>
+      {isLoading ? (
+        <>
+          <Loader2 className="w-3 h-3 animate-spin" />
+          <span>CONNECTING...</span>
+        </>
+      ) : isOffline ? (
+        <>
+          <AlertTriangle className="w-3 h-3" />
+          <span>BACKEND OFFLINE - DEMO MODE</span>
+        </>
+      ) : (
+        <>
+          <CheckCircle2 className="w-3 h-3" />
+          <span>LIVE</span>
+        </>
+      )}
+    </div>
+  );
+};
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -81,7 +116,6 @@ const TeamsPage = lazyWithTimeout(() => import('./pages/TeamsPage'));
 const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPage'));
 const ResultsPage = lazyWithTimeout(() => import('./pages/ResultsPage'));
 const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'));
-
 const AboutPage = lazyWithTimeout(() => import('./pages/AboutPage'));
 
 function App() {
@@ -151,7 +185,6 @@ function App() {
                   return <SimulationPage />;
                 case 'results':
                   return <ResultsPage />;
-
                 case 'intelligence':
                   return <IntelligencePage />;
                 case 'about':
@@ -186,6 +219,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <NotificationProvider>
+        <BackendStatusIndicator />
         {/* Premium static hero background with adaptive blur */}
         <HeroBackground currentPage={currentPage} />
         {/* TODO: Implement navbar auto-hide on scroll */}
