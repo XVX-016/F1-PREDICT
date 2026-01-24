@@ -58,19 +58,16 @@ export const SCHazardPointSchema = z.object({
 
 export type SCHazardPoint = z.infer<typeof SCHazardPointSchema>;
 
-/**
- * Baseline Race Order Item
- */
-export const BaselineOrderItemSchema = z.object({
-    driverId: z.string(),
-    delta: z.number().min(0).nullable(),
-    uncertainty: z.number().min(0).nullable(),
-    confidence: z.enum(["HIGH", "MEDIUM", "LOW"]),
-    sampleSize: z.number().int().min(0).optional(),
-    color: z.string(),
-});
-
-export type BaselineOrderItem = z.infer<typeof BaselineOrderItemSchema>;
+export type BaselineOrderItem = {
+    driverId: string;
+    name: string;
+    delta: number | null;
+    uncertainty: number | null;
+    confidence: "HIGH" | "MEDIUM" | "LOW";
+    status: "ESTIMATED" | "NO_DATA";
+    sampleSize?: number;
+    color: string;
+};
 
 /**
  * Supporting Priors
@@ -86,3 +83,18 @@ export const SupportingPriorSchema = z.object({
 });
 
 export type SupportingPrior = z.infer<typeof SupportingPriorSchema>;
+
+/**
+ * Podium Probability
+ */
+export const PodiumProbabilitySchema = z.object({
+    driverId: z.string(),
+    shortCode: z.string(),
+    p1: z.number().min(0).max(1),
+    p2: z.number().min(0).max(1),
+    p3: z.number().min(0).max(1),
+    podium: z.number().min(0).max(1),
+    confidence: z.enum(["HIGH", "MEDIUM", "LOW"]),
+});
+
+export type PodiumProbability = z.infer<typeof PodiumProbabilitySchema>;

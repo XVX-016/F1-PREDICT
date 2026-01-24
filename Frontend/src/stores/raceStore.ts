@@ -1,95 +1,118 @@
 import { create } from 'zustand';
-import { DriverId, DriverState, RaceContext, ReplayFrame, SimulationConfig, StrategyVariant } from '../types/race';
+import { DriverId, RaceContext, ReplayFrame, StrategyVariant } from '../types/race';
+import {
+    SimulationResult,
+    SimulationConfig as SimConfig,
+    runWithCounterfactual,
+    TyreCompound
+} from '../sim';
 
-interface RaceStoreState {
-    // 1. Context & Config (Inputs)
-    mode: "LIVE" | "REPLAY" | "SIMULATION";
+export type SimulationState = "empty" | "sample" | "running" | "complete" | "error";
+export type DataSource = "sample" | "simulation";
+
+// UI-facing config (maps to SimConfig internally)
+export interface UISimulationConfig {
+    tyreDegMultiplier: number;
+    fuelBurnMultiplier: number;
+    scProbability: number;
+    weatherVariance: number;
+    enableSafetyCar: boolean;
+    useMLResiduals: boolean;
+}
+
+export interface RaceStoreState {
+    // Mode & Context
+    mode: "REPLAY" | "SIMULATION";
     context: RaceContext | null;
-    config: SimulationConfig;
+    config: UISimulationConfig;
 
-    // 2. Playback State (Cursor)
+    // Simulation State Machine
+    simulationState: SimulationState;
+    dataSource: DataSource;
+
+    // NEW: Frozen simulation result from deterministic simulator
+    simulationResult: SimulationResult | null;
+
+    // Playback State
     currentLap: number;
-    currentTime: number; // Seconds
+    currentTime: number;
     isPlaying: boolean;
-    playbackSpeed: number; // 1x, 2x, etc.
+    playbackSpeed: number;
 
-    // 3. Selection State (UI)
+    // Selection State
     selectedDriverId: DriverId | null;
     selectedStrategyId: string | null;
 
-    // 4. Data (The Truth)
-    // Frames are indexed by [lap] for O(1) access during replay
+    // Legacy: Data Store (kept for backward compatibility)
     replayFrames: Record<number, ReplayFrame>;
-
-    // Derived state for the CURRENT cursor
     currentFrame: ReplayFrame | null;
 
-    // Simulation Results (if in SIMULATION mode)
-    simulationResults: {
-        strategies: StrategyVariant[];
-        winProbabilities: Record<DriverId, number>;
-    } | null;
-
     // Actions
-    setMode: (mode: "LIVE" | "REPLAY" | "SIMULATION") => void;
+    setMode: (mode: "REPLAY" | "SIMULATION") => void;
     loadRaceContext: (ctx: RaceContext) => void;
-    updateConfig: (patch: Partial<SimulationConfig>) => void;
+    updateConfig: (patch: Partial<UISimulationConfig>) => void;
 
-    // Playback Actions
     setCursor: (lap: number) => void;
     togglePlay: () => void;
     setPlaybackSpeed: (speed: number) => void;
 
-    // Selection Actions
     selectDriver: (id: DriverId | null) => void;
     selectStrategy: (id: string | null) => void;
 
-    // Data Ingestion
     ingestFrame: (frame: ReplayFrame) => void;
-
-    // Computed Actions
-    runSimulation: () => Promise<void>; // Triggers backend calc
+    runSimulation: () => void;
     computeCounterfactual: (strategy: StrategyVariant) => Promise<void>;
 }
 
 export const useRaceStore = create<RaceStoreState>((set, get) => ({
     // Defaults
-    mode: "REPLAY",
-    context: null,
+    mode: "SIMULATION",
+    context: {
+        season: 2026,
+        round: 1,
+        raceName: "Australian Grand Prix",
+        circuitId: "albert_park",
+        totalLaps: 58
+    },
     config: {
         tyreDegMultiplier: 1.0,
         fuelBurnMultiplier: 1.0,
-        scProbability: 0.15,
+        scProbability: 0.02,
         weatherVariance: 0.2,
         enableSafetyCar: true,
         useMLResiduals: false,
     },
+
+    // Initial State: Empty (no fake data)
+    simulationState: "empty",
+    dataSource: "simulation",
+    simulationResult: null,
 
     currentLap: 1,
     currentTime: 0,
     isPlaying: false,
     playbackSpeed: 1,
 
-    selectedDriverId: null,
+    selectedDriverId: "VER",
     selectedStrategyId: null,
 
+    // Legacy
     replayFrames: {},
     currentFrame: null,
-    simulationResults: null,
 
-    // Actions implementation
+    // Actions
     setMode: (mode) => set({ mode }),
     loadRaceContext: (ctx) => set({ context: ctx }),
     updateConfig: (patch) => set((state) => ({ config: { ...state.config, ...patch } })),
 
     setCursor: (lap) => {
         const state = get();
-        // Clamp lap
-        const safeLap = Math.max(1, Math.min(lap, state.context?.totalLaps || 70));
-
+        const totalLaps = state.simulationResult?.meta.totalLaps ?? state.context?.totalLaps ?? 58;
+        const safeLap = Math.max(1, Math.min(lap, totalLaps));
         set({
             currentLap: safeLap,
-            currentFrame: state.replayFrames[safeLap] || null
+            // Pause when manually scrubbing
+            isPlaying: false
         });
     },
 
@@ -101,75 +124,78 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
 
     ingestFrame: (frame) => set((state) => {
         const newFrames = { ...state.replayFrames, [frame.lap]: frame };
-        // If we are currently ON this lap, update currentFrame too
-        const currentFrame = state.currentLap === frame.lap ? frame : state.currentFrame;
-        return { replayFrames: newFrames, currentFrame };
+        return { replayFrames: newFrames };
     }),
 
-    runSimulation: async () => {
-        const { config } = get();
-        console.log("Running simulation with config:", config);
+    /**
+     * Run simulation with counterfactual comparison
+     * 
+     * Phase 2A: Baseline vs Counterfactual (same seed, one parameter change)
+     * Results are FROZEN and immutable.
+     */
+    runSimulation: () => {
+        const { config, context } = get();
 
-        // TEMPORARY: Ingest some dummy frames to verify charts if no backend connected yet
-        // This is strictly for verifying the D3 chart integration as requested (Step C)
-        // In real implementation, this would fetch from /api/simulation
+        set({ simulationState: "running", isPlaying: false });
 
-        const drivers = ["VER", "NOR", "LEC", "HAM", "SAI"];
-        const frames: Record<number, ReplayFrame> = {};
+        try {
+            // Build baseline simulation config from UI config
+            const drivers = ['VER', 'NOR', 'LEC', 'HAM', 'SAI', 'PIA', 'RUS', 'PER'];
+            const totalLaps = context?.totalLaps ?? 58;
+            const baseSCProb = config.enableSafetyCar ? config.scProbability : 0;
 
-        // Generate 50 laps of data
-        for (let i = 1; i <= 50; i++) {
-            const frameDrivers: Record<DriverId, DriverState> = {};
-
-            drivers.forEach((did, idx) => {
-                // Use consistent but varying data
-                const basePace = 90000 + (idx * 200); // 90s base
-                const variance = Math.sin(i / 5) * 500;
-                const pace = basePace + variance + (Math.random() * 200);
-
-                frameDrivers[did] = {
-                    driverId: did,
-                    name: did,
-                    teamId: "Red Bull Racing", // simplified
-                    lap: i,
-                    position: idx + 1,
-                    gapToLeader: idx * 2.5 + (i * 0.1),
-                    tyre: { compound: "MEDIUM", ageLaps: i, wearPct: i * 1.5, degRateMsPerLap: 0.1 },
-                    fuel: { remainingKg: 100 - i, burnRateKgPerLap: 1.5 },
-                    pace: {
-                        p50Ms: pace,
-                        p05Ms: pace - 400,
-                        p95Ms: pace + 400
-                    },
-                    status: "ON_TRACK"
-                };
-            });
-
-            frames[i] = {
-                lap: i,
-                timeOffset: i * 90,
-                drivers: frameDrivers,
-                weather: { trackTemp: 30, airTemp: 25, rainIntensity: 0 },
-                safetyCarStatus: "NONE"
+            const baseConfig: SimConfig = {
+                circuit: context?.circuitId ?? 'albert_park',
+                totalLaps,
+                drivers,
+                strategies: drivers.map((driverId, idx) => ({
+                    driverId,
+                    pitLaps: idx % 2 === 0 ? [Math.floor(totalLaps * 0.35), Math.floor(totalLaps * 0.7)]
+                        : [Math.floor(totalLaps * 0.4), Math.floor(totalLaps * 0.75)],
+                    tyreSequence: ['MEDIUM', 'HARD', 'SOFT'] as TyreCompound[]
+                })),
+                baseLapTime: Object.fromEntries(
+                    drivers.map((id, idx) => [id, 81000 + idx * 120]) // VER fastest
+                ),
+                pitLossSeconds: 2.5,
+                hazardConfig: {
+                    safetyCarProb: baseSCProb,
+                    dnfProb: 0.001
+                },
+                tyreDegMultiplier: config.tyreDegMultiplier,
+                fuelBurnMultiplier: config.fuelBurnMultiplier,
+                seed: Date.now(),
+                runs: 1
             };
-        }
 
-        set({
-            replayFrames: frames,
-            currentLap: 1,
-            currentFrame: frames[1],
-            context: {
-                season: 2024,
-                round: 4,
-                raceName: "Japanese Grand Prix",
-                circuitId: "suzuka",
-                totalLaps: 50
-            },
-            isPlaying: true // Auto-start replay to see charts move
-        });
+            // Run with counterfactual: +50% SC probability
+            const result = runWithCounterfactual(
+                baseConfig,
+                {
+                    hazardConfig: {
+                        ...baseConfig.hazardConfig,
+                        safetyCarProb: baseSCProb * 1.5
+                    }
+                },
+                "SC Prob +50%"
+            );
+
+            set({
+                simulationResult: result,
+                simulationState: "complete",
+                dataSource: "simulation",
+                currentLap: 1,
+                isPlaying: true,
+                selectedDriverId: "VER"
+            });
+        } catch (error) {
+            console.error("Simulation failed:", error);
+            set({ simulationState: "error" });
+        }
     },
 
     computeCounterfactual: async (strategy) => {
         console.log("Computing counterfactual for:", strategy);
+        // Phase 2 implementation
     }
 }));
