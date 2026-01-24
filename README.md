@@ -307,13 +307,6 @@ python ml/training/train_lgbm.py
 
 ---
 
-## 👥 Contributors
-
-* **Tanmmay Kanhaiya (24BCA7072)** — ML & Probabilistic Modeling, Simulation Engine
-* **Hardik Kumar (24BCE7727)** — Data Engineering & Visualization, Frontend Development
-
----
-
 ## 🎯 Design Philosophy
 
 F1-PREDICT follows a **physics-first, ML-assisted** approach:
