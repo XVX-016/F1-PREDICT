@@ -315,13 +315,6 @@ python ml/training/train_lgbm.py
 
 ---
 
-## 👥 Contributors
-
-* **Tanmmay Kanhaiya (24BCA7072)** — ML & Probabilistic Modeling, Simulation Engine
-* **Hardik Kumar (24BCE7727)** — Data Engineering & Visualization, Frontend Development
-
----
-
 ## 🎯 Design Philosophy
 
 F1-PREDICT follows a **physics-first, ML-assisted** approach:
@@ -381,11 +374,6 @@ This is a **decision instrument**, not a dashboard toy. Every visualization is d
 * Supabase for database infrastructure
 * Formula 1 teams for inspiring real-world strategy analysis workflows
 
----
-
-*Developed for [Insert Hackathon Name] – Track 03: Applied ML for Science & High-Stakes Domains.*
-
----
 
 ## 🏆 Why This Wins in Applied ML for High-Stakes Domains
 
