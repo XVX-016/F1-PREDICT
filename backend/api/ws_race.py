@@ -55,6 +55,7 @@ async def race_ws(websocket: WebSocket, race_id: str):
     
     try:
         while True:
+<<<<<<< HEAD
             # Poll Redis for latest status
             # In a proper pub/sub architecture we might subscribe, 
             # but polling key is robust for simple state mirroring.
@@ -65,6 +66,24 @@ async def race_ws(websocket: WebSocket, race_id: str):
                     "type": "RACE_STATUS",
                     "source": "REDIS",
                     "payload": status
+=======
+            try:
+                # Poll Redis for latest status
+                status = store.get_status(race_id)
+
+                if status:
+                    await websocket.send_text(json.dumps({
+                        "type": "RACE_STATUS",
+                        "source": "REDIS",
+                        "payload": status
+                    }))
+            except Exception as e:
+                # Log error and send offline status
+                print(f"WS Redis Error: {e}")
+                await websocket.send_text(json.dumps({
+                    "type": "CONNECTION_ERROR",
+                    "detail": "Data source unavailable"
+>>>>>>> feature/redis-telemetry-replay
                 }))
             
             # 2Hz update rate is sufficient for UI
@@ -72,3 +91,9 @@ async def race_ws(websocket: WebSocket, race_id: str):
             
     except WebSocketDisconnect:
         print(f"WS disconnected: {race_id}")
+<<<<<<< HEAD
+=======
+    except Exception as e:
+        print(f"WS Global Error: {e}")
+        await websocket.close()
+>>>>>>> feature/redis-telemetry-replay

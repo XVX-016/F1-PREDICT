@@ -3,11 +3,9 @@ import * as d3 from 'd3';
 
 interface DataPoint {
     lap: number;
-    expectedTime: number;
-    p10: number; // 10th percentile
-    p90: number; // 90th percentile
-    p25: number;
-    p75: number;
+    p50: number; // Median
+    p05: number; // 5th percentile
+    p95: number; // 95th percentile
 }
 
 interface StrategyFanChartProps {
@@ -37,7 +35,7 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
             .domain([d3.min(data, d => d.lap) || 0, d3.max(data, d => d.lap) || 57])
             .range([0, innerWidth]);
 
-        const allValues = data.flatMap(d => [d.p10, d.p90, d.expectedTime]);
+        const allValues = data.flatMap(d => [d.p05, d.p95, d.p50]);
         const yScale = d3.scaleLinear()
             .domain([d3.min(allValues) || 0, d3.max(allValues) || 120])
             .range([innerHeight, 0])
@@ -50,15 +48,15 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
         g.append("g")
             .attr("transform", `translate(0,${innerHeight})`)
             .call(xAxis)
-            .attr("font-family", "monospace")
-            .attr("font-size", "10px")
-            .attr("color", "#4b5563");
+            .attr("font-family", "JetBrains Mono, monospace")
+            .attr("font-size", "9px")
+            .attr("color", "#6B7280");
 
         g.append("g")
             .call(yAxis)
-            .attr("font-family", "monospace")
-            .attr("font-size", "10px")
-            .attr("color", "#4b5563");
+            .attr("font-family", "JetBrains Mono, monospace")
+            .attr("font-size", "9px")
+            .attr("color", "#6B7280");
 
         // Grid Lines
         g.append("g")
@@ -66,72 +64,40 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
             .attr("opacity", 0.05)
             .call(d3.axisLeft(yScale).tickSize(-innerWidth).tickFormat(() => ""));
 
-        // Draw the "Fan" - Shaded area for p10-p90
+        // Draw the "Fan" - Shaded area for p05-p95 (90% Confidence)
         const area90 = d3.area<DataPoint>()
             .x(d => xScale(d.lap))
-            .y0(d => yScale(d.p10))
-            .y1(d => yScale(d.p90))
+            .y0(d => yScale(d.p05))
+            .y1(d => yScale(d.p95))
             .curve(d3.curveBasis);
 
-        const area50 = d3.area<DataPoint>()
-            .x(d => xScale(d.lap))
-            .y0(d => yScale(d.p25))
-            .y1(d => yScale(d.p75))
-            .curve(d3.curveBasis);
-
-        // Filter - Ferrari Red Glow
-        const filter = svg.append("defs")
-            .append("filter")
-            .attr("id", "glow")
-            .attr("x", "-20%")
-            .attr("y", "-20%")
-            .attr("width", "140%")
-            .attr("height", "140%");
-
-        filter.append("feGaussianBlur")
-            .attr("stdDeviation", "4")
-            .attr("result", "blur");
-
-        filter.append("feComposite")
-            .attr("in", "SourceGraphic")
-            .attr("in2", "blur")
-            .attr("operator", "over");
-
-        // Outer Fan (P10-P90)
+        // Confidence Fan
         g.append("path")
             .datum(data)
-            .attr("fill", "rgba(220, 38, 38, 0.1)")
+            .attr("fill", "rgba(225, 6, 0, 0.1)")
             .attr("d", area90);
 
-        // Inner Fan (P25-P75)
-        g.append("path")
-            .datum(data)
-            .attr("fill", "rgba(220, 38, 38, 0.2)")
-            .attr("d", area50);
-
-        // Expected Path (The Main Line)
+        // Expected Path (Median)
         const line = d3.line<DataPoint>()
             .x(d => xScale(d.lap))
-            .y(d => yScale(d.expectedTime))
+            .y(d => yScale(d.p50))
             .curve(d3.curveBasis);
 
         g.append("path")
             .datum(data)
             .attr("fill", "none")
-            .attr("stroke", "#dc2626")
-            .attr("stroke-width", 3)
-            .attr("d", line)
-            .attr("filter", "url(#glow)");
+            .attr("stroke", "#E10600")
+            .attr("stroke-width", 2)
+            .attr("d", line);
 
         // Horizontal threshold line (Current Gap/Target)
         g.append("line")
             .attr("x1", 0)
             .attr("x2", innerWidth)
-            .attr("y1", yScale(data[0].expectedTime))
-            .attr("y2", yScale(data[0].expectedTime))
-            .attr("stroke", "white")
-            .attr("stroke-dasharray", "4,4")
-            .attr("opacity", 0.2);
+            .attr("y1", yScale(data[0].p50))
+            .attr("y2", yScale(data[0].p50))
+            .attr("stroke", "#1f1f26")
+            .attr("stroke-width", 1.5);
 
     }, [data, width, height]);
 

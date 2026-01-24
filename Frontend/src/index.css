@@ -1,29 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Geist:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Phase 5: Professional Decision-Support Theme */
 :root {
-  --bg-graphite: #121416;
-  --bg-carbon: #0B0E11;
-  --bg-slate-dark: #1C1E20;
-  --bg-slate-mid: #2A2F38;
+  /* Background */
+  /* Background */
+  --bg-page: #0B0E11;
+  /* Dark by default to prevent white flash */
+  --bg-console: #0B0E11;
+  --bg-card: #1C1C1E;
+  --bg-panel: #141821;
+  --border-subtle: #2A2A2A;
+  --border-strong: #444444;
+
+  /* Text - Inverted for Dark Mode */
+  --text-primary: #FFFFFF;
+  --text-secondary: #E0E0E0;
+  --text-muted: #9E9E9E;
+  --text-caption: #757575;
+
+  /* Accent */
   --accent-red: #E10600;
-  --text-primary: #E6E8EB;
-  --text-secondary: #9AA1AC;
-  --font-ui: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --transition-standard: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --accent-red-light: #FFEBEE;
+
+  /* State Colors (Data Honesty) */
+  --state-green: #2E7D32;
+  --state-green-bg: #E8F5E9;
+  --state-amber: #F57C00;
+  --state-amber-bg: #FFF3E0;
+  --state-red: #C62828;
+  --state-red-bg: #FFEBEE;
+
+  /* Typography */
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+  /* Shadows (Subtle, not flashy) */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
   font-family: var(--font-ui);
-  background-color: transparent;
+  background-color: var(--bg-page);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
-  letter-spacing: 0.01em;
-  overflow-x: hidden;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
 }
 
 .font-mono {
@@ -151,7 +179,7 @@ input::placeholder {
   }
 
   html {
-    background-color: var(--bg-graphite);
+    background-color: var(--bg-console);
   }
 }
 
@@ -670,7 +698,7 @@ textarea {
   }
 
   body {
-    background-color: var(--bg-graphite);
+    background-color: var(--bg-console);
     color: var(--text-primary);
   }
 }
@@ -685,6 +713,38 @@ textarea {
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
+
+/* -------------------------------------------------------------------------- */
+/* SaaS Dashboard Refinements (User Requested)                                */
+/* -------------------------------------------------------------------------- */
+
+/* The "Pit Wall" Glass Effect */
+.glass-card-user {
+  background: rgba(25, 25, 25, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+/* Solid card for data tables */
+.solid-card {
+  background: #161616;
+  border: 1px solid #2D2D2D;
+  border-radius: 12px;
+}
+
+/* Typography Tweaks */
+.font-brand {
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Gradient Text for Hero */
+.text-gradient {
+  background: linear-gradient(to right, #ffffff, #94a3b8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

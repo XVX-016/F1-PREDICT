@@ -1,67 +1,45 @@
-import { Activity } from 'lucide-react';
-import { useTelemetry } from '../../hooks/useTelemetry';
+import { LapFrame } from '../../types/domain';
 
-export const LiveGapTicker: React.FC<{ raceId: string }> = ({ raceId }) => {
-    const { snapshot } = useTelemetry(raceId, true);
+type LiveGapTickerProps = {
+    frames: LapFrame[]
+}
 
-    // Mock gaps if no snapshot for demonstration
-    const drivers = snapshot?.drivers || {
-        'VER': { gap: 0.000, tyre_age: 12, compound: 'HARD', last_lap: '1:31.442' },
-        'NOR': { gap: 4.142, tyre_age: 12, compound: 'HARD', last_lap: '1:31.851' },
-        'LEC': { gap: 8.921, tyre_age: 15, compound: 'MEDIUM', last_lap: '1:32.112' },
-        'HAM': { gap: 12.441, tyre_age: 14, compound: 'MEDIUM', last_lap: '1:32.440' }
-    };
+export function LiveGapTicker({ frames }: LiveGapTickerProps) {
+    // Sort by position if available, else by lap time
+    const sortedFrames = [...frames].sort((a, b) => {
+        if (a.position !== null && b.position !== null) return a.position - b.position;
+        return (a.lap_time_ms || 0) - (b.lap_time_ms || 0);
+    });
+
+    const leaderTime = sortedFrames[0]?.lap_time_ms || 0;
 
     return (
-        <div className="bg-red-600/10 border-y border-red-500/20 py-2 overflow-hidden whitespace-nowrap bg-black backdrop-blur-md">
-            <div className="flex items-center gap-8 animate-marquee">
-                <div className="flex items-center gap-2 text-red-500 font-mono text-[10px] font-bold uppercase tracking-widest border-r border-white/10 pr-8">
-                    <Activity className="w-3 h-3 animate-pulse" />
-                    Live Interval Data
-                </div>
+        <div className="bg-[#121217] border border-[#1f1f26] p-4 h-[220px] flex flex-col">
+            <h3 className="text-xs uppercase tracking-widest text-slate-400 mb-4 font-mono font-black border-b border-[#1f1f26] pb-2">
+                Live Gap Analysis
+            </h3>
 
-                {Object.entries(drivers).map(([id, data]) => (
-                    <div key={id} className="flex items-center gap-3 font-mono">
-                        <span className="text-white font-black">{id}</span>
-                        <span className="text-gray-500">+{data.gap.toFixed(3)}s</span>
-                        <div className={`text-[9px] px-1 rounded ${data.compound === 'SOFT' ? 'bg-red-500/20 text-red-500' :
-                            data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                                'bg-white/10 text-white/50'
-                            }`}>
-                            {data.compound[0]}
-                        </div>
+            <div className="flex-1 overflow-y-auto font-mono text-[10px] space-y-2 no-scrollbar">
+                {sortedFrames.length > 0 ? (
+                    sortedFrames.map((f, i) => {
+                        const gap = i === 0 ? 0 : (f.lap_time_ms || 0) - leaderTime;
+                        return (
+                            <div key={f.driver_id + i} className="flex justify-between items-center bg-black/20 p-2 rounded-sm border-l-2 border-red-600/30">
+                                <span className="text-white font-black">{f.driver_id}</span>
+                                <div className="text-right">
+                                    <span className={`font-bold ${i === 0 ? 'text-green-500' : 'text-slate-400'}`}>
+                                        {i === 0 ? 'INTERVAL' : `+${(gap / 1000).toFixed(3)}s`}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className="h-full flex items-center justify-center">
+                        <p className="text-slate-700 uppercase tracking-widest text-center animate-pulse">Syncing Telemetry...</p>
                     </div>
-                ))}
-
-                {/* Second set for seamless loop */}
-                {Object.entries(drivers).map(([id, data]) => (
-                    <div key={`${id}-copy`} className="flex items-center gap-3 font-mono">
-                        <span className="text-white font-black">{id}</span>
-                        <span className="text-gray-500">+{data.gap.toFixed(3)}s</span>
-                        <div className={`text-[9px] px-1 rounded ${data.compound === 'SOFT' ? 'bg-red-500/20 text-red-500' :
-                            data.compound === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' :
-                                'bg-white/10 text-white/50'
-                            }`}>
-                            {data.compound[0]}
-                        </div>
-                    </div>
-                ))}
+                )}
             </div>
-
-            <style>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .animate-marquee {
-                    display: flex;
-                    width: max-content;
-                    animation: marquee 30s linear infinite;
-                }
-                .animate-marquee:hover {
-                    animation-play-state: paused;
-                }
-            `}</style>
         </div>
-    );
-};
+    )
+}
