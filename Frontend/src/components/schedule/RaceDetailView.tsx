@@ -1,5 +1,6 @@
+
 import { motion } from 'framer-motion';
-import { X, Map as MapIcon, Zap, Gauge, History, Thermometer, Info } from 'lucide-react';
+import { X, Map as MapIcon } from 'lucide-react';
 
 interface RaceDetailViewProps {
     race: any;
@@ -8,173 +9,119 @@ interface RaceDetailViewProps {
 }
 
 export default function RaceDetailView({ race, onClose, getCountryFlag }: RaceDetailViewProps) {
-    // Mock physics data for demonstration - derived from race name or ID
-    const physicsIntel = {
-        tyreStress: race.round % 3 === 0 ? 'High' : race.round % 2 === 0 ? 'Medium' : 'Low',
-        brakeWear: race.round % 4 === 0 ? 'Extreme' : 'Moderate',
-        trackTemp: '34°C',
-        strategyWindow: 'Lap 14 - 21',
-        optimalCompound: 'C3 (Soft)'
-    };
-
-    const sessions = [
-        { name: 'Free Practice 1', time: '11:30', day: 'Friday', status: 'completed' },
-        { name: 'Free Practice 2', time: '15:00', day: 'Friday', status: 'completed' },
-        { name: 'Free Practice 3', time: '12:00', day: 'Saturday', status: 'upcoming' },
-        { name: 'Qualifying', time: '16:00', day: 'Saturday', status: 'upcoming' },
-        { name: 'Grand Prix', time: '18:00', day: 'Sunday', status: 'upcoming' },
-    ];
-
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-y-auto"
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl overflow-y-auto pt-20"
         >
-            <div className="max-w-6xl mx-auto px-4 py-12 relative">
-                {/* Close Button */}
+            <div className="min-h-screen w-full relative">
+                {/* Close Button - Sticky or Fixed */}
                 <button
                     onClick={onClose}
-                    className="absolute right-4 top-4 p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all z-50 border border-white/10"
+                    className="fixed right-8 top-8 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all z-50 backdrop-blur-md hidden md:block"
+                >
+                    <X className="w-8 h-8" />
+                </button>
+
+                {/* Mobile Close Button */}
+                <button
+                    onClick={onClose}
+                    className="fixed right-4 top-4 p-2 rounded-full bg-black/50 text-white z-50 md:hidden"
                 >
                     <X className="w-6 h-6" />
                 </button>
 
-                {/* Hero Header */}
-                <div className="relative h-80 rounded-3xl overflow-hidden mb-12 border border-white/10 group">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
-                    <img
-                        src="/hero/hero-schedule.png"
-                        className="w-full h-full object-cover scale-110 blur-sm opacity-40 transition-transform duration-1000 group-hover:scale-100"
-                        alt=""
-                    />
-                    <div className="absolute bottom-8 left-8 z-20 flex items-end gap-6">
-                        <div className="text-7xl filter drop-shadow-2xl">{getCountryFlag(race.country)}</div>
-                        <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                <span className="px-3 py-1 bg-red-600 rounded-full text-[10px] font-black uppercase tracking-tight">Technical Briefing</span>
-                                <span className="text-gray-400 font-mono text-sm uppercase">Round {race.round}</span>
-                            </div>
-                            <h1 className="text-4xl md:text-6xl font-black italic text-white uppercase tracking-tighter">
-                                {race.raceName}
-                            </h1>
-                            <p className="text-xl text-gray-400 font-medium">{race.circuitName}, {race.country}</p>
-                        </div>
-                    </div>
-                </div>
+                {/* Hero Section Container */}
+                <div className="w-full max-w-7xl mx-auto pt-20 px-6 md:px-12">
 
-                {/* Intelligence Grid */}
-                <div className="track-intel-grid">
-                    {/* Circuit Map Selection */}
-                    <div style={{ gridArea: 'map' }} className="glass-card p-8 flex flex-col items-center justify-center relative min-h-[400px]">
-                        <div className="absolute top-6 left-6 flex items-center gap-2 text-red-500 font-mono text-xs uppercase font-bold tracking-widest">
-                            <MapIcon className="w-4 h-4" /> Circuit Layout
-                        </div>
-                        <img
-                            src={`/circuits/f1_2024_${race.circuitName.toLowerCase().slice(0, 3)}_outline.png`}
-                            alt="Circuit Map"
-                            className="max-h-[300px] w-auto opacity-80 invert brightness-200"
-                            onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/circuits/f1_2024_aus_outline.png';
-                            }}
-                        />
-                        <div className="mt-8 grid grid-cols-3 gap-8 w-full">
-                            <div className="text-center">
-                                <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Length</p>
-                                <p className="text-lg font-black text-white">5.412 km</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Laps</p>
-                                <p className="text-lg font-black text-white">57</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Turns</p>
-                                <p className="text-lg font-black text-white">15</p>
-                            </div>
-                        </div>
-                    </div>
+                    {/* Header Card */}
+                    <div className="relative w-full bg-black border border-white/10 rounded-3xl overflow-hidden mb-8">
+                        {/* Background Elements */}
+                        <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-red-900/20 to-transparent opacity-50" />
 
-                    {/* Sessions Itinerary */}
-                    <div style={{ gridArea: 'sessions' }} className="glass-card p-8">
-                        <h3 className="text-lg font-black text-white uppercase tracking-wider mb-8 flex items-center gap-2">
-                            <History className="w-5 h-5 text-red-500" /> Weekend Itinerary
-                        </h3>
-                        <div className="itinerary-timeline">
-                            {sessions.map((session, i) => (
-                                <div key={i} className={`itinerary-item ${session.status === 'completed' ? 'itinerary-item-past' : ''}`}>
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="text-sm font-bold text-white">{session.name}</p>
-                                            <p className="text-xs text-gray-500 font-mono">{session.day}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-mono font-bold text-red-500">{session.time}</p>
-                                            <p className="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">{session.status}</p>
-                                        </div>
-                                    </div>
+                        <div className="relative z-10 p-12 md:p-16">
+                            {/* Top Badge Row */}
+                            <div className="flex items-center gap-4 mb-6">
+                                <span className="px-4 py-1.5 bg-[#E10600] text-white text-[10px] font-black uppercase tracking-wider rounded-full">
+                                    Technical Briefing
+                                </span>
+                                <span className="text-gray-500 font-mono text-sm uppercase tracking-widest">
+                                    Round {race.round}
+                                </span>
+                            </div>
+
+                            {/* Main Title Group */}
+                            <div className="mb-4">
+                                <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic text-white uppercase tracking-tighter leading-[0.9]">
+                                    {race.country.toUpperCase()} <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+                                        GRAND PRIX
+                                    </span>
+                                </h1>
+                            </div>
+
+                            {/* Subtitle / Location */}
+                            <div className="flex flex-col md:flex-row md:items-center gap-6 mt-6">
+                                <div className="text-6xl drop-shadow-lg">
+                                    {getCountryFlag(race.country)}
                                 </div>
-                            ))}
+                                <div>
+                                    <p className="text-xl md:text-2xl text-gray-400 font-medium tracking-tight">
+                                        {race.circuitName}
+                                    </p>
+                                    <p className="text-sm text-gray-600 font-mono uppercase mt-1">
+                                        {race.city}, {race.country}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Technical Stats */}
-                    <div style={{ gridArea: 'stats' }} className="space-y-4">
-                        <div className="technical-stat-card">
-                            <div className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest">
-                                <Thermometer className="w-3.5 h-3.5" /> Tyre Stress
-                            </div>
-                            <p className="text-2xl font-black text-white uppercase">{physicsIntel.tyreStress}</p>
-                            <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-red-500"
-                                    style={{ width: physicsIntel.tyreStress === 'High' ? '90%' : physicsIntel.tyreStress === 'Medium' ? '60%' : '30%' }}
+                    {/* Circuit Layout Section */}
+                    <div className="relative w-full bg-[#15151e] border-t-4 border-[#E10600] rounded-3xl p-12 md:p-16 mb-20">
+                        {/* Circuit Label */}
+                        <div className="flex items-center gap-3 mb-12">
+                            <MapIcon className="w-5 h-5 text-[#E10600]" />
+                            <span className="text-[#E10600] font-mono text-sm font-bold uppercase tracking-[0.2em]">
+                                Circuit Layout
+                            </span>
+                        </div>
+
+                        {/* Flex Container for Map & Stats */}
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-16">
+
+                            {/* Map Image */}
+                            <div className="flex-1 w-full flex justify-center">
+                                <img
+                                    src={race.trackImg || '/circuits/f1_2024_aus_outline.png'}
+                                    alt="Circuit Map"
+                                    className="max-h-[400px] w-full object-contain filter invert opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = '/circuits/f1_2024_aus_outline.png';
+                                    }}
                                 />
                             </div>
-                        </div>
 
-                        <div className="technical-stat-card">
-                            <div className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest">
-                                <Gauge className="w-3.5 h-3.5" /> Brake Wear
+                            {/* Stats Columns */}
+                            <div className="grid grid-cols-3 gap-12 lg:min-w-[400px]">
+                                <div className="text-center lg:text-left">
+                                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">Length</p>
+                                    <p className="text-3xl lg:text-4xl font-black text-white">5.412 <span className="text-lg text-gray-600">km</span></p>
+                                </div>
+                                <div className="text-center lg:text-left">
+                                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">Laps</p>
+                                    <p className="text-3xl lg:text-4xl font-black text-white">57</p>
+                                </div>
+                                <div className="text-center lg:text-left">
+                                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">Turns</p>
+                                    <p className="text-3xl lg:text-4xl font-black text-white">15</p>
+                                </div>
                             </div>
-                            <p className="text-2xl font-black text-white uppercase">{physicsIntel.brakeWear}</p>
                         </div>
                     </div>
 
-                    {/* Energy Strategy Information */}
-                    <div style={{ gridArea: 'strategy' }} className="glass-card p-8">
-                        <h3 className="text-lg font-black text-white uppercase tracking-wider mb-6 flex items-center gap-2">
-                            <Zap className="w-5 h-5 text-red-500" /> Strategy Intelligence
-                        </h3>
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-white/5 rounded-lg border border-white/10">
-                                        <Info className="w-4 h-4 text-gray-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase font-bold">Pit Window</p>
-                                        <p className="text-sm text-white font-mono">{physicsIntel.strategyWindow}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-white/5 rounded-lg border border-white/10">
-                                        <Info className="w-4 h-4 text-gray-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase font-bold">Recommended Start</p>
-                                        <p className="text-sm text-white font-mono">{physicsIntel.optimalCompound}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-red-600/5 border border-red-500/20 rounded-2xl p-4">
-                                <p className="text-[10px] text-red-500 uppercase font-black tracking-widest mb-2">2026 Regulation Note</p>
-                                <p className="text-xs text-gray-400 leading-relaxed">
-                                    High agility chassis required. "X-Mode" active aero likely triggered in Sector 2 straights. Battery recovery difficulty: <strong>Moderate</strong>.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </motion.div>
