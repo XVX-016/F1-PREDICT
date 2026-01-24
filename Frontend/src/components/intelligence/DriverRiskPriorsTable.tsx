@@ -65,31 +65,31 @@ export const DriverRiskPriorsTable: React.FC<DriverRiskPriorsTableProps> = ({ en
                             <tr>
                                 <th className="py-3 px-4 text-[10px] font-mono text-white/30 uppercase tracking-widest border-b border-white/5">Driver</th>
                                 <th className="py-3 px-4 text-[10px] font-mono text-white/30 uppercase tracking-widest border-b border-white/5 group relative cursor-help text-center">
-                                    IIR
+                                    IIR (NORM)
                                     <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 w-48 p-2 bg-black border border-white/10 text-[9px] normal-case tracking-normal z-50 shadow-2xl pointer-events-none">
-                                        <p className="font-bold mb-1 uppercase text-white/60">Incident Involvement Rate</p>
-                                        Normalized likelihood of involvement in collisions or off-track events.
+                                        <p className="font-bold mb-1 uppercase text-white/60">Incident Rate (Normalized)</p>
+                                        Relative likelihood of involvement in collisions, normalized against field average on comparable circuits.
                                     </div>
                                 </th>
                                 <th className="py-3 px-4 text-[10px] font-mono text-white/30 uppercase tracking-widest border-b border-white/5 group relative cursor-help text-center">
                                     RESTART Δ
                                     <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 w-48 p-2 bg-black border border-white/10 text-[9px] normal-case tracking-normal z-50 shadow-2xl pointer-events-none">
                                         <p className="font-bold mb-1 uppercase text-white/60">Restart Delta</p>
-                                        Average positions gained (+) or lost (-) during SC restarts.
+                                        Average positions gained (+) or lost (-) during SC restarts. Weighted by expected circuit restart frequency.
                                     </div>
                                 </th>
                                 <th className="py-3 px-4 text-[10px] font-mono text-white/30 uppercase tracking-widest border-b border-white/5 group relative cursor-help text-center">
-                                    WET WINS
+                                    WET PACE
                                     <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 w-48 p-2 bg-black border border-white/10 text-[9px] normal-case tracking-normal z-50 shadow-2xl pointer-events-none">
                                         <p className="font-bold mb-1 uppercase text-white/60">Wet Pace Bias</p>
-                                        Relative pace gain/loss in wet vs dry conditions.
+                                        Relative pace gain/loss in wet vs dry conditions based on historical tire thermal management.
                                     </div>
                                 </th>
                                 <th className="py-3 px-4 text-[10px] font-mono text-white/30 uppercase tracking-widest border-b border-white/5 group relative cursor-help text-center">
-                                    σ VARIANCE
+                                    PACE VARIANCE (σ)
                                     <div className="invisible group-hover:visible absolute top-full left-1/2 -translate-x-1/2 w-48 p-2 bg-black border border-white/10 text-[9px] normal-case tracking-normal z-50 shadow-2xl pointer-events-none">
-                                        <p className="font-bold mb-1 uppercase text-white/60">Pace σ</p>
-                                        Standard deviation of lap times (consistency). Higher = more volatile.
+                                        <p className="font-bold mb-1 uppercase text-white/60">Pace Variability (σ)</p>
+                                        Observed lap time dispersion after fuel & tyre normalization. Higher = more volatile.
                                     </div>
                                 </th>
                             </tr>

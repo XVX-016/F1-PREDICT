@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     SimulationProvider,
     SimulationLayout,
@@ -15,33 +14,23 @@ import {
     PitStrategyEditor,
     DisableSafetyCarToggle,
     OverrideGridPositions,
-    FastF1Status,
-    RedisReplayStatus,
     SimulationMain,
     SimulationControlBar,
     RunSimulationButton,
     ReplayToggle,
     ResetSimulationButton,
+    PlaybackSpeedSlider,
+    AdvancedSettings,
     SimulationStatusIndicator,
     ReplayTimeline,
     LapScrubber,
     TimeScrubber,
     SimulationViewport,
-    ViewportTabs,
     Tab,
     RacePositionChart,
     LapTimeChart,
     GapToLeaderChart,
-    PitStopTimeline,
-    SimulationInspector,
-    InspectorTabs,
-    RaceOutcomeTable,
-    PodiumPrediction,
-    CounterfactualDeltaTable,
-    WhatChangedExplanation,
-    PhysicsVsMLChart,
-    ResidualErrorStats,
-    SimulationStateJSON
+    PitStopTimeline
 } from './SimulationPage.components';
 
 export default function SimulationPage() {
@@ -53,7 +42,6 @@ export default function SimulationPage() {
            LEFT PANEL — INPUTS
         ───────────────────────────── */}
                 <SimulationSidebar>
-
                     <SidebarSection title="Race Context">
                         <SeasonSelect />
                         <RaceSelect />
@@ -67,97 +55,56 @@ export default function SimulationPage() {
                         <TyreDegMultiplier />
                         <FuelBurnRate />
                         <SafetyCarProbability />
-                        <WeatherVariance />
+                        <AdvancedSettings>
+                            <WeatherVariance />
+                            <PitStrategyEditor />
+                            <DisableSafetyCarToggle />
+                            <OverrideGridPositions />
+                        </AdvancedSettings>
                     </SidebarSection>
-
-                    <SidebarSection title="Counterfactuals">
-                        <PitStrategyEditor />
-                        <DisableSafetyCarToggle />
-                        <OverrideGridPositions />
-                    </SidebarSection>
-
-                    <SidebarSection title="Data Sources">
-                        <FastF1Status />
-                        <RedisReplayStatus />
-                    </SidebarSection>
-
                 </SimulationSidebar>
 
                 {/* ─────────────────────────────
            MAIN PANEL — RUN + OUTPUT
         ───────────────────────────── */}
                 <SimulationMain>
-
-                    {/* CONTROL BAR */}
                     <SimulationControlBar>
                         <RunSimulationButton />
                         <ReplayToggle />
+                        <PlaybackSpeedSlider />
                         <ResetSimulationButton />
                         <SimulationStatusIndicator />
                     </SimulationControlBar>
 
-                    {/* TIMELINE / SCRUBBER */}
                     <ReplayTimeline>
                         <LapScrubber />
                         <TimeScrubber />
                     </ReplayTimeline>
 
-                    {/* CORE VISUAL OUTPUT */}
                     <SimulationViewport>
+                        <div className="h-full flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+                            {/* TOP ROW: POSITIONS + PACE */}
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 h-[400px] shrink-0">
+                                <Tab id="positions" label="Race Positions">
+                                    <RacePositionChart />
+                                </Tab>
+                                <Tab id="pace" label="Lap Pace">
+                                    <LapTimeChart />
+                                </Tab>
+                            </div>
 
-                        <ViewportTabs>
-
-                            <Tab id="positions" label="Race Positions">
-                                <RacePositionChart />
-                            </Tab>
-
-                            <Tab id="pace" label="Lap Pace">
-                                <LapTimeChart />
-                            </Tab>
-
-                            <Tab id="gaps" label="Gaps">
-                                <GapToLeaderChart />
-                            </Tab>
-
-                            <Tab id="strategy" label="Strategy">
-                                <PitStopTimeline />
-                            </Tab>
-
-                        </ViewportTabs>
-
+                            {/* BOTTOM ROW: GAPS + STRATEGY */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[300px] shrink-0">
+                                <Tab id="gaps" label="Gaps">
+                                    <GapToLeaderChart />
+                                </Tab>
+                                <Tab id="strategy" label="Strategy">
+                                    <PitStopTimeline />
+                                </Tab>
+                            </div>
+                        </div>
                     </SimulationViewport>
-
                 </SimulationMain>
-
-                {/* ─────────────────────────────
-           RIGHT PANEL — ANALYSIS
-        ───────────────────────────── */}
-                <SimulationInspector>
-
-                    <InspectorTabs>
-
-                        <Tab id="summary" label="Summary">
-                            <RaceOutcomeTable />
-                            <PodiumPrediction />
-                        </Tab>
-
-                        <Tab id="delta" label="Counterfactual Δ">
-                            <CounterfactualDeltaTable />
-                            <WhatChangedExplanation />
-                        </Tab>
-
-                        <Tab id="residuals" label="ML Residuals">
-                            <PhysicsVsMLChart />
-                            <ResidualErrorStats />
-                        </Tab>
-
-                        <Tab id="raw" label="Raw State">
-                            <SimulationStateJSON />
-                        </Tab>
-
-                    </InspectorTabs>
-
-                </SimulationInspector>
 
             </SimulationLayout>
         </SimulationProvider>
