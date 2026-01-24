@@ -4,46 +4,79 @@
 import { useRaceStore } from '../stores/raceStore';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const SimulationProvider = ({ children }: { children: React.ReactNode }) => {
-    // Global Playback Loop
+    // Playback state from store
+    const isPlaying = useRaceStore(useShallow(s => s.isPlaying));
+    const playbackSpeed = useRaceStore(useShallow(s => s.playbackSpeed));
+    const currentLap = useRaceStore(useShallow(s => s.currentLap));
+    const simulationResult = useRaceStore(useShallow(s => s.simulationResult));
+    const context = useRaceStore(useShallow(s => s.context));
+
+    // Ref to store interval ID
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Playback Loop Effect
     useEffect(() => {
-        const store = useRaceStore;
+        // Clear any existing interval
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
 
-        // Subscribe to store changes to handle interval management
-        const unsubscribe = store.subscribe((state, prevState) => {
-            if (state.isPlaying !== prevState.isPlaying || state.playbackSpeed !== prevState.playbackSpeed) {
-                // Re-evaluate interval
-            }
-        });
+        // Only run if playing
+        if (!isPlaying) return;
 
-        const interval = setInterval(() => {
-            const { isPlaying, playbackSpeed, currentLap, context, togglePlay, setCursor } = store.getState();
+        const totalLaps = simulationResult?.meta.totalLaps ?? context?.totalLaps ?? 58;
 
-            if (!isPlaying) return;
-
-            const totalLaps = context?.totalLaps ?? 70; // Default for testing
-            const nextLap = currentLap + 1;
+        intervalRef.current = setInterval(() => {
+            const state = useRaceStore.getState();
+            const nextLap = state.currentLap + 1;
 
             if (nextLap > totalLaps) {
-                togglePlay(); // Pause at end
+                // Pause at end
+                useRaceStore.setState({ isPlaying: false });
             } else {
-                setCursor(nextLap);
+                // Advance cursor (don't pause when auto-advancing)
+                useRaceStore.setState({ currentLap: nextLap });
             }
-        }, 1000 / store.getState().playbackSpeed);
+        }, 1000 / playbackSpeed);
 
         return () => {
-            clearInterval(interval);
-            unsubscribe();
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
         };
-    }, []);
+    }, [isPlaying, playbackSpeed, simulationResult, context]);
 
     return <div className="h-screen w-full bg-[#0B0E11] text-white overflow-hidden flex flex-col pt-16">{children}</div>;
 };
+
 export const SimulationLayout = ({ children }: { children: React.ReactNode }) => <div className="flex flex-1 overflow-hidden">{children}</div>;
 
-export const SimulationSidebar = ({ children }: { children: React.ReactNode }) => <aside className="w-80 border-r border-white/10 bg-[#141821] flex flex-col overflow-y-auto">{children}</aside>;
+export const SimulationSidebar = ({ children }: { children: React.ReactNode }) => {
+    const isPlaying = useRaceStore(useShallow(s => s.isPlaying));
+
+    // Auto-collapse when playing, but allow manual override if needed (omitted for now per strict req)
+    const isCollapsed = isPlaying;
+
+    return (
+        <aside className={`${isCollapsed ? 'w-14' : 'w-80'} transition-all duration-300 border-r border-white/10 bg-[#141821] flex flex-col overflow-y-auto overflow-x-hidden`}>
+            {isCollapsed ? (
+                <div className="flex flex-col items-center pt-6 gap-6">
+                    {/* Collapsed Icons Strategy */}
+                    <div className="w-8 h-8 rounded bg-[#E10600] flex items-center justify-center font-bold text-white text-xs">F1</div>
+                    <div className="h-px w-8 bg-white/10" />
+                    <div className="text-[10px] text-gray-500 -rotate-90 whitespace-nowrap mt-12 tracking-widest">CONFIG HIDDEN</div>
+                </div>
+            ) : (
+                children
+            )}
+        </aside>
+    );
+};
 export const SidebarSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
     <div className="p-4 border-b border-white/5">
         <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-4 border-l-2 border-[#E10600] pl-2">{title}</h3>
@@ -56,8 +89,8 @@ export const SimulationControlBar = ({ children }: { children: React.ReactNode }
 export const ReplayTimeline = ({ children }: { children: React.ReactNode }) => <div className="h-24 border-b border-white/10 bg-[#0F1216] px-6 py-4 flex flex-col justify-center gap-2">{children}</div>;
 export const SimulationViewport = ({ children }: { children: React.ReactNode }) => <div className="flex-1 relative p-6 overflow-hidden">{children}</div>;
 export const ViewportTabs = ({ children }: { children: React.ReactNode }) => <div className="h-full flex flex-col">{children}</div>;
-export const Tab = ({ id, label, children }: { id: string, label: string, children: React.ReactNode }) => (
-    <div className="flex-1 border border-white/10 bg-[#1A1D24] p-4 rounded-sm relative overflow-hidden group">
+export const Tab = ({ label, children, className = "" }: { id?: string, label: string, children: React.ReactNode, className?: string }) => (
+    <div className={`flex-1 border border-white/10 bg-[#1A1D24] p-4 rounded-sm relative overflow-hidden group ${className}`}>
         <div className="absolute top-0 left-0 px-3 py-1 bg-white/5 text-[10px] font-mono text-gray-400 uppercase">{label}</div>
         <div className="mt-6 h-full">{children}</div>
     </div>
@@ -183,9 +216,45 @@ export const WeatherVariance = () => {
     );
 };
 
-export const PitStrategyEditor = () => <button className="w-full bg-white/5 border border-white/10 p-2 text-xs hover:bg-white/10">Edit Strategy</button>;
-export const DisableSafetyCarToggle = () => <div className="flex items-center gap-2 text-xs"><input type="checkbox" /> Disable SC</div>;
-export const OverrideGridPositions = () => <button className="w-full bg-white/5 border border-white/10 p-2 text-xs hover:bg-white/10">Override Grid</button>;
+import { useState } from 'react';
+import { ChevronDown, ChevronRight, Settings } from 'lucide-react';
+
+export const AdvancedSettings = ({ children }: { children: React.ReactNode }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <div className="mt-2">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between p-2 text-[10px] uppercase font-bold text-gray-400 hover:bg-white/5 transition-colors rounded"
+            >
+                <div className="flex items-center gap-2">
+                    <Settings className="w-3 h-3" />
+                    Advanced Settings
+                </div>
+                {isOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            </button>
+            {isOpen && <div className="mt-4 space-y-4 pl-2 border-l border-white/10">{children}</div>}
+        </div>
+    );
+};
+
+export const PitStrategyEditor = () => <button className="w-full bg-white/5 border border-white/10 p-2 text-[10px] uppercase font-bold text-gray-400 hover:bg-white/10">Edit Strategy</button>;
+export const DisableSafetyCarToggle = () => {
+    const value = useRaceStore(useShallow(s => s.config.enableSafetyCar));
+    const updateConfig = useRaceStore(s => s.updateConfig);
+    return (
+        <div className="flex items-center gap-3 text-[10px] uppercase font-bold text-gray-400">
+            <input
+                type="checkbox"
+                checked={value}
+                onChange={(e) => updateConfig({ enableSafetyCar: e.target.checked })}
+                className="accent-[#E10600]"
+            />
+            Enable Safety Car
+        </div>
+    );
+};
+export const OverrideGridPositions = () => <button className="w-full bg-white/5 border border-white/10 p-2 text-[10px] uppercase font-bold text-gray-400 hover:bg-white/10">Override Grid</button>;
 
 export const FastF1Status = () => <div className="text-[10px] text-green-500">● FastF1 Connected</div>;
 export const RedisReplayStatus = () => <div className="text-[10px] text-green-500">● Redis Replay Ready</div>;
@@ -225,8 +294,82 @@ export const ReplayToggle = () => {
         </button>
     );
 };
-export const ResetSimulationButton = () => <button className="bg-transparent text-gray-400 px-4 py-2 font-bold text-xs uppercase hover:text-white">Reset</button>;
-export const SimulationStatusIndicator = () => <div className="ml-auto text-[10px] font-mono text-gray-500">IDLE</div>;
+export const PlaybackSpeedSlider = () => {
+    const speed = useRaceStore(useShallow(s => s.playbackSpeed));
+    const setPlaybackSpeed = useRaceStore(s => s.setPlaybackSpeed);
+    return (
+        <div className="flex items-center gap-4 bg-white/5 px-4 py-2 rounded-sm border border-white/10 min-w-[200px]">
+            <span className="text-[10px] font-bold text-gray-500 uppercase whitespace-nowrap">Speed: {speed}x</span>
+            <input
+                type="range"
+                min={1}
+                max={10}
+                step={1}
+                value={speed}
+                onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
+                className="w-full accent-[#E10600] h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+            />
+        </div>
+    );
+};
+
+export const ResetSimulationButton = () => {
+    const [confirming, setConfirming] = useState(false);
+    const reset = () => {
+        // Simple reset logic: reload page or reset store
+        window.location.reload();
+    };
+
+    if (confirming) {
+        return (
+            <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-[#E10600]">ARE YOU SURE?</span>
+                <button onClick={reset} className="text-white text-[10px] font-bold hover:underline">YES</button>
+                <button onClick={() => setConfirming(false)} className="text-gray-500 text-[10px] font-bold hover:underline">NO</button>
+            </div>
+        );
+    }
+
+    return (
+        <button
+            onClick={() => setConfirming(true)}
+            className="bg-transparent text-gray-400 px-4 py-2 font-bold text-xs uppercase hover:text-white"
+        >
+            Reset
+        </button>
+    );
+};
+
+export const SimulationStatusIndicator = () => {
+    const simulationState = useRaceStore(useShallow(s => s.simulationState));
+    const isPlaying = useRaceStore(useShallow(s => s.isPlaying));
+
+    let status = "IDLE";
+    let color = "text-gray-500";
+
+    switch (simulationState) {
+        case "running":
+            status = "SIMULATING...";
+            color = "text-[#E10600] animate-pulse";
+            break;
+        case "complete":
+            status = isPlaying ? "PLAYING" : "COMPLETE";
+            color = isPlaying ? "text-green-500" : "text-white";
+            break;
+        case "sample":
+            status = "SAMPLE DATA";
+            color = "text-yellow-500";
+            break;
+        case "error":
+            status = "ERROR";
+            color = "text-red-500";
+            break;
+        default:
+            status = "READY";
+    }
+
+    return <div className={`ml-auto text-[10px] font-mono font-bold ${color}`}>{status}</div>;
+};
 
 // Timeline Placeholders
 export const LapScrubber = () => {
@@ -277,11 +420,11 @@ export const TimeScrubber = () => {
 
 // Component Placeholders
 import LapTimeChart from '../components/charts/LapTimeChart';
+import RacePositionChart from '../components/charts/RacePositionChart';
+import GapToLeaderChart from '../components/charts/GapToLeaderChart';
+import PitStopTimeline from '../components/charts/PitStopTimeline';
 
-export const RacePositionChart = () => <div className="h-full flex items-center justify-center text-gray-600 text-xs">Chart: Race Positions</div>;
-export { LapTimeChart }; // Export the imported component
-export const GapToLeaderChart = () => <div className="h-full flex items-center justify-center text-gray-600 text-xs">Chart: Gaps</div>;
-export const PitStopTimeline = () => <div className="h-full flex items-center justify-center text-gray-600 text-xs">Chart: Strategy</div>;
+export { LapTimeChart, RacePositionChart, GapToLeaderChart, PitStopTimeline };
 
 export const RaceOutcomeTable = () => <div className="h-32 bg-black/20 mb-4 rounded border border-white/5"></div>;
 export const PodiumPrediction = () => <div className="h-20 bg-black/20 rounded border border-white/5"></div>;
