@@ -19,10 +19,10 @@ const RunSimulationPanel: React.FC<RunSimulationPanelProps> = ({
     onSeedChange
 }) => {
     return (
-        <div className="bg-[#E10600]/10 border border-[#E10600]/20 rounded-lg p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <h3 className="text-sm font-bold text-[#E10600] uppercase tracking-widest">Execution Engine</h3>
-                <div className="flex items-center gap-2 px-2 py-0.5 bg-black/40 rounded border border-white/5">
+        <div className="bg-[#121217] border border-[#1f1f26] rounded-md p-6 space-y-6">
+            <div className="flex justify-between items-center border-b border-[#1f1f26] pb-3">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-none">Execution Engine</h3>
+                <div className="flex items-center gap-2 px-2 py-0.5 bg-[#1f1f26] rounded border border-[#2a2a35]">
                     <span className="text-[10px] font-mono text-slate-400 uppercase">Iterations</span>
                     <span className="text-[10px] font-mono text-white font-bold">10,000</span>
                 </div>
@@ -30,23 +30,23 @@ const RunSimulationPanel: React.FC<RunSimulationPanelProps> = ({
 
             <div className="space-y-4">
                 {/* Seed Locking */}
-                <div className="flex items-center justify-between p-3 bg-black/20 border border-white/5 rounded">
+                <div className="flex items-center justify-between p-3 bg-[#1f1f26] border border-[#2a2a35] rounded">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => onLockToggle(!lockSeed)}
-                            className={`p-1.5 rounded transition-all ${lockSeed ? 'text-white bg-[#E10600]' : 'text-slate-500 bg-white/5'}`}
+                            className={`p-1.5 rounded transition-all ${lockSeed ? 'text-white bg-red-600' : 'text-gray-500 bg-gray-800/20 uppercase font-mono text-[8px] border border-[#2a2a35]'}`}
                         >
                             {lockSeed ? <Lock size={14} /> : <Unlock size={14} />}
                         </button>
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider">Lock Random Seed</span>
-                            <span className="text-[9px] text-slate-500 uppercase tracking-widest">Ensure reproducibility</span>
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wider">REPRODUCIBILITY</span>
+                            <span className="text-[9px] text-gray-500 uppercase tracking-widest">Lock simulation seed</span>
                         </div>
                     </div>
 
                     {lockSeed && (
-                        <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-2 py-1 rounded">
-                            <Hash size={10} className="text-[#E10600]" />
+                        <div className="flex items-center gap-2 bg-black border border-[#2a2a35] px-2 py-1 rounded">
+                            <Hash size={10} className="text-red-600" />
                             <input
                                 type="number"
                                 value={seed || ''}
@@ -61,8 +61,8 @@ const RunSimulationPanel: React.FC<RunSimulationPanelProps> = ({
                 {/* Run Button */}
                 <button
                     className={`w-full group relative overflow-hidden py-4 rounded font-black uppercase tracking-widest transition-all ${isRunning
-                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                            : 'bg-[#E10600] hover:bg-[#ff0700] text-white active:scale-[0.98] shadow-[0_0_20px_rgba(225,6,0,0.3)] hover:shadow-[0_0_30px_rgba(225,6,0,0.5)]'
+                        ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                        : 'bg-red-600 hover:bg-red-500 text-white active:scale-[0.98]'
                         }`}
                     onClick={onRun}
                     disabled={isRunning}
@@ -88,9 +88,9 @@ const RunSimulationPanel: React.FC<RunSimulationPanelProps> = ({
                 </button>
             </div>
 
-            <p className="text-[9px] font-mono text-slate-600 uppercase leading-relaxed text-center">
-                Statistical convergence achieved at N=10k. <br />
-                Seed entropy: {lockSeed ? 'FIXED' : 'OS_RANDOM'}
+            <p className="text-[9px] font-mono text-gray-600 uppercase leading-relaxed text-center">
+                Statistical convergence at N=10k. <br />
+                Entropy: {lockSeed ? 'FIXED_MODEL' : 'DETERMINISTIC_RANDOM'}
             </p>
         </div>
     );

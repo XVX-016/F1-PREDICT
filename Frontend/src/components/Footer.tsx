@@ -2,7 +2,7 @@
 
 export default function Footer() {
     return (
-        <footer className="w-full bg-[#0B0E11] border-t border-white/5 py-12 px-6 mt-auto">
+        <footer className="w-full bg-[#0B0E11] border-t border-white/5 py-12 px-6 mt-20">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
                 <div className="space-y-4">
                     <h3 className="text-white font-semibold tracking-wide uppercase text-sm">F1 Race Intelligence</h3>

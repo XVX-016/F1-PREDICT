@@ -557,6 +557,7 @@ class RaceCalendarService:
         
         return characteristics.get(track_type, characteristics["permanent"])
 
+<<<<<<< HEAD
     def get_current_race_status(self) -> Dict[str, Any]:
         """
         Determines the current or next race status from the calendar.
@@ -565,14 +566,68 @@ class RaceCalendarService:
         # Placeholder logic: return a static "Live" state for testing UI
         # In production this would check self.races against datetime.utcnow()
         return {
+=======
+    def _fetch_real_weather(self, location: str) -> Optional[Dict[str, str]]:
+        """Fetch current weather from WeatherAPI.com"""
+        api_key = os.getenv("WEATHER_API_KEY")
+        if not api_key:
+            return None
+            
+        try:
+            url = f"http://api.weatherapi.com/v1/current.json"
+            params = {
+                "key": api_key,
+                "q": location,
+                "aqi": "no"
+            }
+            
+            response = requests.get(url, params=params, timeout=5)
+            response.raise_for_status()
+            data = response.json()
+            
+            current = data.get("current", {})
+            return {
+                "trackTemp": f"{current.get('temp_c', 0) + 10}°C", # Approximate track temp as air + 10
+                "airTemp": f"{current.get('temp_c', 'N/A')}°C",
+                "humidity": f"{current.get('humidity', 'N/A')}%",
+                "windSpeed": f"{current.get('wind_kph', 'N/A')} km/h"
+            }
+        except Exception as e:
+            logger.error(f"Failed to fetch weather for {location}: {e}")
+            return None
+
+    def get_current_race_status(self) -> Dict[str, Any]:
+        """
+        Determines the current or next race status from the calendar.
+        Fetches real weather if API key is available.
+        """
+        # Default mock status
+        status = {
+>>>>>>> feature/redis-telemetry-replay
             "raceId": "2026-01-17-test-race",
             "name": "Bahrain Grand Prix",
             "round": 1,
             "session": "FP2",
+<<<<<<< HEAD
             "status": "LIVE", # or UPCOMING, COMPLETED
+=======
+            "status": "LIVE", 
+>>>>>>> feature/redis-telemetry-replay
             "trackTemp": "42°C",
             "airTemp": "31°C",
             "humidity": "45%",
             "windSpeed": "12 km/h",
             "nextSessionTime": "2026-03-02T15:00:00Z"
+<<<<<<< HEAD
         }
+=======
+        }
+        
+        # Try to enrich with real weather for 'Bahrain' or specific location
+        # Sakhir is the location for Bahrain GP
+        real_weather = self._fetch_real_weather("Sakhir")
+        if real_weather:
+            status.update(real_weather)
+            
+        return status
+>>>>>>> feature/redis-telemetry-replay

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 // Lucide icons would require installation, using simple text buttons if not available or assume installed
 // Assuming typical project setup. If fails, I will revert to text.
@@ -26,6 +27,12 @@ interface LapState {
         confidence: number;
     }
 }
+=======
+import { useEffect } from "react";
+// Lucide icons would require installation, using simple text buttons if not available or assume installed
+
+
+>>>>>>> feature/redis-telemetry-replay
 
 interface ReplayPanelProps {
     raceId: string;
@@ -43,7 +50,11 @@ export default function ReplayPanel({
     currentLapData
 }: ReplayPanelProps) {
 
+<<<<<<< HEAD
     const { lap, setLap, playing, setPlaying, speed, setSpeed } = useReplay(raceId, maxLap);
+=======
+    const { lap, setLap, playing, setPlaying, speed } = useReplay(raceId, maxLap);
+>>>>>>> feature/redis-telemetry-replay
 
     // Sync parent
     useEffect(() => {

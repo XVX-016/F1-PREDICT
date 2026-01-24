@@ -16,7 +16,7 @@ class TelemetryManager:
             self.redis.ping()
             logger.info("Connected to Redis for live telemetry.")
         except Exception as e:
-            logger.error(f"Failed to connect to Redis: {e}")
+            logger.warning(f"Redis unavailable ({e}) — running in STATELESS mode (live telemetry disabled).")
             self.redis = None
 
     def update_race_state(self, race_id: str, state: Dict[str, Any]):

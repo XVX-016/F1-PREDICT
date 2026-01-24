@@ -1,104 +1,85 @@
-import { MapPin, Clock } from 'lucide-react';
+
 import { motion } from 'framer-motion';
 
 interface RaceCardProps {
-    race: {
-        id: string;
-        round: number;
-        raceName: string;
-        circuitName: string;
-        country: string;
-        city: string;
-        date: string;
-        time: string;
-        status: 'upcoming' | 'live' | 'completed';
-        startISO?: string;
-    };
-    onViewDetails: (race: any) => void;
+    race: any;
     getCountryFlag: (country: string) => string;
+    onViewDetails: (race: any) => void;
+    isNext?: boolean;
 }
 
-const countryColorMap: Record<string, string> = {
-    'Bahrain': 'bg-[#CE1126]',
-    'Saudi Arabia': 'bg-[#006C35]',
-    'Australia': 'bg-[#00008B]',
-    'Japan': 'bg-[#BC002D]',
-    'China': 'bg-[#EE1C25]',
-    'USA': 'bg-[#002868]',
-    'Italy': 'bg-[#009246]',
-    'Monaco': 'bg-[#CE1126]',
-    'Spain': 'bg-[#FABD00]',
-    'Canada': 'bg-[#FF0000]',
-    'Austria': 'bg-[#EF3340]',
-    'United Kingdom': 'bg-[#00247D]',
-    'Belgium': 'bg-[#FFD935]',
-    'Hungary': 'bg-[#436F4D]',
-    'Netherlands': 'bg-[#21468B]',
-    'Azerbaijan': 'bg-[#00B5E2]',
-    'Singapore': 'bg-[#ED2939]',
-    'Mexico': 'bg-[#006847]',
-    'Brazil': 'bg-[#009739]',
-    'Qatar': 'bg-[#8D1B3D]',
-    'UAE': 'bg-[#00732F]'
-};
+const RaceCard = ({ race, getCountryFlag, onViewDetails, isNext }: RaceCardProps) => {
+    // Format dates: "06 - 08 MAR"
+    const formatDateRange = (strDate: string) => {
+        try {
+            const date = new Date(strDate);
+            const startDay = date.toLocaleDateString('en-GB', { day: '2-digit' });
+            // Estimate end date (Sunday) from Friday (usually +2 days)
+            const endDate = new Date(date);
+            endDate.setDate(date.getDate() + 2);
+            const endDay = endDate.toLocaleDateString('en-GB', { day: '2-digit' });
+            const month = date.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
 
-export default function RaceCard({
-    race,
-    onViewDetails,
-    getCountryFlag
-}: RaceCardProps) {
-    const isPast = race.status === 'completed';
-    const isLive = race.status === 'live';
-    const flagColor = countryColorMap[race.country] || 'bg-gray-600';
+            return `${startDay} - ${endDay} ${month}`;
+        } catch {
+            return 'TBD';
+        }
+    };
 
     return (
         <motion.div
-            layoutId={`card-${race.id}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative bg-[#15151e] border-t-4 border-[#e10600] text-white overflow-hidden rounded-br-2xl shadow-2xl transition-transform hover:scale-[1.02] flex flex-col h-full group cursor-pointer"
             onClick={() => onViewDetails(race)}
-            className={`relative overflow-hidden glass-card p-5 mb-4 cursor-pointer group hover:bg-white/10 ${isPast ? 'opacity-70 grayscale-[0.5]' : ''}`}
         >
-            {/* Flag Accent Border */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1 ${flagColor} transition-transform duration-300 group-hover:scale-y-110`} />
-
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
-                <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                        <span className="text-[10px] font-black text-red-600 tracking-[0.2em] uppercase">
-                            ROUND {race.round}
-                        </span>
-                        <div className={`status-pill ${isPast ? 'status-pill-past' : isLive ? 'status-pill-live' : 'status-pill-upcoming'}`}>
-                            {isPast ? 'Final Results' : isLive ? 'Live Now' : 'Upcoming'}
-                        </div>
-                    </div>
-
-                    <h3 className="text-2xl font-black italic text-white uppercase tracking-tighter group-hover:text-red-500 transition-colors">
-                        {race.raceName}
-                    </h3>
-
-                    <div className="flex items-center gap-4 mt-2">
-                        <div className="flex items-center gap-1.5 text-gray-400 font-mono text-xs">
-                            <MapPin className="w-3.5 h-3.5" />
-                            {race.circuitName}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-gray-400 font-mono text-xs">
-                            <Clock className="w-3.5 h-3.5" />
-                            {new Date(race.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
-                        </div>
-                    </div>
+            {/* Top Banner Area */}
+            <div className="relative h-40 w-full bg-black/50">
+                {race.bannerImg ? (
+                    <img src={race.bannerImg} className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-80" alt={race.raceName} />
+                ) : (
+                    <div className="w-full h-full bg-slate-800 opacity-60" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#15151e] to-transparent" />
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#e10600] drop-shadow-md">Round {race.round}</span>
+                    {isNext && (
+                        <span className="bg-white text-[#E10600] text-[9px] font-black px-1.5 py-0.5 rounded animate-pulse">NEXT</span>
+                    )}
                 </div>
 
-                <div className="flex items-center gap-6 self-end md:self-center">
-                    <div className="text-right">
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">{race.country}</div>
-                        <div className="text-4xl filter drop-shadow-lg group-hover:scale-110 transition-transform">{getCountryFlag(race.country)}</div>
-                    </div>
+                {/* Flag in top right */}
+                <div className="absolute top-4 right-4 text-2xl drop-shadow-md">
+                    {getCountryFlag(race.country)}
                 </div>
             </div>
 
-            {/* Subtle Hero Car Peeking effect at low opacity */}
-            <div className="absolute right-[-30px] bottom-[-20px] opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700 pointer-events-none w-64">
-                <img src="/hero/hero-home.png" alt="" className="w-full grayscale" />
+            {/* Content Area */}
+            <div className="p-6 flex justify-between items-end flex-grow">
+                <div className="flex-1 pr-4">
+                    <h2 className="text-lg font-black uppercase italic leading-tight mb-1">{race.country}</h2>
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4 line-clamp-1">{race.raceName}</p>
+
+                    <div className="border-l-2 border-[#e10600] pl-3">
+                        <p className="text-lg font-mono font-bold tracking-tight text-white">{formatDateRange(race.date)}</p>
+                    </div>
+                </div>
+
+                {/* Track Layout - High Contrast White/Grey */}
+                {race.trackImg && (
+                    <div className="w-20 h-20 flex-shrink-0">
+                        <img
+                            src={race.trackImg}
+                            className="w-full h-full object-contain filter invert brightness-200 opacity-80"
+                            alt="Track Layout"
+                        />
+                    </div>
+                )}
             </div>
+
+
         </motion.div>
     );
-}
+};
+
+export default RaceCard;
