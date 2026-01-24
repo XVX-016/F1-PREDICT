@@ -3,9 +3,13 @@ import { Calendar } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { useRaces, Race as ApiRace } from '../hooks/useApi';
 import RaceCard from '../components/schedule/RaceCard';
+import NextRaceHero from '../components/schedule/NextRaceHero';
+import UpcomingRaceRow from '../components/schedule/UpcomingRaceRow';
 import RaceDetailView from '../components/schedule/RaceDetailView';
 import { RaceCardSkeleton } from '../components/common/SkeletonLoaders';
 import PageContainer from '../components/layout/PageContainer';
+import { SEASON_2026_SCHEDULE } from '../data/season2026';
+
 
 type RaceSession = { date: string | null; time: string | null };
 type RaceItem = {
@@ -25,6 +29,9 @@ type RaceItem = {
   status: 'upcoming' | 'live' | 'completed';
   startISO?: string;
   id: string;
+  trackImg?: string;
+  bannerImg?: string;
+  circuitMap?: string;
 };
 
 interface SchedulePageProps {
@@ -35,12 +42,55 @@ export default function SchedulePage({ }: SchedulePageProps) {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'live' | 'completed'>('all');
   const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(selectedYear);
 
+  /* import moved to top */
+
   const [races, setRaces] = useState<RaceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedRace, setSelectedRace] = useState<RaceItem | null>(null);
 
   useEffect(() => {
+    // 1. Static Loading for 2026 (Offline/Verified Mode)
+    if (selectedYear === 2026) {
+      setLoading(true); // Short aesthetic delay could be added if desired, but instant is better
+      setError('');
+
+      try {
+        const staticRaces: RaceItem[] = SEASON_2026_SCHEDULE.map(r => {
+          const startISO = `${r.date}T${r.time.replace('Z', '')}`; // Simplified ISO construction
+          return {
+            round: r.round,
+            raceName: r.raceName,
+            circuitName: r.circuit,
+            country: r.country,
+            city: r.city,
+            date: r.date,
+            time: r.time.substring(0, 5),
+            fp1: { date: null, time: null },
+            fp2: { date: null, time: null },
+            fp3: { date: null, time: null },
+            sprintQualifying: { date: null, time: null },
+            sprint: { date: null, time: null },
+            qualifying: { date: null, time: null },
+            status: 'upcoming', // All 2026 races are future/upcoming
+            startISO: startISO,
+            id: `2026-${r.round}`,
+            trackImg: r.trackImg,
+            bannerImg: r.bannerImg,
+            circuitMap: (r as any).circuitMap
+          };
+        });
+        setRaces(staticRaces);
+        setLoading(false);
+      } catch (e) {
+        console.error("Failed to load static 2026 data", e);
+        setError("Failed to load 2026 Season Data");
+        setLoading(false);
+      }
+      return;
+    }
+
+    // 2. Legacy API Loading for other years (e.g. 2025)
     if (apiLoading) {
       setLoading(true);
       return;
@@ -75,7 +125,7 @@ export default function SchedulePage({ }: SchedulePageProps) {
 
     setRaces(mappedRaces);
     setLoading(false);
-  }, [apiRaces, apiLoading, apiError]);
+  }, [apiRaces, apiLoading, apiError, selectedYear]);
 
   const getRaceStatusUTC = (startISO: string) => {
     const raceDateTime = new Date(startISO);
@@ -102,12 +152,23 @@ export default function SchedulePage({ }: SchedulePageProps) {
     return true;
   });
 
-  const groupedRaces = filteredRaces.reduce((acc: Record<string, RaceItem[]>, race) => {
-    const month = new Date(race.date).toLocaleString('en-US', { month: 'long' });
-    if (!acc[month]) acc[month] = [];
-    acc[month].push(race);
-    return acc;
-  }, {});
+  // Advanced Layout Logic
+  const upcomingRacesFull = races.filter(r => r.status === 'upcoming' || r.status === 'live');
+  const nextRace = upcomingRacesFull.length > 0 ? upcomingRacesFull[0] : null;
+  const subsequentRaces = upcomingRacesFull.slice(1, 5); // Next 4 races
+
+  // Grid races should exclude the pinned ones ONLY if we are in 2026/Current and filter allows.
+  // Actually, simplest is to just show them all in grid OR filter. 
+  // Let's filter them out from the specific grid section below if they are shown in Hero/Upcoming.
+  // ONLY if selectedYear is 2026 (or whatever is "current").
+  const isCurrentSeason = selectedYear === 2026;
+
+  const idsInFeature = new Set<string>();
+  if (isCurrentSeason && nextRace) idsInFeature.add(nextRace.id);
+  if (isCurrentSeason) subsequentRaces.forEach(r => idsInFeature.add(r.id));
+
+  // Decide what to show in the grid
+  const gridRaces = filteredRaces.filter(r => !idsInFeature.has(r.id));
 
   return (
     <PageContainer>
@@ -118,44 +179,49 @@ export default function SchedulePage({ }: SchedulePageProps) {
             <span className="text-xs font-black text-slate-500 tracking-[0.3em] uppercase">Season Calendar</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white">
-            {selectedYear} <span className="text-[#E10600]">Schedule</span>
+            2026 <span className="text-[#E10600]">Schedule</span>
           </h1>
         </header>
+      </div>
 
-        <div className="flex items-center bg-slateDark/40 border border-slateMid/20 rounded-xl p-1">
-          {[2025, 2026].map(year => (
+      {/* --- Featured Section (Next Race) --- */}
+      {/* Only show feature section if it's the 2026 season AND we are filtered to see upcoming/all */}
+      {isCurrentSeason && !loading && !error && (selectedFilter === 'all' || selectedFilter === 'upcoming') && nextRace && (
+        <div className="mb-20 space-y-12">
+          <NextRaceHero
+            race={nextRace}
+            getCountryFlag={getCountryFlag}
+            onViewDetails={(r) => setSelectedRace(r)}
+          />
+        </div>
+      )}
+
+
+      {/* Filter Tabs */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
+        <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">
+          {isCurrentSeason ? `${selectedYear} Race Calendar` : `Archive: ${selectedYear} Season`}
+        </h3>
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {['all', 'upcoming', 'live', 'completed'].map(filter => (
             <button
-              key={year}
-              onClick={() => setSelectedYear(year)}
-              className={`px-6 py-2 rounded-lg text-sm font-black transition-all ${selectedYear === year ? 'bg-[#E10600] text-white shadow-lg' : 'text-gray-500 hover:text-white'
+              key={filter}
+              onClick={() => setSelectedFilter(filter as any)}
+              className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border ${selectedFilter === filter
+                ? 'bg-white text-black border-white'
+                : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30'
                 }`}
             >
-              {year}
+              {filter}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-        {['all', 'upcoming', 'live', 'completed'].map(filter => (
-          <button
-            key={filter}
-            onClick={() => setSelectedFilter(filter as any)}
-            className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border ${selectedFilter === filter
-              ? 'bg-white text-black border-white'
-              : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30'
-              }`}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
-
-      {/* Race List Container */}
+      {/* Race List Grid */}
       {loading ? (
-        <div className="space-y-4">
-          {[1, 2, 3, 4].map(i => <RaceCardSkeleton key={i} />)}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3, 4, 5, 6].map(i => <RaceCardSkeleton key={i} />)}
         </div>
       ) : error ? (
         <div className="glass-card py-20 text-center border-red-500/20">
@@ -163,31 +229,22 @@ export default function SchedulePage({ }: SchedulePageProps) {
           <p className="text-gray-400">{error}</p>
         </div>
       ) : (
-        <div className="space-y-16">
-          {Object.entries(groupedRaces).map(([month, monthRaces]) => (
-            <div key={month} className="space-y-6">
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-black text-white uppercase italic tracking-wider">{month}</h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
-              </div>
-              <div className="space-y-4">
-                {monthRaces.map((race) => (
-                  <RaceCard
-                    key={race.id}
-                    race={race}
-                    getCountryFlag={getCountryFlag}
-                    onViewDetails={(r) => setSelectedRace(r)}
-                  />
-                ))}
-              </div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {gridRaces.map((race) => (
+            <RaceCard
+              key={race.id}
+              race={race}
+              getCountryFlag={getCountryFlag}
+              onViewDetails={(r) => setSelectedRace(r)}
+              isNext={false} // Grid items are never 'Next' if Next is in Hero
+            />
           ))}
         </div>
       )}
 
-      {filteredRaces.length === 0 && !loading && !error && (
+      {gridRaces.length === 0 && !loading && !error && (
         <div className="text-center py-20 glass-card">
-          <p className="text-gray-500 font-mono text-xs uppercase tracking-[0.3em]">No Sessions Found for this Range</p>
+          <p className="text-gray-500 font-mono text-xs uppercase tracking-[0.3em]">No Sessions Found in Calendar Grid</p>
         </div>
       )}
 
