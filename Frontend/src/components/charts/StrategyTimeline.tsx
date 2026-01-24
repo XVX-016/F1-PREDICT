@@ -382,18 +382,18 @@ export default function StrategyTimeline() {
     return (
         <div ref={containerRef} className="h-full w-full relative">
             <svg ref={svgRef} className="w-full h-full text-white" />
-            <div className="absolute top-2 right-2 flex flex-col gap-1 text-[8px] font-mono">
+            <div className="absolute top-2 right-2 flex flex-col gap-1 text-[10px] font-medium font-mono bg-black/50 p-2 rounded backdrop-blur-sm border border-white/10">
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-[#16a34a] opacity-15"></div>
-                    <span className="text-gray-400">OPTIMAL</span>
+                    <div className="w-2 h-2 rounded-full bg-[#16a34a]"></div>
+                    <span className="text-gray-300">OPTIMAL</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-[#f59e0b] opacity-15"></div>
-                    <span className="text-gray-400">VIABLE</span>
+                    <div className="w-2 h-2 rounded-full bg-[#f59e0b]"></div>
+                    <span className="text-gray-300">VIABLE</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-[#dc2626] opacity-15"></div>
-                    <span className="text-gray-400">CLOSED</span>
+                    <div className="w-2 h-2 rounded-full bg-[#dc2626]"></div>
+                    <span className="text-gray-300">CLOSED</span>
                 </div>
             </div>
         </div>

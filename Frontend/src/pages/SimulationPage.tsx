@@ -69,6 +69,15 @@ export default function SimulationPage() {
            MAIN PANEL — RUN + OUTPUT
         ───────────────────────────── */}
                 <SimulationMain>
+                    <div className="bg-[#141821] border-b border-white/10 p-6">
+                        <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic">
+                            <span className="text-[#E10600]">Race</span> Simulation
+                        </h1>
+                        <p className="text-[10px] text-white/50 font-mono uppercase tracking-[0.2em] mt-1">
+                            Deterministic Physics & Monte Carlo Engine
+                        </p>
+                    </div>
+
                     <SimulationControlBar>
                         <RunSimulationButton />
                         <ReplayToggle />
