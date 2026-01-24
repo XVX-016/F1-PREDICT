@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'; // No /api suffix here, appended later or logic adjusted
 
 export interface RaceStatus {
     raceId: string;
@@ -20,10 +20,27 @@ export const useRaceStatus = () => {
     return useQuery<RaceStatus>({
         queryKey: ['raceStatus'],
         queryFn: async () => {
-            const { data } = await axios.get(`${API_BASE_URL}/race-status`);
-            return data;
+            try {
+                const { data } = await axios.get(`${API_BASE_URL}/api/race-status`);
+                return data;
+            } catch (error) {
+                // Return fallback status if backend offline
+                return {
+                    raceId: "offline-demo",
+                    name: "Backend Initializing...",
+                    round: 0,
+                    session: "CHECKING",
+                    status: "UPCOMING",
+                    trackTemp: "--",
+                    airTemp: "--",
+                    humidity: "--",
+                    windSpeed: "--",
+                    nextSessionTime: new Date().toISOString()
+                } as RaceStatus;
+            }
         },
-        refetchInterval: 30000, // Poll every 30s
-        staleTime: 10000
+        refetchInterval: 10000,
+        staleTime: 5000,
+        retry: false // Don't spam retries, just show fallback
     });
 };
