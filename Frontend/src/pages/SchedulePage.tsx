@@ -4,7 +4,6 @@ import { AnimatePresence } from 'framer-motion';
 import { useRaces, Race as ApiRace } from '../hooks/useApi';
 import RaceCard from '../components/schedule/RaceCard';
 import NextRaceHero from '../components/schedule/NextRaceHero';
-import UpcomingRaceRow from '../components/schedule/UpcomingRaceRow';
 import RaceDetailView from '../components/schedule/RaceDetailView';
 import { RaceCardSkeleton } from '../components/common/SkeletonLoaders';
 import PageContainer from '../components/layout/PageContainer';
@@ -155,17 +154,12 @@ export default function SchedulePage({ }: SchedulePageProps) {
   // Advanced Layout Logic
   const upcomingRacesFull = races.filter(r => r.status === 'upcoming' || r.status === 'live');
   const nextRace = upcomingRacesFull.length > 0 ? upcomingRacesFull[0] : null;
-  const subsequentRaces = upcomingRacesFull.slice(1, 5); // Next 4 races
 
-  // Grid races should exclude the pinned ones ONLY if we are in 2026/Current and filter allows.
-  // Actually, simplest is to just show them all in grid OR filter. 
-  // Let's filter them out from the specific grid section below if they are shown in Hero/Upcoming.
-  // ONLY if selectedYear is 2026 (or whatever is "current").
   const isCurrentSeason = selectedYear === 2026;
 
+  // Only exclude the Next Race (shown in the Hero) from the grid
   const idsInFeature = new Set<string>();
   if (isCurrentSeason && nextRace) idsInFeature.add(nextRace.id);
-  if (isCurrentSeason) subsequentRaces.forEach(r => idsInFeature.add(r.id));
 
   // Decide what to show in the grid
   const gridRaces = filteredRaces.filter(r => !idsInFeature.has(r.id));
