@@ -217,7 +217,7 @@ export const WeatherVariance = () => {
 };
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Settings } from 'lucide-react';
+import { Settings, Play, Pause, ChevronDown, ChevronRight } from 'lucide-react';
 
 export const AdvancedSettings = ({ children }: { children: React.ReactNode }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -287,9 +287,9 @@ export const ReplayToggle = () => {
                 }`}
         >
             {isPlaying ? (
-                <><span>⏸</span> Pause</>
+                <><Pause className="w-3 h-3" /> Pause</>
             ) : (
-                <><span>▶</span> Play Replay</>
+                <><Play className="w-3 h-3" /> Replay</>
             )}
         </button>
     );
