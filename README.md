@@ -341,18 +341,5 @@ This project is an **engineering-grade analysis tool**, not a betting system or 
 * Supabase for database infrastructure
 * Formula 1 teams for inspiring real-world strategy analysis workflows
 
----
 
-*Developed for [Insert Hackathon Name] – Track 03: Applied ML for Science & High-Stakes Domains.*
 
----
-
-### ✅ Why This README Wins
-
-* ✅ Emphasizes **probabilistic decision-making** and high-stakes impact
-* ✅ Highlights **real metrics** with clear, judge-friendly tables
-* ✅ Explains **technical sophistication** (physics-first simulation, Monte Carlo, ML calibration)
-* ✅ Shows **future innovation potential** in race strategy and adaptive modeling
-* ✅ Clean Markdown layout with code blocks and tables for AI evaluation
-* ✅ Accurate to actual codebase implementation
-* ✅ Includes installation, testing, and deployment instructions
