@@ -373,22 +373,3 @@ This is a **decision instrument**, not a dashboard toy. Every visualization is d
 * Jolpica F1 API for race schedules and results
 * Supabase for database infrastructure
 * Formula 1 teams for inspiring real-world strategy analysis workflows
-
-
-## 🏆 Why This Wins in Applied ML for High-Stakes Domains
-
-Most ML systems optimize accuracy metrics in isolation. **F1-PREDICT** is designed around **decision risk**, not prediction accuracy.
-
-Key differentiators:
-1. **Physics-constrained ML**: Prevents implausible outputs (e.g., negative lap times).
-2. **Monte Carlo Simulation**: Exposes tail risk (P95 outcomes), not just arithmetic means.
-3. **Deterministic Replay**: Enables scientific debugging for "what-if" analysis.
-4. **Explicit Failure Modes**: System degrades gracefully to **Stateless Mode** if infrastructure (Redis) fails.
-
-This architecture mirrors real-world engineering systems where **incorrect confidence is more dangerous than imperfect accuracy**.
-
-### Hackathon Judging Criteria Check
-* ✅ **Impact**: Evaluating expensive strategy decisions (~$Millions).
-* ✅ **Technical Complexity**: Physics Engine + Monte Carlo + LightGBM.
-* ✅ **Completeness**: Full-stack (FastAPI + React) with polished UI.
-* ✅ **Documentation**: Clear architecture, installation steps, and API docs.
