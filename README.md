@@ -328,29 +328,6 @@ F1-PREDICT follows a **physics-first, ML-assisted** approach:
 This project is an **engineering-grade analysis tool**, not a betting system or fan prediction app.
 
 ---
-
-## 📊 Why This Is Not a Prediction System
-
-The **Strategy Timeline** visualization demonstrates our core philosophy:
-
-> **"Every chart is a pure function of a deterministic simulation result, and ML is bounded to residual correction under identical seeds."**
-
-### What the Strategy Timeline Shows
-
-1. **Pit Window Bands**: Derived from marginal cost comparisons (tyre degradation vs. pit loss), not historical patterns
-2. **Safety Car Overlay**: Probabilistic hazard model that compresses gaps but doesn't predict outcomes
-3. **Counterfactual Overlay**: Same seed, pit lap ±2 — proves decision robustness, not prediction accuracy
-4. **Residual Debug Panel**: Shows where ML correction deviates from pure physics model — explicit transparency
-
-### What It Does NOT Do
-
-❌ Predict race winners  
-❌ Generate betting odds  
-❌ Claim "AI confidence scores"  
-❌ Animate or smooth data to hide uncertainty  
-
-### What Judges Will Understand
-
 ### What You Will Understand From This
 
 The strategy timeline is derived from a high-fidelity synthesis of:
@@ -367,34 +344,9 @@ The strategy timeline is derived from a high-fidelity synthesis of:
 
 ---
 
-## 📝 License
-
-[Specify your license here]
-
----
-
 ## 🙏 Acknowledgments
 
 * FastF1 library for telemetry data
 * Jolpica F1 API for race schedules and results
 * Supabase for database infrastructure
 * Formula 1 teams for inspiring real-world strategy analysis workflows
-
-
-## 🏆 Why This Wins in Applied ML for High-Stakes Domains
-
-Most ML systems optimize accuracy metrics in isolation. **F1-PREDICT** is designed around **decision risk**, not prediction accuracy.
-
-Key differentiators:
-1. **Physics-constrained ML**: Prevents implausible outputs (e.g., negative lap times).
-2. **Monte Carlo Simulation**: Exposes tail risk (P95 outcomes), not just arithmetic means.
-3. **Deterministic Replay**: Enables scientific debugging for "what-if" analysis.
-4. **Explicit Failure Modes**: System degrades gracefully to **Stateless Mode** if infrastructure (Redis) fails.
-
-This architecture mirrors real-world engineering systems where **incorrect confidence is more dangerous than imperfect accuracy**.
-
-### Hackathon Judging Criteria Check
-* ✅ **Impact**: Evaluating expensive strategy decisions (~$Millions).
-* ✅ **Technical Complexity**: Physics Engine + Monte Carlo + LightGBM.
-* ✅ **Completeness**: Full-stack (FastAPI + React) with polished UI.
-* ✅ **Documentation**: Clear architecture, installation steps, and API docs.
