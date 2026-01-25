@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import React, { useMemo } from 'react';
-
-=======
->>>>>>> feature/redis-telemetry-replay
 // Using simple SVG for portability and speed instead of full D3 library import issues
 // This follows the D3 conceptual model described in the plan.
 

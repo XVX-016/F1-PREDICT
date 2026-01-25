@@ -33,32 +33,6 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
         <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-<<<<<<< HEAD
-                {/* Metric Summary */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Max Verstappen Win %</p>
-                        <p className="text-xl font-black text-white font-mono">
-                            {results.win_probability['VER'] ? (results.win_probability['VER'] * 100).toFixed(1) : '0.0'}%
-                        </p>
-                    </div>
-                    <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Model Confidence</p>
-                        <p className="text-xl font-black text-green-500 font-mono">High</p>
-                    </div>
-                    <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Sample Size</p>
-                        <p className="text-xl font-black text-slate-300 font-mono">{results.metadata.iterations.toLocaleString()}</p>
-                    </div>
-                    <div className="p-4 bg-black/20 rounded border border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] text-slate-600 uppercase tracking-widest mb-1">Most Likely Podium</p>
-                        <div className="flex -space-x-2 overflow-hidden mt-1">
-                            {/* Placeholder for top 3 driver avatars or codes */}
-                            <span className="text-xs font-mono text-yellow-500">VER</span>
-                            <span className="text-xs font-mono text-slate-400 ml-2">NOR</span>
-                            <span className="text-xs font-mono text-orange-400 ml-2">LEC</span>
-                        </div>
-=======
                 {/* Primary Outcome: Win Probabilities */}
                 <div className="lg:col-span-8 bg-[#121217] border border-[#1f1f26] rounded-md overflow-hidden">
                     <div className="px-6 py-4 border-b border-[#1f1f26] flex justify-between items-center bg-black/20">
@@ -132,7 +106,6 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
                         <p className="text-[9px] font-mono text-slate-500 uppercase leading-relaxed">
                             Full collision avoidance and tyre wear models applied to simulation trace.
                         </p>
->>>>>>> feature/redis-telemetry-replay
                     </div>
                 </div>
             </div>

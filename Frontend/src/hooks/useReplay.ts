@@ -1,18 +1,11 @@
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-=======
 import { useEffect, useState, useMemo } from "react";
 import { RaceTimeline, LapFrame } from "../types/domain";
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
->>>>>>> feature/redis-telemetry-replay
 
 export function useReplay(raceId: string, maxLap: number) {
     const [lap, setLap] = useState(1);
     const [playing, setPlaying] = useState(false);
-<<<<<<< HEAD
-    const [speed, setSpeed] = useState(1); // 1 = 1 lap/sec
-=======
     const [speed, setSpeed] = useState(1);
     const [timeline, setTimeline] = useState<RaceTimeline | null>(null);
     const [loading, setLoading] = useState(false);
@@ -43,7 +36,6 @@ export function useReplay(raceId: string, maxLap: number) {
         if (!timeline) return [];
         return timeline.laps.filter((f: LapFrame) => f.lap === lap);
     }, [timeline, lap]);
->>>>>>> feature/redis-telemetry-replay
 
     // Playback Loop
     useEffect(() => {
@@ -70,13 +62,9 @@ export function useReplay(raceId: string, maxLap: number) {
         playing,
         setPlaying,
         speed,
-<<<<<<< HEAD
-        setSpeed
-=======
         setSpeed,
         timeline,
         currentFrames,
         loading
->>>>>>> feature/redis-telemetry-replay
     };
 }

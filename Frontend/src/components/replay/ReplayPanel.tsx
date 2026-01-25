@@ -1,38 +1,7 @@
-<<<<<<< HEAD
-import React, { useEffect, useState } from "react";
-// Lucide icons would require installation, using simple text buttons if not available or assume installed
-// Assuming typical project setup. If fails, I will revert to text.
-// Given "production-grade", I'll use standard elements if I can't confirm library.
-// But the user prompt had <Play />. I'll use text for safety unless I check package.json.
-// Actually, I'll use simple styled buttons.
-
-interface LapState {
-    lap: number;
-    gap_to_leader_ms: number;
-    car_state: {
-        tyre_compound: string;
-        tyre_age_laps: number;
-        fuel_kg: number;
-    };
-    pace_model: {
-        predicted_lap_ms: number;
-        uncertainty: {
-            p05_ms: number;
-            p95_ms: number;
-        };
-    };
-    decision?: {
-        action: string;
-        explanation: string;
-        confidence: number;
-    }
-}
-=======
 import { useEffect } from "react";
 // Lucide icons would require installation, using simple text buttons if not available or assume installed
 
 
->>>>>>> feature/redis-telemetry-replay
 
 interface ReplayPanelProps {
     raceId: string;
@@ -50,11 +19,7 @@ export default function ReplayPanel({
     currentLapData
 }: ReplayPanelProps) {
 
-<<<<<<< HEAD
-    const { lap, setLap, playing, setPlaying, speed, setSpeed } = useReplay(raceId, maxLap);
-=======
     const { lap, setLap, playing, setPlaying, speed } = useReplay(raceId, maxLap);
->>>>>>> feature/redis-telemetry-replay
 
     // Sync parent
     useEffect(() => {

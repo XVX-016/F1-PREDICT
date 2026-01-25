@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React from "react";
-=======
 
->>>>>>> feature/redis-telemetry-replay
 
 interface Failure {
     lap: number;
