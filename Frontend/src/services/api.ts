@@ -78,23 +78,6 @@ export const api = {
     },
 
     simulateRace: async (raceId: string, params: any): Promise<any> => {
-<<<<<<< HEAD
-        // Map camelCase to snake_case for Python Backend
-        const backendParams = {
-            tyre_deg_multiplier: params.tyreDegMultiplier,
-            sc_probability: params.scProbability,
-            strategy_aggression: params.strategyAggression,
-            weather_scenario: params.weatherScenario,
-            grid_source: params.gridSource,
-            seed: params.seed,
-            iterations: params.iterations // if present
-        };
-
-        const response = await fetch(`${API_BASE_URL}/api/races/${raceId}/simulate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(backendParams),
-=======
         return safeFetch(`${API_BASE_URL}/api/races/${raceId}/simulate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -103,7 +86,6 @@ export const api = {
             // Mock simulation result structure
             meta: { totalLaps: 58, circuit: "albert_park" },
             baseline: { drivers: {}, safetyCarLaps: [] }
->>>>>>> feature/redis-telemetry-replay
         });
     },
 
