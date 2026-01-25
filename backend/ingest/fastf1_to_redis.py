@@ -17,14 +17,11 @@ def ingest_race(year=2024, race="Bahrain", session_type="R"):
     session.load(laps=True, telemetry=False, weather=False, messages=False)
     
     store = RedisTelemetryStore()
-<<<<<<< HEAD
-=======
     
     if not store.r:
         print("Error: Redis is not available. Skipping ingestion.")
         return
 
->>>>>>> feature/redis-telemetry-replay
     race_id = f"{race.lower()}_{year}"
     
     laps = session.laps

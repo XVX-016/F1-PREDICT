@@ -557,16 +557,6 @@ class RaceCalendarService:
         
         return characteristics.get(track_type, characteristics["permanent"])
 
-<<<<<<< HEAD
-    def get_current_race_status(self) -> Dict[str, Any]:
-        """
-        Determines the current or next race status from the calendar.
-        For Week 1 MVP, we mock a 'Live' scenario or fetch from Ergast if connectivity allows.
-        """
-        # Placeholder logic: return a static "Live" state for testing UI
-        # In production this would check self.races against datetime.utcnow()
-        return {
-=======
     def _fetch_real_weather(self, location: str) -> Optional[Dict[str, str]]:
         """Fetch current weather from WeatherAPI.com"""
         api_key = os.getenv("WEATHER_API_KEY")
@@ -603,24 +593,16 @@ class RaceCalendarService:
         """
         # Default mock status
         status = {
->>>>>>> feature/redis-telemetry-replay
             "raceId": "2026-01-17-test-race",
             "name": "Bahrain Grand Prix",
             "round": 1,
             "session": "FP2",
-<<<<<<< HEAD
-            "status": "LIVE", # or UPCOMING, COMPLETED
-=======
             "status": "LIVE", 
->>>>>>> feature/redis-telemetry-replay
             "trackTemp": "42°C",
             "airTemp": "31°C",
             "humidity": "45%",
             "windSpeed": "12 km/h",
             "nextSessionTime": "2026-03-02T15:00:00Z"
-<<<<<<< HEAD
-        }
-=======
         }
         
         # Try to enrich with real weather for 'Bahrain' or specific location
@@ -630,4 +612,3 @@ class RaceCalendarService:
             status.update(real_weather)
             
         return status
->>>>>>> feature/redis-telemetry-replay

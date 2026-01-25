@@ -12,17 +12,6 @@ from models.domain import SimulationRequest, SimulationResponse, RaceTimeline
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["races"])
-<<<<<<< HEAD
-
-class SimulationRequest(BaseModel):
-    tyre_deg_multiplier: float = 1.0
-    sc_probability: float = 0.15
-    strategy_aggression: str = "Balanced"
-    weather_scenario: str = "Dry"
-    grid_source: str = "Qualifying"
-    seed: Optional[int] = None
-=======
->>>>>>> feature/redis-telemetry-replay
 
 @router.get("/")
 async def get_races(season: int = 2026):
@@ -38,30 +27,7 @@ async def get_races(season: int = 2026):
         logger.error(f"Error fetching races: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch races")
 
-<<<<<<< HEAD
-@router.post("/{race_id}/simulate/compare")
-async def compare_strategies(
-    race_id: str,
-    request: Dict[str, Any]
-):
-    """Compares two specific race strategies."""
-    try:
-        results = simulation_engine.compare_strategies(
-            race_id=race_id,
-            driver_id=request.get("driver_id", "VER"),
-            strategy_a=request["strategy_a"],
-            strategy_b=request["strategy_b"],
-            params=request.get("params", {})
-        )
-        return results
-    except Exception as e:
-        logger.error(f"Error comparing strategies: {e}")
-        raise HTTPException(status_code=500, detail="Failed to compare strategies")
-
-@router.post("/{race_id}/simulate")
-=======
 @router.post("/{race_id}/simulate", response_model=SimulationResponse)
->>>>>>> feature/redis-telemetry-replay
 async def simulate_race(race_id: str, request: SimulationRequest):
     """
     Executes a high-fidelity Monte Carlo simulation (default 10k iterations).
