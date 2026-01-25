@@ -1,8 +1,7 @@
 import { useState, useCallback } from "react";
-import axios from "axios";
 import { SimulationRequest, SimulationResponse } from "../types/domain";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export function useSimulation() {
     const [running, setRunning] = useState(false);
@@ -16,18 +15,26 @@ export function useSimulation() {
         setProgress(10); // Simulation started
 
         try {
-            const response = await axios.post<SimulationResponse>(
-                `${API_BASE}/races/${raceId}/simulate`,
-                request
-            );
+            const response = await fetch(`${API_BASE}/api/races/${raceId}/simulate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Simulation failed to execute.");
+            }
+
+            const data: SimulationResponse = await response.json();
 
             setProgress(100);
-            setResult(response.data);
+            setResult(data);
             setRunning(false);
-            return response.data;
+            return data;
         } catch (err: any) {
             console.error("Simulation failed:", err);
-            setError(err.response?.data?.detail || "Simulation failed to execute.");
+            setError(err.message || "Simulation failed to execute.");
             setRunning(false);
             setProgress(0);
             return null;

@@ -1,8 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
 import { RaceTimeline, LapFrame } from "../types/domain";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export function useReplay(raceId: string, maxLap: number) {
     const [lap, setLap] = useState(1);
@@ -18,8 +17,10 @@ export function useReplay(raceId: string, maxLap: number) {
         async function fetchTimeline() {
             setLoading(true);
             try {
-                const res = await axios.get<RaceTimeline>(`${API_BASE}/races/${raceId}/timeline`);
-                setTimeline(res.data);
+                const res = await fetch(`${API_BASE}/api/races/${raceId}/timeline`);
+                if (!res.ok) throw new Error('Failed to fetch timeline');
+                const data = await res.json();
+                setTimeline(data);
             } catch (err) {
                 console.error("Failed to fetch replay timeline:", err);
             } finally {
@@ -67,4 +68,3 @@ export function useReplay(raceId: string, maxLap: number) {
         loading
     };
 }
-
