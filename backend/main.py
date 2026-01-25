@@ -42,11 +42,8 @@ if frontend_url:
 
 app.add_middleware(
     CORSMiddleware,
-<<<<<<< HEAD
-    allow_origins=["*"],
-=======
-    allow_origins=origins,
->>>>>>> feature/redis-telemetry-replay
+    # allow_origins=origins, # TODO: Re-enable strict ORIGINS once env var is confirmed
+    allow_origins=["*"], # TEMPORARY FIX: Allow all for debugging "Backend Offline"
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,17 +58,12 @@ app.include_router(user.router, prefix="/api/users", tags=["users"])
 
 import api.live_telemetry as telemetry
 import api.ws_race as ws_race
-<<<<<<< HEAD
-app.include_router(telemetry.router)
-app.include_router(ws_race.router)
-=======
 import api.compare as compare
 import api.sc_hazard as sc_hazard
 app.include_router(telemetry.router)
 app.include_router(ws_race.router)
 app.include_router(compare.router)
 app.include_router(sc_hazard.router, prefix="/api")
->>>>>>> feature/redis-telemetry-replay
 
 @app.get("/health")
 async def health_check():
