@@ -8,6 +8,8 @@ from typing import Dict, Any, Optional
 from services.simulation_engine import simulation_engine
 from database.supabase_client import get_db
 from models.domain import SimulationRequest, SimulationResponse, RaceTimeline
+from dependencies import get_redis_client
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +38,17 @@ async def simulate_race(race_id: str, request: SimulationRequest):
         request.track_id = race_id
         logger.info(f"Triggering track-first simulation for {race_id}")
         results = simulation_engine.run_simulation(request)
+        
+        # Add metadata transparency
+        if not results.metadata:
+            results.metadata = {}
+        
+        results.metadata.update({
+            "source": "simulation_engine",
+            "is_fallback": False,
+            "generated_at": datetime.utcnow().isoformat()
+        })
+        
         return results
     except Exception as e:
         logger.error(f"Simulation failed: {e}")
@@ -49,50 +62,55 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
     try:
         # For now, we fetch from Redis (REPLAY source)
         # In a real app, this would query the race:{race_id}:replay:lap:* keys
-        from scripts.fastf1_to_redis import get_redis_client
         import json
         r = get_redis_client()
         
-        # Get metadata
-        meta_json = r.get(f"race:{race_id}:meta")
-        if not meta_json:
-            raise HTTPException(status_code=404, detail="Race metadata not found")
-        meta = json.loads(meta_json)
+        source = "redis"
+        is_fallback = False
         
-        # Get all laps
+        meta = {}
         laps = []
-        # Pattern: race:{race_id}:replay:lap:{lap}
-        try:
-            lap_keys = r.keys(f"race:{race_id}:replay:lap:*")
-            for k in sorted(lap_keys, key=lambda x: int(x.split(":")[-1])):
-                lap_data = r.hgetall(k)
-                for driver, frame_json in lap_data.items():
-                    laps.append(json.loads(frame_json))
-        except Exception as e:
-            logger.warning(f"Redis lap fetch failed: {e}")
-
-        # Fallback: Check local JSON cache if we have no data (Redis failed or empty)
-        # Note: In the new ingestion, we don't save 'laps' separate from telemetry in local cache
-        # We just have the big telemetry files.
-        # But the frontend expects `telemetry` array in the response to populate `state.drivers`.
-        # `laps` is less critical for the Replay engine (it calculates position on fly or uses telemetry).
-        
         telemetry = []
-        import glob
-        import os
         
-        # Try fetching telemetry from Redis first
-        # Key: race:{race_id}:replay:telemetry:{lap}:{driver}... complex.
-        # Actually our ingestion now puts everything in JSON or Redis. 
-        # If Redis keys `race:{race_id}:replay:telemetry:*` exist...
-        
-        # SIMPLIFICATION for robustness:
-        # Always check local cache if telemetry is empty.
-        
+        if r:
+            # Get metadata
+            meta_json = r.get(f"race:{race_id}:meta")
+            if meta_json:
+                meta = json.loads(meta_json)
+            
+            # Get all laps
+            try:
+                lap_keys = r.keys(f"race:{race_id}:replay:lap:*")
+                for k in sorted(lap_keys, key=lambda x: int(x.split(":")[-1])):
+                    lap_data = r.hgetall(k)
+                    for driver, frame_json in lap_data.items():
+                        laps.append(json.loads(frame_json))
+            except Exception as e:
+                logger.warning(f"Redis lap fetch failed: {e}")
+        else:
+            logger.warning("Redis unavailable, falling back to local cache.")
+            source = "local_cache"
+            is_fallback = True
+
+        # Fallback logic for both metadata and data
+        if not meta:
+            meta = {
+                "race_id": race_id,
+                "source": source,
+                "is_fallback": is_fallback,
+                "generated_at": datetime.utcnow().isoformat()
+            }
+        else:
+            meta.update({
+                "source": source,
+                "is_fallback": is_fallback,
+                "generated_at": datetime.utcnow().isoformat()
+            })
+
         if not telemetry:
+            import glob
+            import os
             cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
-            # File pattern: {race_id}_{driver_code}.json
-            # Use 'Japan' if race_id is 'Japan'
             files = glob.glob(os.path.join(cache_dir, f"{race_id}_*.json"))
             
             if files:
@@ -100,8 +118,7 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
                 for fpath in files:
                     try:
                         with open(fpath, 'r') as f:
-                            data = json.load(f) # dict: lap_num (str) -> list[frames]
-                            # We need to flatten this into a single list of TelemetryFrame
+                            data = json.load(f)
                             for frames in data.values():
                                 telemetry.extend(frames)
                     except Exception as e:
@@ -112,7 +129,7 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
         return RaceTimeline(
             meta=meta,
             laps=laps,
-            telemetry=telemetry, # Ensure this field is added to model return
+            telemetry=telemetry,
             summary={"total_time_ms": 0}
         )
     except Exception as e:

@@ -116,7 +116,14 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
         });
     },
 
-    togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
+    togglePlay: () => set((state) => {
+        const totalLaps = state.simulationResult?.meta.totalLaps ?? state.context?.totalLaps ?? 58;
+        const shouldRestart = !state.isPlaying && state.currentLap >= totalLaps;
+        return {
+            isPlaying: !state.isPlaying,
+            currentLap: shouldRestart ? 1 : state.currentLap
+        };
+    }),
     setPlaybackSpeed: (speed) => set({ playbackSpeed: speed }),
 
     selectDriver: (id) => set({ selectedDriverId: id }),

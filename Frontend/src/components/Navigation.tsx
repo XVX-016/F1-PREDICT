@@ -10,6 +10,7 @@ interface NavigationProps {
 const navItems = [
   { label: "Simulation", id: "simulation" },
   { label: "Intelligence", id: "intelligence" },
+  { label: "Replay", id: "replay" }, // Added Replay
   { label: "Schedule", id: "schedule" },
   { label: "Results", id: "results" },
   { label: "Drivers", id: "driver" },

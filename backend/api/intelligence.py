@@ -13,22 +13,54 @@ router = APIRouter(prefix="/api/intelligence", tags=["Intelligence"])
 async def get_intelligence(race_id: str, drivers: Optional[str] = None):
     """
     Returns the latest high-level probabilistic analysis for a race.
-    If drivers are provided, it generates an analytical baseline immediately (Zero-Sim).
+    Enforces the 'Inference vs Execution' boundary.
     """
+    from dependencies import get_redis_client
+    from datetime import datetime
+    import json
+    
     try:
-        if drivers:
-            driver_ids = drivers.split(",")
-            return intelligence_service.generate_analysis(race_id, driver_ids)
+        r = get_redis_client()
+        cache_key = f"intelligence:{race_id}:latest"
+        
+        source = "redis"
+        is_fallback = False
+        analysis = None
+        
+        if r:
+            cached_data = r.get(cache_key)
+            if cached_data:
+                analysis_dict = json.loads(cached_data)
+                analysis = IntelligenceAnalysis(**analysis_dict)
+        
+        if not analysis:
+            logger.info(f"No cached intelligence for {race_id}. Generating analytical baseline.")
             
-        # Fallback to simulation-based analysis if no driver list (for existing sandbox compatibility)
-        request = SimulationRequest(
-            track_id=race_id,
-            iterations=1000, 
-            use_ml=True,
-            capture_trace=False
-        )
-        artifact = simulation_engine.run_simulation(request)
-        analysis = intelligence_service.process_artifact(race_id, artifact)
+            if drivers:
+                driver_ids = drivers.split(",")
+                analysis = intelligence_service.generate_analysis(race_id, driver_ids)
+                source = "on_the_fly_inference"
+            else:
+                # Passive simulation fallback
+                request = SimulationRequest(
+                    track_id=race_id,
+                    iterations=1000, 
+                    use_ml=True,
+                    capture_trace=False
+                )
+                artifact = simulation_engine.run_simulation(request)
+                analysis = intelligence_service.process_artifact(race_id, artifact)
+                source = "on_the_fly_simulation"
+                is_fallback = True # Marked as fallback if not pre-cached
+
+            # Cache it
+            if r:
+                r.set(cache_key, analysis.json(), ex=3600)
+
+        # Explicit Metadata Guarantee
+        # We wrap it in a way that the model fields are populated correctly but we disclose provenance
+        analysis.explanation = f"{analysis.explanation} [Source: {source}]"
+        
         return analysis
     except Exception as e:
         logger.error(f"Failed to fetch intelligence analysis for {race_id}: {e}")

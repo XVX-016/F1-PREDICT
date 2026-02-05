@@ -5,11 +5,10 @@ export default function DriversPage() {
   return (
     <PageContainer>
       <div className="space-y-12">
-        <header className="border-l-4 border-[#E10600] pl-6 py-2">
+        <header className="border-l-4 border-[#E10600] pl-6 py-2 mb-12">
           <h1 className="text-4xl font-black uppercase tracking-tighter text-white">
             F1 Drivers <span className="text-[#E10600]">2026</span>
           </h1>
-          <p className="text-slate-400 font-mono text-xs mt-1 uppercase tracking-widest">Official Grid & Driver IDs</p>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">

@@ -143,3 +143,29 @@ class SimulationResponse(BaseModel):
     
     metadata: Dict[str, Any]
     trace: Optional[List[LapFrame]] = None
+
+class SimulationTraceArtifact(BaseModel):
+    """
+    Internal artifact containing full simulation results.
+    Used to bridge pure physics engine output to the intelligence layer.
+    """
+    win_probability: Dict[str, float]
+    podium_probability: Dict[str, List[float]]
+    pace_distributions: Dict[str, Dict[str, float]]
+    robustness_score: Dict[str, float]
+    metadata: Dict[str, Any]
+
+class IntelligenceAnalysis(BaseModel):
+    """
+    UI-safe public intelligence contract.
+    Strictly excludes internal simulation data (seeds, traces, iterations).
+    """
+    race_id: str
+    model_version: str
+    generated_at: str
+    win_probability: Dict[str, float]
+    podium_probability: Dict[str, List[float]]
+    pace_distributions: Dict[str, Dict[str, float]]
+    robustness_score: Dict[str, float]
+    mode: str
+    explanation: str

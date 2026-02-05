@@ -159,7 +159,7 @@ export default function LapTimeChart() {
         return (
             <div className="h-full flex items-center justify-center text-gray-500 font-mono text-xs">
                 <div className="text-center">
-                    <div className="text-2xl mb-2">⏱</div>
+                    <div className="text-2xl mb-2 opacity-20 font-light">⌗</div>
                     <div>Run simulation to view pace</div>
                 </div>
             </div>

@@ -29,3 +29,22 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
         # we might fallback to just decoding the JWT if we trust the gateway.
         # But 'db.auth.get_user(token)' is the correct way.
         raise HTTPException(status_code=401, detail=str(e))
+
+def get_redis_client():
+    """
+    Dependency to get a Redis client.
+    Returns None if Redis is unavailable, allowing callers to handle fallback.
+    """
+    import redis
+    import os
+    
+    host = os.getenv("REDIS_HOST", "localhost")
+    port = int(os.getenv("REDIS_PORT", 6379))
+    
+    try:
+        r = redis.Redis(host=host, port=port, decode_responses=True, socket_timeout=1)
+        # Ping to verify connection
+        r.ping()
+        return r
+    except (redis.ConnectionError, redis.TimeoutError):
+        return None

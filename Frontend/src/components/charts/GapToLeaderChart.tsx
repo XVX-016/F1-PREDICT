@@ -86,7 +86,7 @@ export default function GapToLeaderChart() {
 
         // Safety Car Highlighting
         visibleData.forEach(d => {
-            if (d.isSafetyCar) {
+            if (d.raceState === 'SC') {
                 svg.append("rect")
                     .attr("x", x(d.lap - 0.5))
                     .attr("y", margin.top)
@@ -134,7 +134,7 @@ export default function GapToLeaderChart() {
         return (
             <div className="h-full flex items-center justify-center text-gray-500 font-mono text-xs">
                 <div className="text-center">
-                    <div className="text-2xl mb-2">📊</div>
+                    <div className="text-2xl mb-2 opacity-20 font-light">⬚</div>
                     <div>Run simulation to view gaps</div>
                 </div>
             </div>

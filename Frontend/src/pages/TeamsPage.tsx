@@ -5,7 +5,9 @@ const TeamsPage = () => {
   return (
     <PageContainer>
       <header className="border-l-4 border-[#E10600] pl-6 py-2 mb-12">
-        <h1 className="text-4xl font-black uppercase tracking-tighter text-white">F1 Teams <span className="text-[#E10600]">2026</span></h1>
+        <h1 className="text-4xl font-black uppercase tracking-tighter text-white">
+          F1 Teams <span className="text-[#E10600]">2026</span>
+        </h1>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">

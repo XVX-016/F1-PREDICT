@@ -116,6 +116,7 @@ const TeamsPage = lazyWithTimeout(() => import('./pages/TeamsPage'));
 const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPage'));
 const ResultsPage = lazyWithTimeout(() => import('./pages/ResultsPage'));
 const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'));
+const ReplayPage = lazyWithTimeout(() => import('./pages/ReplayPage'));
 const AboutPage = lazyWithTimeout(() => import('./pages/AboutPage'));
 
 function App() {
@@ -187,6 +188,8 @@ function App() {
                   return <ResultsPage />;
                 case 'intelligence':
                   return <IntelligencePage />;
+                case 'replay':
+                  return <ReplayPage />;
                 case 'about':
                   return <AboutPage />;
                 default:

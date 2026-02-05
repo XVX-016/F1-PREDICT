@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import RaceBriefingControls from '../components/intelligence/RaceBriefingControls';
 import DriverRiskPriorsTable from '../components/intelligence/DriverRiskPriorsTable';
-import SCHazardChart from '../components/charts/SCHazardChart';
+// Removed SCHazardChart for shipping phase stability
 import BaselineRaceOrderChart from '../components/intelligence/BaselineRaceOrderChart';
 import PodiumProbabilityCard from '../components/intelligence/PodiumProbabilityCard';
 import SupportingPriorsSection from '../components/intelligence/SupportingPriorsSection';
@@ -21,7 +21,6 @@ const IntelligencePage = () => {
 
     const {
         driverPriorsEnvelope,
-        scHazardEnvelope,
         baselineOrderEnvelope,
         podiumProbabilityEnvelope,
         supportingPriorsEnvelope
@@ -48,24 +47,12 @@ const IntelligencePage = () => {
         <PageContainer>
             <div className="space-y-8 pb-20">
                 {/* Header Section */}
-                <header className="space-y-6">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                        <div className="relative">
-                            <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">
-                                <span className="text-[#E10600]">Race</span> Intelligence
-                            </h1>
-                            <div className="flex flex-col gap-1 mt-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="h-0.5 w-12 bg-[#E10600]"></span>
-                                    <p className="text-[10px] text-white/50 font-mono uppercase tracking-[0.4em]">Priors & Performance Briefing</p>
-                                </div>
-                                <p className="text-[9px] text-[#E10600]/60 uppercase tracking-widest font-black italic">
-                                    "All metrics are conditioned on selected circuit and session."
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
+                <header className="border-l-4 border-[#E10600] pl-6 py-2 mb-12">
+                    <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white">
+                        <span className="text-[#E10600]">Race</span> Intelligence
+                    </h1>
+                </header>
+                <div className="mb-12">
                     <RaceBriefingControls
                         selectedCircuit={selectedCircuit}
                         onCircuitChange={setSelectedCircuit}
@@ -74,22 +61,26 @@ const IntelligencePage = () => {
                         selectedCondition={selectedCondition}
                         onConditionChange={setSelectedCondition}
                     />
-                </header>
+                </div>
 
                 <main className="space-y-12">
-                    {/* Primary Grid: Reference Table vs Charts */}
+                    {/* Primary Grid: Podium & Baseline first */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                        {/* Reference: Driver Risk Priors (Full Grid) */}
-                        <div className="space-y-8">
-                            <DriverRiskPriorsTable envelope={driverPriorsEnvelope} />
+                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
                             <PodiumProbabilityCard envelope={podiumProbabilityEnvelope} />
                         </div>
-
-                        {/* Analysis: Hazard & Pace */}
-                        <div className="space-y-8">
-                            <SCHazardChart envelope={scHazardEnvelope} />
+                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
                             <BaselineRaceOrderChart envelope={baselineOrderEnvelope} />
                         </div>
+                    </div>
+
+                    {/* Detailed Risk Stats - Moved Down */}
+                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden px-8 py-6">
+                        <div className="mb-6">
+                            <h2 className="text-xl font-black text-white uppercase tracking-tighter italic">Driver Risk Priors</h2>
+                            <p className="text-[10px] text-white/40 font-mono uppercase tracking-[0.2em] mt-1">Stochastic Outcome Distribution</p>
+                        </div>
+                        <DriverRiskPriorsTable envelope={driverPriorsEnvelope} />
                     </div>
 
                     {/* Section: Auxiliary Priors */}

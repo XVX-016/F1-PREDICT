@@ -77,7 +77,7 @@ export const SEASON_2026_TEAMS: Team[] = [
         name: 'Audi',
         powerUnit: 'Audi',
         color: '#CC0000', // Audi Red
-        carImage: '/models/2026audicarright.avif',
+        carImage: '/models/2026audicarright.webp',
         drivers: [
             { id: 'hul', name: 'Nico Hülkenberg', number: 27, image: '/avatars/2026audinichul01right.avif', countryCode: 'GER' },
             { id: 'bor', name: 'Gabriel Bortoleto', number: 5, image: '/avatars/2026audigabbor01right.avif', countryCode: 'BRA' },

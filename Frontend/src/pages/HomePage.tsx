@@ -73,17 +73,20 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
           >
             <button
               onClick={() => setCurrentPage('intelligence')}
-              className="group relative px-8 py-4 border border-[#E10600] text-white font-bold uppercase tracking-widest text-sm overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(225,6,0,0.4)]"
+              className="group relative px-8 py-4 bg-[#E10600] text-white font-bold uppercase tracking-widest text-sm transition-all hover:bg-[#ff1a1a] hover:scale-105"
             >
-              <span className="relative z-10">Intelligence Engine</span>
-              <div className="absolute inset-0 bg-[#E10600]/10 group-hover:bg-[#E10600]/20 transition-colors"></div>
+              Intelligence Engine
             </button>
 
             <button
-              onClick={() => setCurrentPage('predict')}
-              className="group px-8 py-4 bg-[#E10600] text-white font-bold uppercase tracking-widest text-sm hover:bg-[#ff1a1a] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(225,6,0,0.6)]"
+              onClick={() => setCurrentPage('simulation')}
+              className="group px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-sm hover:scale-105 transition-all relative overflow-hidden"
+              style={{
+                backgroundImage: 'repeating-conic-gradient(#f0f0f0 0% 25%, #ffffff 0% 50%)',
+                backgroundSize: '20px 20px'
+              }}
             >
-              Live Forecast
+              <span className="relative z-10">Race Simulation</span>
             </button>
           </motion.div>
         </div>

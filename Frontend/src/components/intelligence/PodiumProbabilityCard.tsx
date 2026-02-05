@@ -34,10 +34,10 @@ export const PodiumProbabilityCard: React.FC<PodiumProbabilityCardProps> = ({ en
                     </div>
                     <div>
                         <h3 className="text-sm font-bold text-white uppercase tracking-widest">
-                            Podium Likelihood
+                            Estimated Podium Finish
                         </h3>
                         <p className="text-[10px] text-white/40 uppercase tracking-widest">
-                            Estimated Top-3 Finish Probability
+                            Aggregated likelihood over N simulations
                         </p>
                     </div>
                 </div>

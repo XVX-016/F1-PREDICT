@@ -168,13 +168,13 @@ export default function SchedulePage({ }: SchedulePageProps) {
     <PageContainer>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <header className="border-l-4 border-[#E10600] pl-6 py-2">
-          <div className="flex items-center gap-3 mb-2">
-            <Calendar className="w-4 h-4 text-[#E10600]" />
-            <span className="text-xs font-black text-slate-500 tracking-[0.3em] uppercase">Season Calendar</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white">
+          <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white mb-2">
             2026 <span className="text-[#E10600]">Schedule</span>
           </h1>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-3 h-3 text-[#E10600]" />
+            <span className="text-[9px] font-black text-slate-500 tracking-[0.3em] uppercase">Season Calendar</span>
+          </div>
         </header>
       </div>
 

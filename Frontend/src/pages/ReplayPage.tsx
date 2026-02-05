@@ -212,12 +212,15 @@ const ReplayPage = () => {
                                 <h1 className="text-4xl font-black text-white tracking-tighter italic uppercase drop-shadow-lg">
                                     <span className="text-[#E10600]">Race</span> Replay
                                 </h1>
+                                <p className="text-[10px] text-white/40 font-mono uppercase tracking-[0.2em] -mt-1 mb-2">
+                                    Historical / Deterministic Visualization
+                                </p>
                                 <div className="flex items-center gap-4 mt-2">
                                     <div className="bg-black/50 backdrop-blur px-2 py-1 border border-white/10 rounded text-[10px] font-mono font-bold">
                                         LAP <span className="text-[#E10600] text-lg">{state?.currentLap || 1}</span> <span className="text-white/40">/ {state?.totalLaps || 53}</span>
                                     </div>
-                                    <div className={`text-[10px] font-mono font-bold uppercase tracking-widest ${loading ? 'text-yellow-500' : 'text-[#4ade80]'}`}>
-                                        {loading ? 'BUFFERING' : 'LIVE'}
+                                    <div className={`text-[10px] font-mono font-bold uppercase tracking-widest ${loading ? 'text-yellow-500' : 'text-blue-500'}`}>
+                                        {loading ? 'BUFFERING' : 'ARCHIVE DATA'}
                                     </div>
                                 </div>
                             </div>
