@@ -6,7 +6,7 @@
  * for all 20 drivers in the 2025 F1 season.
  */
 
-import { enhancedCalibrationService } from '../src/services/enhancedCalibration';
+import * as fs from 'fs';
 import { trackPredictionService } from '../src/services/TrackPredictionService';
 
 async function generateAllTrackPredictions() {
@@ -22,11 +22,11 @@ async function generateAllTrackPredictions() {
 
     // Generate predictions for each track
     const allPredictions = await trackPredictionService.generateAllTrackPredictions();
-    
+
     console.log('');
     console.log('🎯 Prediction Summary:');
     console.log('=====================');
-    
+
     // Display predictions for each track
     allPredictions.forEach((trackPrediction, index) => {
       console.log(`\n${index + 1}. ${trackPrediction.trackName}`);
@@ -37,14 +37,14 @@ async function generateAllTrackPredictions() {
       console.log(`   Weather: ${trackPrediction.weather.condition}, ${trackPrediction.weather.tempC}°C, ${trackPrediction.weather.rainChancePct}% rain`);
       console.log('');
       console.log('   🏆 Top 3 Predictions:');
-      
+
       trackPrediction.predictions.slice(0, 3).forEach((driver, pos) => {
         const position = pos + 1;
         const emoji = position === 1 ? '🥇' : position === 2 ? '🥈' : '🥉';
         console.log(`   ${emoji} ${driver.position}. ${driver.driverName} (${driver.team})`);
         console.log(`      Win: ${(driver.winProbability * 100).toFixed(1)}% | Podium: ${(driver.podiumProbability * 100).toFixed(1)}%`);
       });
-      
+
       console.log('');
       console.log('   📊 Full Grid:');
       trackPrediction.predictions.forEach((driver, pos) => {
@@ -53,18 +53,18 @@ async function generateAllTrackPredictions() {
         const podiumPct = (driver.podiumProbability * 100).toFixed(1);
         console.log(`   ${position.toString().padStart(2, ' ')}. ${driver.driverName.padEnd(20)} | ${driver.team.padEnd(15)} | Win: ${winPct.padStart(5)}% | Podium: ${podiumPct.padStart(5)}%`);
       });
-      
+
       console.log('   ' + '─'.repeat(80));
     });
 
     // Generate summary statistics
     console.log('\n📈 Season Prediction Summary:');
     console.log('============================');
-    
+
     // Count wins by driver
     const driverWins: { [key: string]: number } = {};
     const driverPodiums: { [key: string]: number } = {};
-    
+
     allPredictions.forEach(trackPrediction => {
       trackPrediction.predictions.slice(0, 3).forEach((driver, pos) => {
         const driverName = driver.driverName;
@@ -77,7 +77,7 @@ async function generateAllTrackPredictions() {
 
     // Sort drivers by wins
     const sortedDrivers = Object.entries(driverWins)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .map(([driver, wins]) => ({ driver, wins, podiums: driverPodiums[driver] || 0 }));
 
     console.log('\n🏆 Predicted Season Champions:');
@@ -90,11 +90,11 @@ async function generateAllTrackPredictions() {
     // Track type analysis
     console.log('\n🏁 Track Type Analysis:');
     const trackTypeStats: { [key: string]: { count: number; winners: string[] } } = {};
-    
+
     allPredictions.forEach(trackPrediction => {
       const trackType = trackPrediction.trackType;
       const winner = trackPrediction.predictions[0].driverName;
-      
+
       if (!trackTypeStats[trackType]) {
         trackTypeStats[trackType] = { count: 0, winners: [] };
       }
@@ -105,17 +105,17 @@ async function generateAllTrackPredictions() {
     Object.entries(trackTypeStats).forEach(([trackType, stats]) => {
       console.log(`\n${trackType.replace('_', ' ').toUpperCase()}:`);
       console.log(`   Races: ${stats.count}`);
-      
+
       // Count wins by driver for this track type
       const winsByDriver: { [key: string]: number } = {};
       stats.winners.forEach(winner => {
         winsByDriver[winner] = (winsByDriver[winner] || 0) + 1;
       });
-      
+
       const topDrivers = Object.entries(winsByDriver)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 3);
-      
+
       console.log(`   Top drivers: ${topDrivers.map(([driver, wins]) => `${driver} (${wins})`).join(', ')}`);
     });
 
@@ -123,7 +123,7 @@ async function generateAllTrackPredictions() {
     console.log('\n🏎️ Team Performance Analysis:');
     const teamWins: { [key: string]: number } = {};
     const teamPodiums: { [key: string]: number } = {};
-    
+
     allPredictions.forEach(trackPrediction => {
       trackPrediction.predictions.slice(0, 3).forEach((driver, pos) => {
         const team = driver.team;
@@ -135,7 +135,7 @@ async function generateAllTrackPredictions() {
     });
 
     const sortedTeams = Object.entries(teamWins)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .map(([team, wins]) => ({ team, wins, podiums: teamPodiums[team] || 0 }));
 
     console.log('\n🏆 Predicted Constructor Standings:');
@@ -147,9 +147,9 @@ async function generateAllTrackPredictions() {
 
     console.log('\n✅ All track predictions generated successfully!');
     console.log(`📊 Total predictions: ${allPredictions.length} tracks × 20 drivers = ${allPredictions.length * 20} predictions`);
-    
+
     // Save predictions to file
-    const fs = require('fs');
+    // Save predictions to file
     const predictionsData = {
       generatedAt: new Date().toISOString(),
       totalTracks: allPredictions.length,
@@ -172,10 +172,10 @@ async function generateAllTrackPredictions() {
     };
 
     fs.writeFileSync(
-      '2025_track_predictions.json', 
+      '2025_track_predictions.json',
       JSON.stringify(predictionsData, null, 2)
     );
-    
+
     console.log('💾 Predictions saved to 2025_track_predictions.json');
 
   } catch (error) {

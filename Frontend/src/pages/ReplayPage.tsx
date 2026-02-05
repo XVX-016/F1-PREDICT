@@ -143,9 +143,9 @@ const TimelineScrubber = ({
 );
 
 const ReplayPage = () => {
-    const [selectedRace, setSelectedRace] = useState('Japan');
+    const [selectedRace, _setSelectedRace] = useState('Japan');
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(true); // Default collapsed for max view
-    const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+    const [selectedDriverId, _setSelectedDriverId] = useState<string | null>(null);
 
     const {
         state,

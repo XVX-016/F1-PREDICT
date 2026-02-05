@@ -32,8 +32,8 @@ const BackendStatusIndicator = () => {
 
   return (
     <div className={`fixed bottom-4 right-4 z-[9999] px-4 py-2 rounded-full border backdrop-blur-md text-xs font-bold flex items-center gap-2 shadow-2xl transition-all duration-500 ${isOffline
-        ? 'bg-red-500/10 border-red-500 text-red-500'
-        : 'bg-[#E10600]/10 border-[#E10600] text-[#E10600]'
+      ? 'bg-red-500/10 border-red-500 text-red-500'
+      : 'bg-[#E10600]/10 border-[#E10600] text-[#E10600]'
       }`}>
       {isLoading ? (
         <>
@@ -131,7 +131,7 @@ function App() {
   };
 
   const [currentPage, setCurrentPageState] = useState(getInitialPage());
-  const [raceData, setRaceData] = useState<any>(null);
+  // const [raceData, setRaceData] = useState<any>(null); // Unused currently
 
   // Initialize Jolpica API with fallback data on app start
   useEffect(() => {
@@ -139,11 +139,11 @@ function App() {
   }, []);
 
   // Update hash on page change
-  const setCurrentPage = (page: string, data?: any) => {
+  const setCurrentPage = (page: string, _data?: any) => {
     // Check if page string already has params
     const pageName = page.split('?')[0];
     setCurrentPageState(pageName);
-    setRaceData(data || null);
+    // setRaceData(data || null);
 
     // If we're updating manual state, we update hash.
     // If page string implies params (e.g. 'intelligence?driver=VER'), set it directly.

@@ -10,7 +10,7 @@ export const SimulationProvider = ({ children }: { children: React.ReactNode }) 
     // Playback state from store
     const isPlaying = useRaceStore(useShallow(s => s.isPlaying));
     const playbackSpeed = useRaceStore(useShallow(s => s.playbackSpeed));
-    const currentLap = useRaceStore(useShallow(s => s.currentLap));
+    // const currentLap = useRaceStore(useShallow(s => s.currentLap));
     const simulationResult = useRaceStore(useShallow(s => s.simulationResult));
     const context = useRaceStore(useShallow(s => s.context));
 
@@ -56,11 +56,20 @@ export const SimulationProvider = ({ children }: { children: React.ReactNode }) 
 
 export const SimulationLayout = ({ children }: { children: React.ReactNode }) => <div className="flex flex-1 overflow-hidden">{children}</div>;
 
-export const SimulationSidebar = ({ children }: { children: React.ReactNode }) => {
+export const SimulationSidebar = ({
+    children,
+    isCollapsed: propIsCollapsed,
+    onToggle
+}: {
+    children: React.ReactNode;
+    isCollapsed?: boolean;
+    onToggle?: () => void;
+}) => {
     const isPlaying = useRaceStore(useShallow(s => s.isPlaying));
 
-    // Auto-collapse when playing, but allow manual override if needed (omitted for now per strict req)
-    const isCollapsed = isPlaying;
+    // Auto-collapse when playing, but allow manual override if needed
+    // Use prop if provided, else use store state
+    const isCollapsed = propIsCollapsed !== undefined ? propIsCollapsed : isPlaying;
 
     return (
         <aside className={`${isCollapsed ? 'w-14' : 'w-80'} transition-all duration-300 border-r border-white/10 bg-[#141821] flex flex-col overflow-y-auto overflow-x-hidden`}>
