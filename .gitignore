@@ -60,6 +60,8 @@ ENV/
 
 # FastF1 cache
 cache/
+.fastf1-cache/
+.fastf1_cache/
 *.ff1pkl
 fastf1_http_cache.sqlite
 
@@ -104,3 +106,8 @@ backend/serviceaccountkey.json
 backend/cache/
 *.sqlite
 f1-race-replay-main/
+Frontend/dist/
+Frontend/node_modules/
+backend/__pycache__/
+.fastf1-cache/
+.fastf1_cache/
