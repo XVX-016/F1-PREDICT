@@ -62,17 +62,58 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
         # Get all laps
         laps = []
         # Pattern: race:{race_id}:replay:lap:{lap}
-        # We can use keys or a smarter way, but for now scan/keys is fine for small f1 data
-        keys = r.keys(f"race:{race_id}:replay:lap:*")
-        for k in sorted(keys, key=lambda x: int(x.split(":")[-1])):
-            lap_data = r.hgetall(k)
-            for driver, frame_json in lap_data.items():
-                laps.append(json.loads(frame_json))
+        try:
+            lap_keys = r.keys(f"race:{race_id}:replay:lap:*")
+            for k in sorted(lap_keys, key=lambda x: int(x.split(":")[-1])):
+                lap_data = r.hgetall(k)
+                for driver, frame_json in lap_data.items():
+                    laps.append(json.loads(frame_json))
+        except Exception as e:
+            logger.warning(f"Redis lap fetch failed: {e}")
+
+        # Fallback: Check local JSON cache if we have no data (Redis failed or empty)
+        # Note: In the new ingestion, we don't save 'laps' separate from telemetry in local cache
+        # We just have the big telemetry files.
+        # But the frontend expects `telemetry` array in the response to populate `state.drivers`.
+        # `laps` is less critical for the Replay engine (it calculates position on fly or uses telemetry).
         
+        telemetry = []
+        import glob
+        import os
+        
+        # Try fetching telemetry from Redis first
+        # Key: race:{race_id}:replay:telemetry:{lap}:{driver}... complex.
+        # Actually our ingestion now puts everything in JSON or Redis. 
+        # If Redis keys `race:{race_id}:replay:telemetry:*` exist...
+        
+        # SIMPLIFICATION for robustness:
+        # Always check local cache if telemetry is empty.
+        
+        if not telemetry:
+            cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
+            # File pattern: {race_id}_{driver_code}.json
+            # Use 'Japan' if race_id is 'Japan'
+            files = glob.glob(os.path.join(cache_dir, f"{race_id}_*.json"))
+            
+            if files:
+                logger.info(f"Found {len(files)} local cache files for {race_id}")
+                for fpath in files:
+                    try:
+                        with open(fpath, 'r') as f:
+                            data = json.load(f) # dict: lap_num (str) -> list[frames]
+                            # We need to flatten this into a single list of TelemetryFrame
+                            for frames in data.values():
+                                telemetry.extend(frames)
+                    except Exception as e:
+                        logger.error(f"Failed to load cache file {fpath}: {e}")
+            else:
+                 logger.warning(f"No local cache files found in {cache_dir} for {race_id}")
+
         return RaceTimeline(
             meta=meta,
             laps=laps,
-            summary={"total_time_ms": 0} # Placeholder
+            telemetry=telemetry, # Ensure this field is added to model return
+            summary={"total_time_ms": 0}
         )
     except Exception as e:
         logger.error(f"Failed to fetch timeline: {e}")

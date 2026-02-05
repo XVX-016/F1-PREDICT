@@ -178,7 +178,8 @@ def predict_with_model(features: np.ndarray, model_type: str) -> Dict[str, Any]:
         
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
-        return {"error": str(e)}
+        logger.exception("Internal error")
+        return {"error": "Internal server error"}
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -278,7 +279,8 @@ def predict_ml():
         
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.exception("Internal error")
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/predict/compare', methods=['POST'])
 def compare_predictions():
@@ -309,7 +311,8 @@ def compare_predictions():
         
     except Exception as e:
         logger.error(f"Comparison failed: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.exception("Internal error")
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/predict/race', methods=['GET'])
 def predict_race():
@@ -355,7 +358,8 @@ def predict_race():
         
     except Exception as e:
         logger.error(f"Race prediction failed: {e}")
-        return jsonify({"error": str(e)}), 500
+        logger.exception("Internal error")
+        return jsonify({"error": "Internal server error"}), 500
 
 def generate_driver_features(driver: str, race_name: str) -> Dict[str, Any]:
     """Generate realistic features for a driver"""
@@ -411,4 +415,4 @@ if __name__ == '__main__':
     # Start the service
     port = int(os.environ.get('PORT', 5001))
     logger.info(f"🚀 Starting F1 ML Prediction Service V2 on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

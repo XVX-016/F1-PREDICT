@@ -16,14 +16,9 @@ export const ENV_CONFIG = {
   WEATHER_API_KEY: (import.meta as any).env?.VITE_WEATHER_API_KEY || '',
   OPENWEATHER_API_KEY: (import.meta as any).env?.VITE_OPENWEATHER_API_KEY || '',
 
-  // Firebase Configuration (placeholders)
-  FIREBASE_API_KEY: (import.meta as any).env?.VITE_FIREBASE_API_KEY || 'your_api_key_here',
-  FIREBASE_AUTH_DOMAIN: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || 'your_project.firebaseapp.com',
-  FIREBASE_PROJECT_ID: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || 'your_project_id',
-  FIREBASE_STORAGE_BUCKET: (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || 'your_project.appspot.com',
-  FIREBASE_MESSAGING_SENDER_ID: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || 'your_sender_id',
-  FIREBASE_APP_ID: (import.meta as any).env?.VITE_FIREBASE_APP_ID || 'your_app_id',
-  FIREBASE_MEASUREMENT_ID: (import.meta as any).env?.VITE_FIREBASE_MEASUREMENT_ID || 'your_measurement_id',
+  // Firebase Configuration (Removed)
+  // FIREBASE_API_KEY: ...
+
 
   // Local API Configuration (replaces external Jolpica API)
   JOLPICA_BASE_URL: (import.meta as any).env?.VITE_JOLPICA_BASE_URL || '/ergast/f1',

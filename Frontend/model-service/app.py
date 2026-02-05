@@ -786,7 +786,8 @@ def latest_predictions():
 
         return jsonify(response)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        logger.exception("Internal error")
+        return jsonify({'success': False, 'error': "Internal server error"}), 500
 
 
 @app.route('/predictions/race', methods=['GET'])
@@ -801,7 +802,9 @@ def predictions_by_race():
       5) dynamic generation for missing races
     """
     try:
-        race_name = request.args.get('name', type=str)
+        raw_race_name = request.args.get('name', type=str)
+        # Security hardening: Prevent path traversal
+        race_name = os.path.basename(raw_race_name) if raw_race_name else None
         date_str = request.args.get('date', default=None, type=str)
         if not race_name:
             return jsonify({'success': False, 'error': 'Missing race name'}), 400
@@ -978,8 +981,9 @@ def predictions_by_race():
         }
         return jsonify(payload)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        logger.exception("Internal error")
+        return jsonify({'success': False, 'error': "Internal server error"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

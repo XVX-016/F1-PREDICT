@@ -14,10 +14,6 @@ help:
 	@echo "  make test-integration - Run integration tests"
 	@echo "  make test-validation - Run validation tests"
 	@echo "  make clean          - Clean cache and temporary files"
-	@echo "  make docker-build   - Build Docker image"
-	@echo "  make docker-up      - Start Docker containers"
-	@echo "  make docker-down    - Stop Docker containers"
-	@echo "  make docker-logs    - View Docker logs"
 	@echo "  make dev            - Start development server"
 	@echo "  make lint           - Run linter"
 	@echo ""
@@ -61,27 +57,6 @@ clean:
 	find backend -name "*.pyc" -delete
 	find backend -name "*.pyo" -delete
 	@echo "Clean complete"
-
-# Docker commands
-docker-build:
-	@echo "Building Docker image..."
-	docker-compose build
-
-docker-up:
-	@echo "Starting Docker containers..."
-	docker-compose up -d
-
-docker-down:
-	@echo "Stopping Docker containers..."
-	docker-compose down
-
-docker-logs:
-	@echo "Viewing Docker logs..."
-	docker-compose logs -f backend
-
-docker-restart:
-	@echo "Restarting Docker containers..."
-	docker-compose restart
 
 # Development server
 dev:
