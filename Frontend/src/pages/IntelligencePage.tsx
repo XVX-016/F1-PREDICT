@@ -45,14 +45,14 @@ const IntelligencePage = () => {
 
     return (
         <PageContainer>
-            <div className="space-y-8 pb-20">
+            <div className="space-y-4 pb-20">
                 {/* Header Section */}
-                <header className="border-l-4 border-[#E10600] pl-6 py-2 mb-12">
+                <header className="border-l-4 border-[#E10600] pl-6 py-2 mb-6">
                     <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white">
                         <span className="text-[#E10600]">Race</span> Intelligence
                     </h1>
                 </header>
-                <div className="mb-12">
+                <div className="mb-6">
                     <RaceBriefingControls
                         selectedCircuit={selectedCircuit}
                         onCircuitChange={setSelectedCircuit}
@@ -63,24 +63,41 @@ const IntelligencePage = () => {
                     />
                 </div>
 
-                <main className="space-y-12">
+                <main className="space-y-8">
                     {/* Primary Grid: Podium & Baseline first */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
-                            <PodiumProbabilityCard envelope={podiumProbabilityEnvelope} />
+                        {/* 01 // Podium Probability */}
+                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset min-h-[500px]">
+                            <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+                                <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">01 // Estimated Podium Finish</span>
+                                <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: PROBABILITY %</span>
+                            </div>
+                            <div className="flex-1 p-6">
+                                <PodiumProbabilityCard envelope={podiumProbabilityEnvelope} />
+                            </div>
                         </div>
-                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
-                            <BaselineRaceOrderChart envelope={baselineOrderEnvelope} />
+
+                        {/* 02 // Baseline Race Order */}
+                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset min-h-[500px]">
+                            <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+                                <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">02 // Baseline Race Order</span>
+                                <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: Δ LAP TIME (S)</span>
+                            </div>
+                            <div className="flex-1 p-6">
+                                <BaselineRaceOrderChart envelope={baselineOrderEnvelope} />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Detailed Risk Stats - Moved Down */}
-                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden px-8 py-6">
-                        <div className="mb-6">
-                            <h2 className="text-xl font-black text-white uppercase tracking-tighter italic">Driver Risk Priors</h2>
-                            <p className="text-[10px] text-white/40 font-mono uppercase tracking-[0.2em] mt-1">Stochastic Outcome Distribution</p>
+                    {/* 03 // Detailed Risk Stats */}
+                    <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
+                        <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+                            <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">03 // Driver Risk & Variability Priors</span>
+                            <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: STOCHASTIC σ</span>
                         </div>
-                        <DriverRiskPriorsTable envelope={driverPriorsEnvelope} />
+                        <div className="p-8">
+                            <DriverRiskPriorsTable envelope={driverPriorsEnvelope} />
+                        </div>
                     </div>
 
                     {/* Section: Auxiliary Priors */}

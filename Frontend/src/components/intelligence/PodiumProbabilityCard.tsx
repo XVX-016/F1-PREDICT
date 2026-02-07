@@ -1,4 +1,4 @@
-import { Trophy, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { PodiumProbability, DataEnvelope } from '../../types/intelligence';
 
 interface PodiumProbabilityCardProps {
@@ -10,7 +10,7 @@ export const PodiumProbabilityCard: React.FC<PodiumProbabilityCardProps> = ({ en
 
     if (validity === 'UNAVAILABLE') {
         return (
-            <div className="bg-[#15151e] rounded-xl border border-white/10 p-6 flex flex-col items-center justify-center text-center h-[350px]">
+            <div className="flex flex-col items-center justify-center text-center h-[350px]">
                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4">
                     <AlertCircle className="text-white/20 w-6 h-6" />
                 </div>
@@ -26,22 +26,7 @@ export const PodiumProbabilityCard: React.FC<PodiumProbabilityCardProps> = ({ en
     const topDrivers = data.slice(0, 8);
 
     return (
-        <div className="bg-[#15151e] rounded-xl border border-white/10 p-6 flex flex-col h-full transition-all hover:border-white/20">
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#F5C542]/10 rounded-lg">
-                        <Trophy className="w-4 h-4 text-[#F5C542]" />
-                    </div>
-                    <div>
-                        <h3 className="text-sm font-bold text-white uppercase tracking-widest">
-                            Estimated Podium Finish
-                        </h3>
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest">
-                            Aggregated likelihood over N simulations
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <div className="flex flex-col h-full">
 
             <div className="space-y-5 flex-1 p-1">
                 {topDrivers.map((d, i) => (

@@ -68,7 +68,7 @@ export const checkMLServiceHealth = async (): Promise<boolean> => {
     clearTimeout(timeoutId);
     return response.ok;
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       console.warn('ML Service health check timed out');
     } else {
       console.warn('ML Service health check failed:', error);
