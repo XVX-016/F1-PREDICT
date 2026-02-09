@@ -299,18 +299,21 @@ export class ReplayEngine {
     }
 
     private lerp(v0: number, v1: number, t: number): number {
-        return v0 * (1 - t) + v1 * t;
+        const val = v0 * (1 - t) + v1 * t;
+        return Number.isFinite(val) ? val : v0;
     }
 
     private lerpPos(a: { x: number, y: number }, b: { x: number, y: number }, t: number) {
+        const x = this.lerp(a.x, b.x, t);
+        const y = this.lerp(a.y, b.y, t);
         return {
-            x: this.lerp(a.x, b.x, t),
-            y: this.lerp(a.y, b.y, t)
+            x: Number.isFinite(x) ? x : a.x,
+            y: Number.isFinite(y) ? y : a.y
         };
     }
 
     /**
-     * Hardened interpolation with bounds safety.
+     * Hardened interpolation with O(log N) binary search and bounds safety.
      * Guaranteed to return a valid TelemetrySample even with packet loss.
      */
     private interpolateDriver(id: string, t: number): TelemetrySample & { id: string } {
@@ -331,18 +334,31 @@ export class ReplayEngine {
             return { ...samples[samples.length - 1], id, t };
         }
 
-        // Standard Case: Find bounding samples
+        // Optimized Binary Search for bounding samples
+        let low = 0;
+        let high = samples.length - 1;
         let i = 0;
-        while (i < samples.length && samples[i].t < t) i++;
 
-        // Safety check
-        if (i === 0) return { ...samples[0], id, t };
-        if (i >= samples.length) return { ...samples[samples.length - 1], id, t };
+        while (low <= high) {
+            const mid = Math.floor((low + high) / 2);
+            if (samples[mid].t <= t) {
+                i = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
 
-        const a = samples[i - 1];
-        const b = samples[i];
+        // Boundary safety
+        if (i >= samples.length - 1) {
+            return { ...samples[samples.length - 1], id, t };
+        }
 
-        const factor = (t - a.t) / (b.t - a.t);
+        const a = samples[i];
+        const b = samples[i + 1];
+
+        const deltaTime = b.t - a.t;
+        const factor = deltaTime > 0 ? (t - a.t) / deltaTime : 0;
 
         return {
             id,

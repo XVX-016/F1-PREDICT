@@ -57,10 +57,16 @@ export function buildDistanceMap(points: Point[]): TrackData {
  * using high-precision binary search on a track's LUT.
  */
 export function positionFromProgress(track: TrackData, progress: number): Point {
-    if (!track.points || track.points.length === 0) return { x: 0, y: 0 };
+    // Defensive check for invalid track data
+    if (!track || !track.points || track.points.length === 0 || !track.cumulativeDistances) {
+        console.warn(`[trackSpline] Invalid track data for lookup`, track);
+        return { x: 0, y: 0 };
+    }
 
-    // Wrap progress between 0 and 1
-    const p = ((progress % 1) + 1) % 1;
+    // Wrap progress between 0 and 1 and guard against NaN
+    let p = ((progress % 1) + 1) % 1;
+    if (isNaN(p)) p = 0;
+
     const targetDist = p * track.totalLength;
 
     const distances = track.cumulativeDistances;

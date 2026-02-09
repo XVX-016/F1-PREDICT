@@ -32,6 +32,9 @@ export function useReplay(raceId: string) {
                 console.log('[useReplay] Data loaded, duration:', payload.duration);
                 setMaxTime(payload.duration / 1000);
                 setLoading(false);
+            } else if (type === 'ERROR') {
+                console.error('[useReplay] Worker error:', payload.message);
+                setLoading(false);
             }
         };
 
@@ -65,6 +68,10 @@ export function useReplay(raceId: string) {
                 if (!res.ok) throw new Error('Failed to fetch timeline');
                 const timeline: RaceTimeline = await res.json();
 
+                if (!timeline || (!timeline.telemetry && !timeline.laps)) {
+                    throw new Error('Malformed timeline data received');
+                }
+
                 const { metadata, telemetry } = transformTimelineData(timeline);
 
                 // Enhance metadata with DRIVER_INFO
@@ -76,10 +83,15 @@ export function useReplay(raceId: string) {
                 // Mark as loaded BEFORE posting to prevent race conditions
                 dataLoadedRef.current = raceId;
 
-                workerRef.current?.postMessage({
-                    type: 'LOAD',
-                    payload: { metadata: enhancedMetadata, telemetry }
-                });
+                if (workerRef.current) {
+                    workerRef.current.postMessage({
+                        type: 'LOAD',
+                        payload: { metadata: enhancedMetadata, telemetry }
+                    });
+                } else {
+                    console.error('[useReplay] Worker lost during fetch');
+                    setLoading(false);
+                }
             } catch (err) {
                 console.error("[useReplay] Failed to fetch replay timeline:", err);
                 setLoading(false);
