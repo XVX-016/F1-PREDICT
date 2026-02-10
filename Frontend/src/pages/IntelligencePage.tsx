@@ -30,6 +30,12 @@ const IntelligencePage = () => {
         trackCondition: selectedCondition
     });
 
+    // Check for degraded data validity
+    const isFallbackOrDegraded =
+        driverPriorsEnvelope?.validity !== 'VALID' ||
+        baselineOrderEnvelope?.validity !== 'VALID' ||
+        podiumProbabilityEnvelope?.validity !== 'VALID';
+
     const assumptions = [
         {
             title: 'Model Calibration Boundary',
@@ -52,6 +58,27 @@ const IntelligencePage = () => {
                         <span className="text-[#E10600]">Race</span> Intelligence
                     </h1>
                 </header>
+
+                {/* Data Validity Alert */}
+                {isFallbackOrDegraded && (
+                    <div className="mb-6 bg-yellow-900/20 border border-yellow-500/50 p-4 rounded-lg flex items-start gap-3">
+                        <div className="text-yellow-500 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                                <path d="M12 9v4" />
+                                <path d="M12 17h.01" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 className="text-yellow-500 font-bold uppercase tracking-wider text-xs mb-1">Data Validity Warning</h3>
+                            <p className="text-yellow-200/80 text-xs font-mono">
+                                Some intelligence models are running in degraded mode due to insufficient historical telemetry.
+                                Predictions may rely on generic priors rather than track-specific data.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 <div className="mb-6">
                     <RaceBriefingControls
                         selectedCircuit={selectedCircuit}

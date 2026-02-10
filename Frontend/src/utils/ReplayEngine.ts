@@ -1,6 +1,14 @@
 import { TrackData, TrackConfig, positionFromProgress } from './trackSpline';
 
 /**
+ * Invariants:
+ * - Deterministic: same inputs (telemetry + metadata) -> same replay state
+ * - No randomness: all stochastic behavior must be seeded or pre-calculated
+ * - No wall-clock time: simulation time is strictly driven by tick(dt)
+ * - All state derived from timing + events
+ */
+
+/**
  * Driver telemetry point following the production-grade schema.
  */
 export interface TelemetrySample {
@@ -117,10 +125,13 @@ export class ReplayEngine {
     play() { this.isPlaying = true; }
     pause() { this.isPlaying = false; }
     setSpeed(s: number) { this.speedMultiplier = s; }
+
     seek(t: number) {
         this.currentTime = Math.max(0, Math.min(t, this.duration));
-        // Reset pit states on seek to be safe, or we'd need complex state reconstruction.
-        // For Phase 2, a reset ensures no stuck states, though it's a simplification.
+
+        // TODO(PHASE-3): Proper indexed state snapshots for O(1) seeks.
+        // Current seek mechanism simplistically resets pit states to avoid stuck states.
+        // To be fully deterministic, we should ideally replay events from the nearest keyframe.
         Object.keys(this.driverPitStates).forEach(id => {
             this.driverPitStates[id] = {
                 state: PitState.TRACK,
@@ -180,7 +191,7 @@ export class ReplayEngine {
             case PitState.PIT_LANE: {
                 // Move along pit spline
                 // Speed Limit Logic (Simplified: Green flag speed)
-                // TODO: Check RaceControl for SC/VSC
+                // TODO(PHASE-4): Check RaceControl interface for SC/VSC status to adjust pit lane speed limit dynamically.
                 const isSC = false; // Placeholder for RaceControl
                 const speedLimit = isSC ? this.PIT_LANE_SPEED_SC : this.PIT_LANE_SPEED_GREEN;
 
