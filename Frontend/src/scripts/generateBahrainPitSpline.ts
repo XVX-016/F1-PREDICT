@@ -26,7 +26,6 @@ const OUTPUT_PATH = 'src/data/bahrain_pit_dense.json';
 function generate() {
     console.log(`🏁 Starting PIT spline generation for: ${TRACK_ID}`);
 
-    const mainPoints = mainTrack.points;
     const totalLength = mainTrack.totalLength;
 
     // 1. Identify Main Track Segment
@@ -58,15 +57,19 @@ function generate() {
     // Pit Entry: x ~ 5200, y=0 -> x=5412 -> x=400 approx.
     // We need to bridge the gap.
 
+    // --- RAW_PIT_POINTS (Referenced for design) ---
+    // (Used as inspiration for SHORT_CONTINUOUS_POINTS)
+    /*
     const RAW_PIT_POINTS: [number, number][] = [
         [5150, 20],  // Entry Diverge
         [5250, 40],  // Limit Line
-        [5412, 40],  // Crosses Start line (wrapped)
+        [totalLength, 40],  // Crosses Start line (wrapped)
         [0, 40],     // Wrapped X (will adjust)
         [200, 40],   // Pit Box area
         [350, 40],   // Limit End
         [450, 20]    // Rejoin
     ];
+    */
 
     // Adjust for wrapping X coordinate logic
     // Since our main spline is a loop [0,0] -> ... -> [5412,0],
@@ -80,11 +83,11 @@ function generate() {
         [5150, 20],
         [5200, 35],
         [5250, 40], // Start of pit lane proper
-        [5412, 40],
-        [5612, 40], // e.g. x=200 equivalent
-        [5762, 40], // e.g. x=350 equivalent
-        [5812, 35],
-        [5862, 20]  // Rejoin at x=450 equivalent
+        [totalLength, 40],
+        [totalLength + 200, 40], // e.g. x=200 equivalent
+        [totalLength + 350, 40], // e.g. x=350 equivalent
+        [totalLength + 400, 35],
+        [totalLength + 450, 20]  // Rejoin at x=450 equivalent
     ];
 
     // 2. Spline Generation
@@ -93,8 +96,7 @@ function generate() {
 
     // 3. Resample
     const densePoints: [number, number][] = [];
-    const cumulativeDistances: number[] = [];
-    let currentLength = 0;
+    // let currentLength = 0; // Reserved for distance mapping if needed
 
     for (let i = 0; i <= DENSE_POINTS_COUNT; i++) {
         const t = i / DENSE_POINTS_COUNT;
@@ -122,38 +124,37 @@ function generate() {
         // YES. We need to wrap coordinates to match the main track's visual space.
         // If index i has x > 5412, we subtract 5412.
 
-        if (finalX >= 5412) finalX -= 5412;
+        if (finalX >= totalLength) finalX -= totalLength;
 
         densePoints.push([Number(finalX.toFixed(3)), Number(pos.z.toFixed(3))]);
 
         if (i > 0) {
-            const prev = densePoints[i - 1];
-            // Caution: If we wrapped, hypot calculation needs to account for wrap or use continuous dist?
-            // currentLength should use the SPLINE distance (continuous), not the wrapped point distance.
-            // We can ask the spline for length.
-            // Or use the continuous position for distance calc.
+            // const prev = densePoints[i - 1];
+            // distance logic can be added here
         }
     }
 
     // Recalculate length from continuous spline to be accurate
-    const rawLength = spline.getLength();
+    // const rawLength = spline.getLength();
 
-    // 4. Scale to Target Length (420m)
-    // The approximate points above span ~700m (5862 - 5150).
-    // We want exactly ~420m.
     // Let's trust the points' SHAPE but scale the distance?
     // No, shrinking 700m to 420m will squash it.
     // Let's adjust the input points to be closer to 420m span.
     // 5150 to 5570 approx.
 
+    // 5580 - 5180 = 400m vs 5412 wrap.
+    // If totalLength is 5412: 5580 - 5180 = 400.
+    // We'll use relative offsets from totalLength.
+
+
     const SHORT_CONTINUOUS_POINTS: [number, number][] = [
         [5180, 20],
         [5210, 35],
         [5250, 40],
-        [5412, 40],
-        [5500, 40],
-        [5550, 35],
-        [5580, 20]
+        [totalLength, 40],
+        [totalLength + 88, 40],
+        [totalLength + 138, 35],
+        [totalLength + 168, 20]
     ];
     // Span: 5580 - 5180 = 400m. This is closer.
 
@@ -167,7 +168,7 @@ function generate() {
     // Generate final dense points with wrapping
     const finalPoints: [number, number][] = [];
     const finalDistances: number[] = [];
-    let accLength = 0;
+    // let accLength = 0; // Reserved for precise arc-length mapping if split from t
 
     for (let i = 0; i <= DENSE_POINTS_COUNT; i++) {
         const t = i / DENSE_POINTS_COUNT;
@@ -176,7 +177,7 @@ function generate() {
         let wrappedX = pos.x;
         // Determine if we should wrap. 
         // The track logic wraps at 5412.
-        if (wrappedX > 5412) wrappedX -= 5412;
+        if (wrappedX > totalLength) wrappedX -= totalLength;
 
         finalPoints.push([Number(wrappedX.toFixed(3)), Number(pos.z.toFixed(3))]);
 

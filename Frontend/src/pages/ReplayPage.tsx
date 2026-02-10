@@ -4,7 +4,7 @@ import {
     SimulationSidebar,
     SimulationMain,
 } from './SimulationPage.components';
-import { Play, Pause, Info, Activity, Navigation, Timer } from 'lucide-react';
+import { Play, Pause, Activity, Navigation, Timer } from 'lucide-react';
 import { useReplay } from '../hooks/useReplay';
 import { TrackMap } from '../components/replay/TrackMap';
 import { DriverState } from '../utils/ReplayEngine';
@@ -112,6 +112,16 @@ const TelemetryOverlay = ({ driver }: { driver: DriverState | null }) => {
     );
 }
 
+interface TimelineScrubberProps {
+    currentTime: number;
+    maxTime: number;
+    onScrub: (t: number) => void;
+    playing: boolean;
+    setPlaying: (p: boolean) => void;
+    speed: number;
+    setSpeed: (s: number) => void;
+}
+
 const TimelineScrubber = ({
     currentTime,
     maxTime,
@@ -120,7 +130,7 @@ const TimelineScrubber = ({
     setPlaying,
     speed,
     setSpeed
-}: any) => {
+}: TimelineScrubberProps) => {
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60);
         const s = Math.floor(seconds % 60);
@@ -169,9 +179,9 @@ const TimelineScrubber = ({
 };
 
 const ReplayPage = () => {
-    const [selectedRace, _setSelectedRace] = useState('bahrain_2024');
+    const [selectedRace] = useState('bahrain_2024');
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
-    const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+    const [selectedDriverId] = useState<string | null>(null);
 
     const {
         state,

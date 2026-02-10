@@ -177,7 +177,7 @@ export class ReplayEngine {
                 }
                 break;
 
-            case PitState.PIT_LANE:
+            case PitState.PIT_LANE: {
                 // Move along pit spline
                 // Speed Limit Logic (Simplified: Green flag speed)
                 // TODO: Check RaceControl for SC/VSC
@@ -186,7 +186,8 @@ export class ReplayEngine {
 
                 // Stationary Logic (Mid-pit approximately ~200m?)
                 // Bahrain Pit is ~420m. Mid is 210m.
-                if (Math.abs(context.distance - 210) < 5 && context.stationaryTimer < this.PIT_STOP_DURATION) {
+                const midPoint = this.pitTrack.totalLength / 2;
+                if (Math.abs(context.distance - midPoint) < 5 && context.stationaryTimer < this.PIT_STOP_DURATION) {
                     context.stationaryTimer += dt * 1000; // accumulate ms
                     // Car is stopped
                 } else {
@@ -200,6 +201,7 @@ export class ReplayEngine {
                     context.distance = this.pitTrack.totalLength;
                 }
                 break;
+            }
 
             case PitState.EXITING:
                 // Blend from Pit -> Track

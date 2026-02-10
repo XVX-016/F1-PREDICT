@@ -62,14 +62,14 @@ export function transformTimelineData(timeline: RaceTimeline): {
         }
 
         telemetry[f.driver_id].push({
-            t: f.t,
+            t: f.t || 0,
             lap: (f as any).lap || 1,
-            progress: f.rel_dist,
-            speed: f.speed,
-            throttle: f.throttle,
-            brake: f.brake,
-            gear: f.gear,
-            drs: f.drs > 0,
+            progress: isNaN(f.rel_dist) ? 0 : (f.rel_dist || 0),
+            speed: isNaN(f.speed) ? 0 : (f.speed || 0),
+            throttle: isNaN(f.throttle) ? 0 : (f.throttle || 0),
+            brake: isNaN(f.brake) ? 0 : (f.brake || 0),
+            gear: isNaN(f.gear) ? 1 : (f.gear || 1),
+            drs: (f.drs || 0) > 0,
             isPitting: (f as any).is_pitting || false
         });
     });

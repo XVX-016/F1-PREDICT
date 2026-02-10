@@ -40,7 +40,7 @@ function ensureClockwise(points: [number, number][]): [number, number][] {
 function generate() {
     console.log(`🏁 Starting spline generation for: ${TRACK_ID}`);
 
-    let points = ensureClockwise(RAW_POINTS);
+    const points = ensureClockwise(RAW_POINTS);
 
     // 1. Convert to THREE.Vector3 for smoothing
     const curvePoints = points.map(p => new THREE.Vector3(p[0], 0, p[1]));

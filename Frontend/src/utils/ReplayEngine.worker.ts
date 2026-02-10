@@ -8,26 +8,31 @@ let isLooping = false;
 const TARGET_FPS = 120;
 
 self.onmessage = (e: MessageEvent) => {
-    const { type, payload } = e.data;
+    try {
+        const { type, payload } = e.data;
 
-    switch (type) {
-        case 'LOAD':
-            engine.loadData(payload.metadata, payload.telemetry);
-            self.postMessage({ type: 'LOADED', payload: { duration: engine.getDuration() } });
-            break;
-        case 'PLAY':
-            startLoop();
-            break;
-        case 'PAUSE':
-            stopLoop();
-            break;
-        case 'SEEK':
-            engine.seek(payload.t);
-            broadcastState();
-            break;
-        case 'SET_SPEED':
-            engine.setSpeed(payload.speed);
-            break;
+        switch (type) {
+            case 'LOAD':
+                engine.loadData(payload.metadata, payload.telemetry);
+                self.postMessage({ type: 'LOADED', payload: { duration: engine.getDuration() } });
+                break;
+            case 'PLAY':
+                startLoop();
+                break;
+            case 'PAUSE':
+                stopLoop();
+                break;
+            case 'SEEK':
+                engine.seek(payload.t);
+                broadcastState();
+                break;
+            case 'SET_SPEED':
+                engine.setSpeed(payload.speed);
+                break;
+        }
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown worker error';
+        self.postMessage({ type: 'ERROR', payload: { message } });
     }
 };
 
@@ -37,21 +42,27 @@ self.onmessage = (e: MessageEvent) => {
 function tick() {
     if (!isLooping) return;
 
-    const now = performance.now();
-    const dtSeconds = (now - lastTick) / 1000;
+    try {
+        const now = performance.now();
+        const dtSeconds = (now - lastTick) / 1000;
 
-    // Safety cap for dt to prevent explosion after long pauses/backgrounding
-    if (dtSeconds > 0.1) {
+        // Safety cap for dt to prevent explosion after long pauses/backgrounding
+        if (dtSeconds > 0.1) {
+            lastTick = now;
+            requestNextTick();
+            return;
+        }
+
         lastTick = now;
+        engine.tick(dtSeconds);
+        broadcastState();
+
         requestNextTick();
-        return;
+    } catch (err: unknown) {
+        isLooping = false;
+        const message = err instanceof Error ? err.message : 'Unknown tick error';
+        self.postMessage({ type: 'ERROR', payload: { message: `Tick error: ${message}` } });
     }
-
-    lastTick = now;
-    engine.tick(dtSeconds);
-    broadcastState();
-
-    requestNextTick();
 }
 
 function requestNextTick() {
