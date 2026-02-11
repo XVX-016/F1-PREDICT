@@ -1,4 +1,3 @@
-import React from 'react';
 import { DriverRiskPrior, DataEnvelope } from '../../types/intelligence';
 
 interface DriverRiskPriorsTableProps {
@@ -27,15 +26,9 @@ export const DriverRiskPriorsTable: React.FC<DriverRiskPriorsTableProps> = ({ en
     };
 
     return (
-        <div className="bg-[#15151e] rounded-xl border border-white/10 overflow-hidden flex flex-col h-[600px]">
-            {/* Header with Provenance */}
-            <div className="p-4 border-b border-white/10 bg-[#1E1E24] flex justify-between items-start">
-                <div>
-                    <h3 className="text-lg font-bold text-white uppercase tracking-wider">Driver Risk & Variability Priors</h3>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">
-                        Historical behavior inferred from past races.
-                    </p>
-                </div>
+        <div className="flex flex-col h-full">
+            {/* Table layout */}
+            <div className="flex justify-end p-4 border-b border-white/10">
                 <div className="text-right flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2">
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${validity === 'VALID' ? 'bg-[#4ade80]/10 text-[#4ade80]' : 'bg-[#ffb347]/10 text-[#ffb347]'}`}>

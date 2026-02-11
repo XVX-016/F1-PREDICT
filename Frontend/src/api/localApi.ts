@@ -23,9 +23,9 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
-      
+
       const response = await Promise.race([
-        fetch(url, { 
+        fetch(url, {
           signal: controller.signal,
           headers: {
             'Accept': 'application/json',
@@ -34,18 +34,18 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
         }),
         createTimeout(TIMEOUT_DURATION)
       ]) as Response;
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data;
     } catch (error) {
       console.warn(`Local API attempt ${attempt + 1} failed for ${url}:`, error);
-      
+
       if (attempt === retries) {
         // Final attempt: try Fast-F1 endpoint as fallback
         try {
@@ -63,7 +63,7 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
         }
         throw new Error(`Failed to fetch data after ${retries + 1} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-      
+
       // Wait before retrying (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
     }
@@ -74,12 +74,12 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
 const getCachedOrFetch = async (key: string, fetchFn: () => Promise<any>) => {
   const cached = cache.get(key);
   const now = Date.now();
-  
+
   if (cached && (now - cached.timestamp) < CACHE_DURATION) {
     console.log(`Using cached data for ${key}`);
     return cached.data;
   }
-  
+
   try {
     console.log(`Fetching fresh data for ${key}`);
     const data = await fetchFn();
@@ -120,6 +120,22 @@ export const getDriverStandings = async () => {
 
 export const getConstructorStandings = async () => {
   return getCachedOrFetch('constructor-standings', () => fetchWithTimeout(`${LOCAL_BASE_URL}/2025/constructorstandings`));
+};
+
+// Intelligence & Baseline Endpoints
+export const getIntelligence = async (raceId: string, drivers?: string) => {
+  const url = drivers
+    ? `/api/intelligence/${raceId}?drivers=${drivers}`
+    : `/api/intelligence/${raceId}`;
+  return fetchWithTimeout(url);
+};
+
+export const getBaseline = async (raceId: string) => {
+  return fetchWithTimeout(`/api/baseline/${raceId}`);
+};
+
+export const getBaselineSummary = async (raceId: string, drivers: string) => {
+  return fetchWithTimeout(`/api/baseline/${raceId}/summary?drivers=${drivers}`);
 };
 
 // Archive API functions
@@ -171,7 +187,7 @@ export const checkLocalServices = async () => {
       fetch(`${LOCAL_BASE_URL}/2025/drivers`),
       fetch(`${FAST_F1_BASE_URL}/health`)
     ]);
-    
+
     return {
       jolpica: jolpicaHealth.status === 'fulfilled' && (jolpicaHealth as any).value.ok,
       fastF1: fastF1Health.status === 'fulfilled' && (fastF1Health as any).value.ok

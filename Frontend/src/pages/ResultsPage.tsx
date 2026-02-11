@@ -1,7 +1,18 @@
 import { useState } from 'react';
-import { getArchiveRaces, getArchiveResults, getArchiveDriverStandings, getArchiveConstructorStandings } from '../api/jolpica';
+import {
+  getArchiveRaces,
+  getArchiveResults,
+  getArchiveDriverStandings,
+  getArchiveConstructorStandings,
+  JolpicaRace,
+  JolpicaDriverStanding,
+  JolpicaConstructorStanding,
+  JolpicaDriver,
+  JolpicaConstructor
+} from '../api/jolpica';
 import { useQuery } from '@tanstack/react-query';
 import PageContainer from '../components/layout/PageContainer';
+import { AlertCircle } from 'lucide-react';
 
 // Content type filters
 const CONTENT_FILTERS = [
@@ -13,23 +24,44 @@ const CONTENT_FILTERS = [
 // Available years
 const AVAILABLE_YEARS = Array.from({ length: 2025 - 1950 + 1 }, (_, i) => 2025 - i);
 
+interface RaceResult {
+  number: string;
+  position: string;
+  points: string;
+  Driver: JolpicaDriver;
+  Constructor: JolpicaConstructor;
+  grid: string;
+  laps: string;
+  status: string;
+  Time?: {
+    millis: string;
+    time: string;
+  };
+}
+
+interface RaceWithResults extends JolpicaRace {
+  Results?: RaceResult[];
+}
+
 export default function ResultsPage() {
   const [selectedYear, setSelectedYear] = useState(2025);
   const [activeContentFilter, setActiveContentFilter] = useState('races');
 
-  const { data: archiveRaces } = useQuery({
+  const { data: archiveRaces, isError: isRacesError } = useQuery<JolpicaRace[]>({
     queryKey: ['archive-races', selectedYear],
     queryFn: async () => {
       const data = await getArchiveRaces(selectedYear);
-      let raceArray = [];
-      if (Array.isArray(data)) raceArray = data;
-      else if (data?.MRData?.RaceTable?.Races) raceArray = data.MRData.RaceTable.Races;
+      let raceArray: JolpicaRace[] = [];
+      // Type guard for the new structure
+      if (data?.MRData?.RaceTable?.Races) {
+        raceArray = data.MRData.RaceTable.Races;
+      }
       return raceArray;
     },
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
-  const { data: archiveResults, isLoading: resultsLoading } = useQuery({
+  const { data: archiveResults, isLoading: resultsLoading } = useQuery<Record<string, { winner: RaceResult; podium: RaceResult[] }>>({
     queryKey: ['archive-results', selectedYear],
     queryFn: async () => {
       // Fetch all results for the season.
@@ -37,14 +69,16 @@ export default function ResultsPage() {
       const data = await getArchiveResults(selectedYear);
 
       // Map race results to a more usable format
-      const resultsMap: Record<string, any> = {};
+      const resultsMap: Record<string, { winner: RaceResult; podium: RaceResult[] }> = {};
 
       if (data?.MRData?.RaceTable?.Races) {
-        data.MRData.RaceTable.Races.forEach((race: any) => {
-          resultsMap[race.round] = {
-            winner: race.Results[0],
-            podium: race.Results.slice(0, 3)
-          };
+        data.MRData.RaceTable.Races.forEach((race: RaceWithResults) => {
+          if (race.Results && race.Results.length > 0) {
+            resultsMap[race.round] = {
+              winner: race.Results[0],
+              podium: race.Results.slice(0, 3)
+            };
+          }
         });
       }
       return resultsMap;
@@ -53,13 +87,12 @@ export default function ResultsPage() {
     enabled: activeContentFilter === 'races',
   });
 
-  const { data: driverStandings, isLoading: driversLoading } = useQuery({
+  const { data: driverStandings, isLoading: driversLoading } = useQuery<JolpicaDriverStanding[]>({
     queryKey: ['archive-drivers', selectedYear],
     queryFn: async () => {
       const data = await getArchiveDriverStandings(selectedYear);
-      let standingsArray = [];
-      if (Array.isArray(data)) standingsArray = data;
-      else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings) {
+      let standingsArray: JolpicaDriverStanding[] = [];
+      if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings) {
         standingsArray = data.MRData.StandingsTable.StandingsLists[0].DriverStandings;
       }
       return standingsArray;
@@ -68,13 +101,12 @@ export default function ResultsPage() {
     enabled: activeContentFilter === 'drivers',
   });
 
-  const { data: teamStandings, isLoading: teamsLoading } = useQuery({
+  const { data: teamStandings, isLoading: teamsLoading } = useQuery<JolpicaConstructorStanding[]>({
     queryKey: ['archive-teams', selectedYear],
     queryFn: async () => {
       const data = await getArchiveConstructorStandings(selectedYear);
-      let standingsArray = [];
-      if (Array.isArray(data)) standingsArray = data;
-      else if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings) {
+      let standingsArray: JolpicaConstructorStanding[] = [];
+      if (data?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings) {
         standingsArray = data.MRData.StandingsTable.StandingsLists[0].ConstructorStandings;
       }
       return standingsArray;
@@ -132,6 +164,13 @@ export default function ResultsPage() {
 
       {/* Main Content Area */}
       <div>
+        {activeContentFilter === 'races' && isRacesError && (
+          <div className="p-4 mb-4 bg-red-900/20 border border-red-500/50 rounded flex items-center gap-3 text-red-400">
+            <AlertCircle size={20} />
+            <span className="text-sm font-mono">Failed to load race archive. API might be unavailable.</span>
+          </div>
+        )}
+
         {resultsLoading || driversLoading || teamsLoading ? (
           <div className="py-24 text-center">
             <p className="text-textSecondary font-mono text-xs uppercase tracking-widest animate-pulse">Synchronizing Data...</p>
@@ -155,10 +194,10 @@ export default function ResultsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slateMid/20">
-                    {archiveRaces.map((r: any, i: number) => {
+                    {archiveRaces.map((r, i) => {
                       const result = archiveResults?.[r.round];
                       return (
-                        <tr key={i} className="hover:bg-slateDark/40 transition-colors group cursor-pointer">
+                        <tr key={r.round || i} className="hover:bg-slateDark/40 transition-colors group cursor-pointer">
                           <td className="py-5 px-6 font-mono text-xs text-white">R{r.round.padStart(2, '0')}</td>
                           <td className="py-5 px-6">
                             <p className="text-sm font-bold text-textPrimary uppercase tracking-tight">{r.raceName}</p>
@@ -175,8 +214,8 @@ export default function ResultsPage() {
                           </td>
                           <td className="py-5 px-6">
                             <div className="flex gap-2">
-                              {result?.podium?.map((p: any, idx: number) => (
-                                <span key={idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600] border-[#E10600] text-white' : 'bg-slateDark/50 border-slateMid/20 text-white'
+                              {result?.podium?.map((p, idx) => (
+                                <span key={p.Driver?.driverId || idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600] border-[#E10600] text-white' : 'bg-slateDark/50 border-slateMid/20 text-white'
                                   }`}>
                                   {p.Driver?.code || p.Driver?.familyName.slice(0, 3).toUpperCase()}
                                 </span>
@@ -208,8 +247,8 @@ export default function ResultsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slateMid/20">
-                {driverStandings?.map((d: any, i: number) => (
-                  <tr key={i} className="hover:bg-slateDark/40 transition-colors">
+                {driverStandings?.map((d, i) => (
+                  <tr key={d.Driver?.driverId || i} className="hover:bg-slateDark/40 transition-colors">
                     <td className="py-4 px-6 font-mono text-sm font-bold text-textPrimary">{d.position}</td>
                     <td className="py-4 px-6">
                       <span className="text-sm font-semibold text-textPrimary uppercase tracking-wide">
@@ -237,8 +276,8 @@ export default function ResultsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slateMid/20">
-                {teamStandings?.map((t: any, i: number) => (
-                  <tr key={i} className="hover:bg-slateDark/40 transition-colors">
+                {teamStandings?.map((t, i) => (
+                  <tr key={t.Constructor?.constructorId || i} className="hover:bg-slateDark/40 transition-colors">
                     <td className="py-4 px-6 font-mono text-sm font-bold text-white">{t.position}</td>
                     <td className="py-4 px-6">
                       <span className="text-sm font-semibold text-white uppercase tracking-wide">

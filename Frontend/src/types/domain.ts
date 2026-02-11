@@ -18,6 +18,22 @@ export interface LapFrame {
     source: DataSource;
 }
 
+export interface TelemetryFrame {
+    t: number;
+    driver_id: string;
+    x: number;
+    y: number;
+    dist: number;
+    rel_dist: number;
+    speed: number;
+    gear: number;
+    drs: number;
+    throttle: number;
+    brake: number;
+    compound?: string;
+    tyre_life?: number;
+}
+
 export interface RaceTimeline {
     meta: {
         source: DataSource;
@@ -25,8 +41,10 @@ export interface RaceTimeline {
         session_type?: string;
         season?: number;
         ingestion_timestamp?: string;
+        lap_count?: number;
     };
     laps: LapFrame[];
+    telemetry: TelemetryFrame[];
     summary: {
         total_time_ms: number;
         [key: string]: any;
@@ -67,4 +85,17 @@ export interface SimulationResponse {
         params?: Record<string, any>;
         events?: SimulationEvent[];
     };
+    trace?: LapFrame[];
+}
+
+export interface IntelligenceAnalysis {
+    race_id: string;
+    model_version: string;
+    generated_at: string;
+    win_probability: Record<string, number>;
+    podium_probability: Record<string, number[]>;
+    pace_distributions: Record<string, Record<string, number>>;
+    robustness_score: Record<string, number>;
+    mode: string;
+    explanation: string;
 }

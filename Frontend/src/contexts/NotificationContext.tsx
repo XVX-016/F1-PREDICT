@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
 
@@ -92,7 +92,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       clearAllNotifications,
     }}>
       {children}
-      
+
       {/* Notification Container */}
       <div className="fixed top-4 right-4 z-[10000] space-y-2">
         <AnimatePresence>

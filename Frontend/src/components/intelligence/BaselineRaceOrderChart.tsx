@@ -1,4 +1,3 @@
-import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { BaselineOrderItem, DataEnvelope } from '../../types/intelligence';
 
@@ -15,7 +14,7 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
 
     if (validity === 'UNAVAILABLE') {
         return (
-            <div className="h-[500px] bg-black/30 rounded-xl flex flex-col items-center justify-center border border-white/5 border-dashed p-8 text-center">
+            <div className="h-[400px] flex flex-col items-center justify-center border border-white/5 border-dashed p-8 text-center rounded-xl">
                 <span className="text-sm text-white/60 font-mono mb-2 font-bold uppercase tracking-widest">
                     Baseline Order Unavailable
                 </span>
@@ -98,16 +97,8 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
     };
 
     return (
-        <div className="bg-[#15151e] rounded-xl border border-white/10 p-6 flex flex-col h-[600px]">
-            <div className="flex justify-between items-start mb-6">
-                <div>
-                    <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-1 border-l-2 border-[#E10600] pl-3">
-                        Baseline Race Order
-                    </h3>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest ml-4">
-                        Expected green-flag pace (Δ lap time vs leader).
-                    </p>
-                </div>
+        <div className="flex flex-col h-full">
+            <div className="flex justify-end mb-4">
                 <div className="text-right">
                     <span className="text-[8px] text-white/20 font-mono uppercase block">Source: {source}</span>
                     <span className="text-[8px] text-white/10 font-mono block uppercase">Status: {validity}</span>

@@ -1,7 +1,123 @@
 // API cache for better performance
-const cache = new Map<string, { data: any; timestamp: number }>();
+// We use unknown here to allow diverse response types, but consumers should cast safely
+const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const TIMEOUT_DURATION = 10000; // 10 seconds
+
+import { ENV_CONFIG } from '../config/environment';
+
+const BASE_URL = `${ENV_CONFIG.JOLPICA_BASE_URL}/2025`;
+
+// --- Interfaces ---
+
+export interface JolpicaDriver {
+  driverId: string;
+  givenName: string;
+  familyName: string;
+  nationality: string;
+  dateOfBirth: string;
+  permanentNumber?: string;
+  code?: string;
+  // url?: string; // Optional
+}
+
+export interface JolpicaConstructor {
+  constructorId: string;
+  name: string;
+  nationality: string;
+  // url?: string;
+}
+
+export interface JolpicaLocation {
+  lat?: string;
+  long?: string;
+  locality?: string;
+  country?: string;
+}
+
+export interface JolpicaCircuit {
+  circuitId?: string;
+  circuitName: string;
+  Location: JolpicaLocation;
+}
+
+export interface JolpicaResult {
+  number: string;
+  position: string;
+  positionText: string;
+  points: string;
+  Driver: JolpicaDriver;
+  Constructor: JolpicaConstructor;
+  grid: string;
+  laps: string;
+  status: string;
+  Time?: {
+    millis: string;
+    time: string;
+  };
+  FastestLap?: {
+    rank: string;
+    lap: string;
+    Time: { time: string };
+    AverageSpeed: { units: string; speed: string };
+  };
+}
+
+export interface JolpicaRace {
+  round: string;
+  raceName: string;
+  date: string;
+  time?: string;
+  circuit: JolpicaCircuit;
+  Results?: JolpicaResult[];
+}
+
+export interface JolpicaDriverStanding {
+  position: string;
+  positionText: string;
+  points: string;
+  wins: string;
+  Driver: JolpicaDriver;
+  Constructors: JolpicaConstructor[];
+}
+
+export interface JolpicaConstructorStanding {
+  position: string;
+  positionText: string;
+  points: string;
+  wins: string;
+  Constructor: JolpicaConstructor;
+}
+
+export interface JolpicaApiResponse<T> {
+  MRData: {
+    xmlns?: string;
+    series?: string;
+    url?: string;
+    limit?: string;
+    offset?: string;
+    total?: string;
+    RaceTable?: {
+      season?: string;
+      Races: T[];
+    };
+    DriverTable?: {
+      Drivers: T[];
+    };
+    ConstructorTable?: {
+      Constructors: T[];
+    };
+    StandingsTable?: {
+      season?: string;
+      StandingsLists: {
+        season?: string;
+        round?: string;
+        DriverStandings?: T[];
+        ConstructorStandings?: T[];
+      }[];
+    };
+  };
+}
 
 // Static fallback data for when API is completely unresponsive
 const FALLBACK_DATA = {
@@ -29,7 +145,7 @@ const FALLBACK_DATA = {
           { driverId: 'lawson', givenName: 'Liam', familyName: 'Lawson', nationality: 'New Zealander', dateOfBirth: '2002-02-11' },
           { driverId: 'hulkenberg', givenName: 'Nico', familyName: 'Hülkenberg', nationality: 'German', dateOfBirth: '1987-08-19' },
           { driverId: 'sargeant', givenName: 'Logan', familyName: 'Sargeant', nationality: 'American', dateOfBirth: '2000-12-31' }
-        ]
+        ] as JolpicaDriver[]
       }
     }
   },
@@ -47,7 +163,7 @@ const FALLBACK_DATA = {
           { constructorId: 'haas', name: 'Haas F1 Team', nationality: 'American' },
           { constructorId: 'williams', name: 'Williams', nationality: 'British' },
           { constructorId: 'sauber', name: 'Stake F1 Team Kick Sauber', nationality: 'Swiss' }
-        ]
+        ] as JolpicaConstructor[]
       }
     }
   },
@@ -79,21 +195,21 @@ const FALLBACK_DATA = {
           { round: '22', raceName: 'Las Vegas Grand Prix', circuit: { circuitName: 'Las Vegas Strip Circuit', Location: { country: 'USA', locality: 'Las Vegas' } }, date: '2025-11-23' },
           { round: '23', raceName: 'Qatar Grand Prix', circuit: { circuitName: 'Lusail International Circuit', Location: { country: 'Qatar', locality: 'Lusail' } }, date: '2025-11-30' },
           { round: '24', raceName: 'Abu Dhabi Grand Prix', circuit: { circuitName: 'Yas Marina Circuit', Location: { country: 'UAE', locality: 'Abu Dhabi' } }, date: '2025-12-07' }
-        ]
+        ] as JolpicaRace[]
       }
     }
   }
 };
 
-// Helper function to create a timeout promise
+// Helper functions for fetch with timeout
+// Helper functions for fetch with timeout
 const createTimeout = (ms: number) => {
   return new Promise((_, reject) => {
     setTimeout(() => reject(new Error('Request timeout')), ms);
   });
 };
 
-// Helper function to fetch with timeout and retry
-const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
+const fetchWithTimeout = async <T>(url: string, retries = 2): Promise<T> => {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const controller = new AbortController();
@@ -116,13 +232,12 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as T;
       return data;
     } catch (error) {
       console.warn(`Jolpica API attempt ${attempt + 1} failed for ${url}:`, error);
 
       if (attempt === retries) {
-        // Final attempt fallback: use Ergast directly if Jolpica fails
         if (url.includes('api.jolpi.ca/ergast')) {
           try {
             const ergastUrl = url
@@ -131,7 +246,7 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
             console.warn(`Falling back to Ergast: ${ergastUrl}`);
             const res = await fetch(ergastUrl, { headers: { 'Accept': 'application/json' } });
             if (res.ok) {
-              const json = await res.json();
+              const json = await res.json() as T;
               return json;
             }
           } catch (fallbackErr) {
@@ -140,21 +255,19 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
         }
         throw new Error(`Failed to fetch data after ${retries + 1} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-
-      // Wait before retrying (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
     }
   }
+  throw new Error('Unreachable');
 };
 
-// Helper function to get cached data or fetch new data
-const getCachedOrFetch = async (key: string, fetchFn: () => Promise<any>, fallbackKey?: string) => {
+const getCachedOrFetch = async <T>(key: string, fetchFn: () => Promise<T>, fallbackKey?: string): Promise<T> => {
   const cached = cache.get(key);
   const now = Date.now();
 
   if (cached && (now - cached.timestamp) < CACHE_DURATION) {
     console.log(`Using cached data for ${key}`);
-    return cached.data;
+    return cached.data as T;
   }
 
   try {
@@ -163,59 +276,49 @@ const getCachedOrFetch = async (key: string, fetchFn: () => Promise<any>, fallba
     cache.set(key, { data, timestamp: now });
     return data;
   } catch (error) {
-    // If fetch fails, return cached data even if expired
     if (cached) {
       console.warn(`Fetch failed for ${key}, using expired cached data`);
-      return cached.data;
+      return cached.data as T;
     }
-
-    // If no cached data and fallback key provided, use static fallback data
     if (fallbackKey && FALLBACK_DATA[fallbackKey as keyof typeof FALLBACK_DATA]) {
       console.warn(`API completely failed for ${key}, using static fallback data`);
-      return FALLBACK_DATA[fallbackKey as keyof typeof FALLBACK_DATA];
+      return FALLBACK_DATA[fallbackKey as keyof typeof FALLBACK_DATA] as unknown as T;
     }
-
     throw error;
   }
 };
 
-import { ENV_CONFIG } from '../config/environment';
-
-const BASE_URL = `${ENV_CONFIG.JOLPICA_BASE_URL}/2025`;
-
-// Jolpica API functions (now serving as fallback to FastF1)
+// Exports
 export const getDrivers = async () => {
-  return getCachedOrFetch('drivers', () => fetchWithTimeout(`${BASE_URL}/drivers`), 'drivers');
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaDriver>>('drivers', () => fetchWithTimeout(`${BASE_URL}/drivers`), 'drivers');
 };
 
 export const getConstructors = async () => {
-  return getCachedOrFetch('constructors', () => fetchWithTimeout(`${BASE_URL}/constructors`), 'constructors');
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaConstructor>>('constructors', () => fetchWithTimeout(`${BASE_URL}/constructors`), 'constructors');
 };
 
 export const getRaces = async () => {
-  return getCachedOrFetch('races', () => fetchWithTimeout(`${BASE_URL}/races`), 'races');
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaRace>>('races', () => fetchWithTimeout(`${BASE_URL}/races`), 'races');
 };
 
 export const getResults = async (round?: number) => {
   const url = round ? `${BASE_URL}/${round}/results` : `${BASE_URL}/results`;
   const key = round ? `results-${round}` : 'results';
-  return getCachedOrFetch(key, () => fetchWithTimeout(url));
+  // Use JolpicaRace as it now includes Results
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaRace>>(key, () => fetchWithTimeout(url));
 };
 
 export const getDriverStandings = async () => {
-  return getCachedOrFetch('driver-standings', () => fetchWithTimeout(`${BASE_URL}/driverstandings`));
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaDriverStanding>>('driver-standings', () => fetchWithTimeout(`${BASE_URL}/driverstandings`));
 };
 
 export const getConstructorStandings = async () => {
-  return getCachedOrFetch('constructor-standings', () => fetchWithTimeout(`${BASE_URL}/constructorstandings`));
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaConstructorStanding>>('constructor-standings', () => fetchWithTimeout(`${BASE_URL}/constructorstandings`));
 };
 
-// Add more as needed (sprint, qualifying, pitstop, lap, status) 
-
-// Archive API functions with improved error handling
 export const getArchiveRaces = async (year: number) => {
   const key = `archive-races-${year}`;
-  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/races?limit=100`));
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaRace>>(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/races?limit=100`));
 };
 
 export const getArchiveResults = async (year: number, round?: number) => {
@@ -223,88 +326,16 @@ export const getArchiveResults = async (year: number, round?: number) => {
     ? `${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/${round}/results?limit=100`
     : `${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/results?limit=1000`;
   const key = round ? `archive-results-${year}-${round}` : `archive-results-${year}`;
-  return getCachedOrFetch(key, () => fetchWithTimeout(url));
+  // Use JolpicaRace
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaRace>>(key, () => fetchWithTimeout(url));
 };
 
 export const getArchiveDriverStandings = async (year: number) => {
   const key = `archive-driver-standings-${year}`;
-  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/driverstandings?limit=100`));
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaDriverStanding>>(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/driverstandings?limit=100`));
 };
 
 export const getArchiveConstructorStandings = async (year: number) => {
   const key = `archive-constructor-standings-${year}`;
-  return getCachedOrFetch(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/constructorstandings?limit=100`));
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaConstructorStanding>>(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/constructorstandings?limit=100`));
 };
-
-// Utility function to clear cache
-export const clearCache = () => {
-  cache.clear();
-  console.log('API cache cleared');
-};
-
-// Utility function to get cache stats
-export const getCacheStats = () => {
-  return {
-    size: cache.size,
-    entries: Array.from(cache.keys())
-  };
-};
-
-// Utility function to preload cache with fallback data
-export const preloadFallbackData = () => {
-  const now = Date.now();
-  console.log('Preloading fallback data into cache...');
-
-  // Preload with fallback data that will be used if API fails
-  Object.entries(FALLBACK_DATA).forEach(([key, data]) => {
-    cache.set(key, { data, timestamp: now - CACHE_DURATION - 1 }); // Mark as expired so it will try API first
-  });
-
-  console.log('Fallback data preloaded successfully');
-};
-
-// Utility function to check if we're using fallback data
-export const isUsingFallbackData = (key: string) => {
-  const cached = cache.get(key);
-  if (!cached) return false;
-
-  // Check if the cached data matches our fallback data
-  const fallbackData = FALLBACK_DATA[key as keyof typeof FALLBACK_DATA];
-  if (!fallbackData) return false;
-
-  return JSON.stringify(cached.data) === JSON.stringify(fallbackData);
-};
-
-// Utility function to get API health status
-export const getApiHealthStatus = async () => {
-  try {
-    const startTime = Date.now();
-    await fetchWithTimeout(`${BASE_URL}/drivers`, 1); // Single attempt with short timeout
-    const responseTime = Date.now() - startTime;
-
-    return {
-      status: 'healthy',
-      responseTime,
-      timestamp: new Date().toISOString()
-    };
-  } catch (error) {
-    return {
-      status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    };
-  }
-};
-
-// Initialize the API with fallback data
-export const initializeJolpicaApi = () => {
-  console.log('Initializing Jolpica API with fallback data...');
-  preloadFallbackData();
-
-  // Test API health on initialization
-  getApiHealthStatus().then(health => {
-    console.log('Jolpica API Health Check:', health);
-  }).catch(error => {
-    console.warn('Failed to check Jolpica API health:', error);
-  });
-}; 

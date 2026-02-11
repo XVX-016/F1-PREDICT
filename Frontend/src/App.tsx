@@ -117,6 +117,7 @@ const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPage'));
 const ResultsPage = lazyWithTimeout(() => import('./pages/ResultsPage'));
 const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'));
 const ReplayPage = lazyWithTimeout(() => import('./pages/ReplayPage'));
+const CalibrationPage = lazyWithTimeout(() => import('./pages/CalibrationPage'));
 const AboutPage = lazyWithTimeout(() => import('./pages/AboutPage'));
 
 function App() {
@@ -190,6 +191,8 @@ function App() {
                   return <IntelligencePage />;
                 case 'replay':
                   return <ReplayPage />;
+                case 'calibration':
+                  return <CalibrationPage />;
                 case 'about':
                   return <AboutPage />;
                 default:

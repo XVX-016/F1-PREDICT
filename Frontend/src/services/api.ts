@@ -95,7 +95,7 @@ export const api = {
             eventSource.onmessage = (event) => {
                 onMessage(JSON.parse(event.data));
             };
-            eventSource.onerror = (error) => {
+            eventSource.onerror = () => {
                 console.warn('SSE Disconnected (Backend likely offline)');
                 eventSource.close();
             };
