@@ -3,8 +3,8 @@
 
 export const ENV_CONFIG = {
   // ML & Backend Service Configuration (standardized to use same base for simplicity if deployed together)
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
-  BACKEND_URL: import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://f1-predict-jqkb.onrender.com',
+  BACKEND_URL: import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://f1-predict-jqkb.onrender.com',
 
   // ML Service Proxy (Vite dev server)
   ML_SERVICE_PROXY: import.meta.env.VITE_MODEL_SERVICE_PROXY || '/ml',
@@ -27,7 +27,7 @@ export const ENV_CONFIG = {
   ML_MODEL_UPDATE_INTERVAL: parseInt(import.meta.env.VITE_ML_MODEL_UPDATE_INTERVAL || '300000'),
 
   // WebSocket Configuration
-  WEBSOCKET_URL: import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:8000/ws/live',
+  WEBSOCKET_URL: import.meta.env.VITE_WEBSOCKET_URL || 'wss://f1-predict-jqkb.onrender.com/ws/live',
   WEBSOCKET_RECONNECT_ATTEMPTS: parseInt(import.meta.env.VITE_WEBSOCKET_RECONNECT_ATTEMPTS || '5'),
   WEBSOCKET_RECONNECT_INTERVAL: parseInt(import.meta.env.VITE_WEBSOCKET_RECONNECT_INTERVAL || '1000'),
 };
