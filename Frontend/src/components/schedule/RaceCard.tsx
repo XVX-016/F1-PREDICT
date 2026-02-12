@@ -36,7 +36,7 @@ const RaceCard = ({ race, getCountryFlag, onViewDetails, isNext }: RaceCardProps
             {/* Top Banner Area */}
             <div className="relative h-40 w-full bg-black/50">
                 {race.bannerImg ? (
-                    <img src={race.bannerImg} className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-80" alt={race.raceName} />
+                    <img src={race.bannerImg} loading="lazy" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-80" alt={race.raceName} />
                 ) : (
                     <div className="w-full h-full bg-slate-800 opacity-60" />
                 )}
@@ -70,6 +70,7 @@ const RaceCard = ({ race, getCountryFlag, onViewDetails, isNext }: RaceCardProps
                     <div className="w-20 h-20 flex-shrink-0">
                         <img
                             src={race.trackImg}
+                            loading="lazy"
                             className="w-full h-full object-contain filter invert brightness-200 opacity-80"
                             alt="Track Layout"
                         />

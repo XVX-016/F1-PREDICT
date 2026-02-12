@@ -27,6 +27,7 @@ const AVAILABLE_YEARS = Array.from({ length: 2025 - 1950 + 1 }, (_, i) => 2025 -
 interface RaceResult {
   number: string;
   position: string;
+  positionText: string;
   points: string;
   Driver: JolpicaDriver;
   Constructor: JolpicaConstructor;
@@ -198,15 +199,15 @@ export default function ResultsPage() {
                       const result = archiveResults?.[r.round];
                       return (
                         <tr key={r.round || i} className="hover:bg-slateDark/40 transition-colors group cursor-pointer">
-                          <td className="py-5 px-6 font-mono text-xs text-white">R{r.round.padStart(2, '0')}</td>
+                          <td className="py-5 px-6 font-mono text-xs text-white">R{(r.round || '0').toString().padStart(2, '0')}</td>
                           <td className="py-5 px-6">
-                            <p className="text-sm font-bold text-textPrimary uppercase tracking-tight">{r.raceName}</p>
+                            <p className="text-sm font-bold text-textPrimary uppercase tracking-tight">{r.raceName || 'Unknown Race'}</p>
                             <p className="text-[10px] text-textSecondary uppercase tracking-widest">{r.date ? new Date(r.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}</p>
                           </td>
                           <td className="py-5 px-6">
-                            {result?.winner ? (
+                            {result?.winner?.Driver?.familyName ? (
                               <span className="text-sm font-black text-textPrimary uppercase tracking-tighter italic">
-                                {result.winner.Driver?.familyName}
+                                {result.winner.Driver.familyName}
                               </span>
                             ) : (
                               <span className="text-xs text-slate-600 font-mono italic">DATA_PENDING</span>
@@ -214,12 +215,12 @@ export default function ResultsPage() {
                           </td>
                           <td className="py-5 px-6">
                             <div className="flex gap-2">
-                              {result?.podium?.map((p, idx) => (
-                                <span key={p.Driver?.driverId || idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600] border-[#E10600] text-white' : 'bg-slateDark/50 border-slateMid/20 text-white'
+                              {result?.podium?.length ? result.podium.map((p, idx) => (
+                                <span key={p?.Driver?.driverId || idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600] border-[#E10600] text-white' : 'bg-slateDark/50 border-slateMid/20 text-white'
                                   }`}>
-                                  {p.Driver?.code || p.Driver?.familyName.slice(0, 3).toUpperCase()}
+                                  {p?.Driver?.code || p?.Driver?.familyName?.slice(0, 3).toUpperCase() || '??'}
                                 </span>
-                              )) || <span className="text-[10px] font-mono text-slate-600">---</span>}
+                              )) : <span className="text-[10px] font-mono text-slate-600">---</span>}
                             </div>
                           </td>
                           <td className="py-5 px-6 text-right">

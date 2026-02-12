@@ -1,17 +1,16 @@
 import CarModelViewer from "./CarModelViewer";
 
-const TeamCard = ({ team, focused, autoRotate }) => (
+const TeamCard = ({ team, focused, autoRotate }: { team: any, focused: boolean, autoRotate: boolean }) => (
   <div
-    className={`glass-card transition-all duration-500 p-8 m-4 min-w-[350px] max-w-[400px] relative ${
-      focused ? "ring-4 ring-red-500 scale-105" : "opacity-70"
-    }`}
+    className={`glass-card transition-all duration-500 p-8 m-4 min-w-[350px] max-w-[400px] relative ${focused ? "ring-4 ring-red-500 scale-105" : "opacity-70"
+      }`}
   >
     <h2 className="text-2xl font-bold mb-2" style={{ color: team.accent }}>{team.name}</h2>
     <div className="flex items-center mb-4">
-      {team.drivers.map(driver => (
+      {team.drivers.map((driver: any) => (
         <div key={driver.name} className="flex flex-col items-center mx-2">
           <div className="relative">
-            <img src={driver.avatar} alt={driver.name} className="w-16 h-16 rounded-full border-2 border-white" />
+            <img src={driver.avatar} alt={driver.name} loading="lazy" className="w-16 h-16 rounded-full border-2 border-white" />
             <span className="absolute -bottom-2 -right-2 bg-black rounded-full border border-white px-2 py-1 text-lg">{driver.flag}</span>
           </div>
           <div className="text-white font-bold">{driver.name}</div>
