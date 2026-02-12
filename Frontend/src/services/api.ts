@@ -1,6 +1,6 @@
+import { ENV_CONFIG } from '../config/environment';
 
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = ENV_CONFIG.API_BASE_URL;
 
 export interface ProbabilityResponse {
     race_id: string;

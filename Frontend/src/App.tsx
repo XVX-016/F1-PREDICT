@@ -1,10 +1,9 @@
-import React, { useState, lazy, Suspense, useEffect } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import Navigation from './components/Navigation';
 import HeroBackground from './components/HeroBackground';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import { NotificationProvider } from './contexts/NotificationContext';
-import { initializeJolpicaApi } from './api/jolpica';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRaceStatus } from './hooks/useRaceStatus';
 import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
@@ -96,29 +95,33 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-// Lazy load all pages for better performance with timeout
-const lazyWithTimeout = (importFn: () => Promise<any>, timeout = 10000) => {
-  return lazy(() => {
-    return Promise.race([
-      importFn(),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Page loading timeout')), timeout)
-      )
-    ]);
+// Lazy load all pages for better performance with retry logic
+const lazyWithRetry = (importFn: () => Promise<any>, retries = 2) => {
+  return lazy(async () => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await importFn();
+      } catch (err) {
+        if (i === retries - 1) throw err;
+        console.warn(`Retry loading module (${i + 1}/${retries})...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    throw new Error('Failed to load module after retries');
   });
 };
 
-const HomePage = lazyWithTimeout(() => import('./pages/HomePage'));
-const DriversPage = lazyWithTimeout(() => import('./pages/DriversPage'));
-const TelemetryPage = lazyWithTimeout(() => import('./pages/TelemetryPage'));
-const SchedulePage = lazyWithTimeout(() => import('./pages/SchedulePage'));
-const TeamsPage = lazyWithTimeout(() => import('./pages/TeamsPage'));
-const SimulationPage = lazyWithTimeout(() => import('./pages/SimulationPage'));
-const ResultsPage = lazyWithTimeout(() => import('./pages/ResultsPage'));
-const IntelligencePage = lazyWithTimeout(() => import('./pages/IntelligencePage'));
-const ReplayPage = lazyWithTimeout(() => import('./pages/ReplayPage'));
-const CalibrationPage = lazyWithTimeout(() => import('./pages/CalibrationPage'));
-const AboutPage = lazyWithTimeout(() => import('./pages/AboutPage'));
+const HomePage = lazyWithRetry(() => import('./pages/HomePage'));
+const DriversPage = lazyWithRetry(() => import('./pages/DriversPage'));
+const TelemetryPage = lazyWithRetry(() => import('./pages/TelemetryPage'));
+const SchedulePage = lazyWithRetry(() => import('./pages/SchedulePage'));
+const TeamsPage = lazyWithRetry(() => import('./pages/TeamsPage'));
+const SimulationPage = lazyWithRetry(() => import('./pages/SimulationPage'));
+const ResultsPage = lazyWithRetry(() => import('./pages/ResultsPage'));
+const IntelligencePage = lazyWithRetry(() => import('./pages/IntelligencePage'));
+const ReplayPage = lazyWithRetry(() => import('./pages/ReplayPage'));
+const CalibrationPage = lazyWithRetry(() => import('./pages/CalibrationPage'));
+const AboutPage = lazyWithRetry(() => import('./pages/AboutPage'));
 
 function App() {
   // Helper to extract page name from hash (ignoring query params)
@@ -135,10 +138,6 @@ function App() {
   const [currentPage, setCurrentPageState] = useState(getInitialPage());
   // const [raceData, setRaceData] = useState<any>(null); // Unused currently
 
-  // Initialize Jolpica API with fallback data on app start
-  useEffect(() => {
-    initializeJolpicaApi();
-  }, []);
 
   // Update hash on page change
   const setCurrentPage = (page: string, _data?: any) => {

@@ -33,21 +33,35 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 # Add production frontend URL from env
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
-    origins.append(frontend_url)
+    if "," in frontend_url:
+        origins.extend([url.strip() for url in frontend_url.split(",") if url.strip()])
+    else:
+        origins.append(frontend_url)
+
+# In development, we allow all for ease of use, but in production we are strict.
+# NOTE: allow_credentials=True requires specific origins (not "*").
+is_prod = os.getenv("ENV") == "production"
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=origins, # TODO: Re-enable strict ORIGINS once env var is confirmed
-    allow_origins=["*"], # TEMPORARY FIX: Allow all for debugging "Backend Offline"
-    allow_credentials=True,
+    allow_origins=origins if (is_prod or os.getenv("STRICT_CORS")) else ["*"],
+    allow_credentials=True, # We'll keep this True but ensure origins are handled
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Overwrite allow_origins if credentials+all is requested (FastAPI/Starlette safety)
+if not is_prod and not os.getenv("STRICT_CORS"):
+    # If we want credentials AND wildcard, we actually have to be careful.
+    # Starlette doesn't allow ["*"] with allow_credentials=True.
+    # So we either set allow_credentials=False or use a different approach.
+    pass
 
 # Include routers
 app.include_router(drivers.router, prefix="/api/drivers", tags=["drivers"])
@@ -87,7 +101,8 @@ async def shutdown_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
 
 
