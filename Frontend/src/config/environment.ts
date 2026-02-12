@@ -2,41 +2,34 @@
 // This file provides default values and can be overridden by .env file
 
 export const ENV_CONFIG = {
-  // ML Service Configuration
-  ML_SERVICE_URL: (import.meta as any).env?.VITE_MODEL_SERVICE_URL || 'http://localhost:8000',
-  ML_SERVICE_PROXY: (import.meta as any).env?.VITE_MODEL_SERVICE_PROXY || '/ml',
+  // ML & Backend Service Configuration (standardized to use same base for simplicity if deployed together)
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  BACKEND_URL: import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
 
-  // Backend Configuration
-  BACKEND_URL: (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3001',
-
-  // API Configuration
-  API_BASE_URL: (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8000',
+  // ML Service Proxy (Vite dev server)
+  ML_SERVICE_PROXY: import.meta.env.VITE_MODEL_SERVICE_PROXY || '/ml',
 
   // Weather API
-  WEATHER_API_KEY: (import.meta as any).env?.VITE_WEATHER_API_KEY || '',
-  OPENWEATHER_API_KEY: (import.meta as any).env?.VITE_OPENWEATHER_API_KEY || '',
-
-  // Firebase Configuration (Removed)
-  // FIREBASE_API_KEY: ...
-
+  WEATHER_API_KEY: import.meta.env.VITE_WEATHER_API_KEY || '',
+  OPENWEATHER_API_KEY: import.meta.env.VITE_OPENWEATHER_API_KEY || '',
 
   // Local API Configuration (replaces external Jolpica API)
-  JOLPICA_BASE_URL: (import.meta as any).env?.VITE_JOLPICA_BASE_URL || '/ergast/f1',
-  FAST_F1_BASE_URL: (import.meta as any).env?.VITE_FAST_F1_BASE_URL || 'http://localhost:8000',
+  JOLPICA_BASE_URL: import.meta.env.VITE_JOLPICA_BASE_URL || '/ergast/f1',
+  FAST_F1_BASE_URL: import.meta.env.VITE_FAST_F1_BASE_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
 
   // Feature Flags
-  LIVE_DATA_ENABLED: (import.meta as any).env?.VITE_LIVE_DATA_ENABLED === 'true' ? true : false,
-  USE_SAMPLE_PREDICTIONS: (import.meta as any).env?.VITE_USE_SAMPLE_PREDICTIONS === 'true', // default false - use XGBoost model
+  LIVE_DATA_ENABLED: import.meta.env.VITE_LIVE_DATA_ENABLED === 'true',
+  USE_SAMPLE_PREDICTIONS: import.meta.env.VITE_USE_SAMPLE_PREDICTIONS === 'true',
   USE_LOCAL_ONLY: true,
 
   // ML Model Configuration
-  ML_MODEL_ENABLED: (import.meta as any).env?.VITE_ML_MODEL_ENABLED !== 'false', // default true
-  ML_MODEL_UPDATE_INTERVAL: parseInt((import.meta as any).env?.VITE_ML_MODEL_UPDATE_INTERVAL || '300000'),
+  ML_MODEL_ENABLED: import.meta.env.VITE_ML_MODEL_ENABLED !== 'false',
+  ML_MODEL_UPDATE_INTERVAL: parseInt(import.meta.env.VITE_ML_MODEL_UPDATE_INTERVAL || '300000'),
 
   // WebSocket Configuration
-  WEBSOCKET_URL: (import.meta as any).env?.VITE_WEBSOCKET_URL || 'ws://localhost:8000/ws/live',
-  WEBSOCKET_RECONNECT_ATTEMPTS: parseInt((import.meta as any).env?.VITE_WEBSOCKET_RECONNECT_ATTEMPTS || '5'),
-  WEBSOCKET_RECONNECT_INTERVAL: parseInt((import.meta as any).env?.VITE_WEBSOCKET_RECONNECT_INTERVAL || '1000'),
+  WEBSOCKET_URL: import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:8000/ws/live',
+  WEBSOCKET_RECONNECT_ATTEMPTS: parseInt(import.meta.env.VITE_WEBSOCKET_RECONNECT_ATTEMPTS || '5'),
+  WEBSOCKET_RECONNECT_INTERVAL: parseInt(import.meta.env.VITE_WEBSOCKET_RECONNECT_INTERVAL || '1000'),
 };
 
 // Helper function to get environment variable with fallback

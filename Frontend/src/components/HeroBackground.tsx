@@ -8,7 +8,7 @@ interface HeroBackgroundProps {
 export default function HeroBackground({ currentPage }: HeroBackgroundProps) {
     const [style, setStyle] = useState<any>({
         '--bg-blur': '0px',
-        backgroundImage: "url('/hero/hero-car.jpg')"
+        backgroundImage: "url('/hero/home-bg-new.jpg')"
     });
 
     useEffect(() => {

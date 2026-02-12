@@ -23,21 +23,25 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    hmr: {
+      overlay: false,
+      protocol: 'ws',
+      host: 'localhost',
+      port: 5173,
+    },
     proxy: {
       '/ml': {
-        target: process.env.BACKEND_URL || 'http://localhost:8000',
+        target: process.env.VITE_API_BASE_URL || 'http://localhost:8000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/ml/, '')
       },
-      // Proxy public Jolpica (Django) Ergast endpoints
       '/ergast': {
         target: 'https://api.jolpi.ca',
         changeOrigin: true,
         secure: false
       },
-      // Proxy local Fast-F1 service
       '/fastf1': {
-        target: process.env.BACKEND_URL || 'http://localhost:8000',
+        target: process.env.VITE_API_BASE_URL || 'http://localhost:8000',
         changeOrigin: true,
         secure: false
       }

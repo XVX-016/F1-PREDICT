@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/(api|ml|fastf1|ergast)/:path*",
+            "destination": "https://f1-predict-backend.onrender.com/:path*"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
