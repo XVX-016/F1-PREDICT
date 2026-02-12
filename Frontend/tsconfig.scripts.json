@@ -1,0 +1,11 @@
+{
+    "extends": "./tsconfig.node.json",
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "allowImportingTsExtensions": false,
+        "noEmit": true
+    },
+    "include": [
+        "scripts"
+    ]
+}

@@ -19,7 +19,8 @@ class WeatherService:
     """
     
     def __init__(self):
-        self.openweather_api_key = os.getenv("OPENWEATHER_API_KEY", "3d269e8b0e5344a3a8b91712251408")
+        # Support both naming conventions
+        self.openweather_api_key = os.getenv("OPENWEATHER_API_KEY") or os.getenv("WEATHER_API_KEY") or "3d269e8b0e5344a3a8b91712251408"
         self.base_url = "http://api.openweathermap.org/data/2.5"
         
         # Circuit location coordinates (lat, lon) for weather API calls

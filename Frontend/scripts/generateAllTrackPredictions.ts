@@ -10,21 +10,21 @@ import * as fs from 'fs';
 import { trackPredictionService } from '../src/services/TrackPredictionService';
 
 async function generateAllTrackPredictions() {
-  console.log('🏁 F1 2025 Track Predictions Generator');
+  console.log('F1 2026 Track Predictions Generator');
   console.log('=====================================');
   console.log('');
 
   try {
     // Get all 2025 tracks
     const allTracks = trackPredictionService.getAllTracks();
-    console.log(`📅 Found ${allTracks.length} tracks in 2025 F1 calendar`);
+    console.log(`Found ${allTracks.length} tracks in 2026 F1 calendar`);
     console.log('');
 
     // Generate predictions for each track
     const allPredictions = await trackPredictionService.generateAllTrackPredictions();
 
     console.log('');
-    console.log('🎯 Prediction Summary:');
+    console.log('Prediction Summary:');
     console.log('=====================');
 
     // Display predictions for each track
@@ -36,7 +36,7 @@ async function generateAllTrackPredictions() {
       console.log(`   Difficulty: ${trackPrediction.difficulty}`);
       console.log(`   Weather: ${trackPrediction.weather.condition}, ${trackPrediction.weather.tempC}°C, ${trackPrediction.weather.rainChancePct}% rain`);
       console.log('');
-      console.log('   🏆 Top 3 Predictions:');
+      console.log('Top 3 Predictions:');
 
       trackPrediction.predictions.slice(0, 3).forEach((driver, pos) => {
         const position = pos + 1;
@@ -46,7 +46,7 @@ async function generateAllTrackPredictions() {
       });
 
       console.log('');
-      console.log('   📊 Full Grid:');
+      console.log('Full Grid:');
       trackPrediction.predictions.forEach((driver, pos) => {
         const position = pos + 1;
         const winPct = (driver.winProbability * 100).toFixed(1);
@@ -58,7 +58,7 @@ async function generateAllTrackPredictions() {
     });
 
     // Generate summary statistics
-    console.log('\n📈 Season Prediction Summary:');
+    console.log('\nSeason Prediction Summary:');
     console.log('============================');
 
     // Count wins by driver
@@ -80,7 +80,7 @@ async function generateAllTrackPredictions() {
       .sort(([, a], [, b]) => b - a)
       .map(([driver, wins]) => ({ driver, wins, podiums: driverPodiums[driver] || 0 }));
 
-    console.log('\n🏆 Predicted Season Champions:');
+    console.log('\nPredicted Season Champions:');
     sortedDrivers.slice(0, 10).forEach((driver, index) => {
       const position = index + 1;
       const emoji = position === 1 ? '👑' : position <= 3 ? '🥇' : '🏆';
@@ -88,7 +88,7 @@ async function generateAllTrackPredictions() {
     });
 
     // Track type analysis
-    console.log('\n🏁 Track Type Analysis:');
+    console.log('\nTrack Type Analysis:');
     const trackTypeStats: { [key: string]: { count: number; winners: string[] } } = {};
 
     allPredictions.forEach(trackPrediction => {
@@ -120,7 +120,7 @@ async function generateAllTrackPredictions() {
     });
 
     // Team analysis
-    console.log('\n🏎️ Team Performance Analysis:');
+    console.log('\nTeam Performance Analysis:');
     const teamWins: { [key: string]: number } = {};
     const teamPodiums: { [key: string]: number } = {};
 
@@ -138,15 +138,15 @@ async function generateAllTrackPredictions() {
       .sort(([, a], [, b]) => b - a)
       .map(([team, wins]) => ({ team, wins, podiums: teamPodiums[team] || 0 }));
 
-    console.log('\n🏆 Predicted Constructor Standings:');
+    console.log('\nPredicted Constructor Standings:');
     sortedTeams.forEach((team, index) => {
       const position = index + 1;
       const emoji = position === 1 ? '🏆' : position <= 3 ? '🥇' : '🏎️';
       console.log(`${emoji} ${position}. ${team.team} - ${team.wins} wins, ${team.podiums} podiums`);
     });
 
-    console.log('\n✅ All track predictions generated successfully!');
-    console.log(`📊 Total predictions: ${allPredictions.length} tracks × 20 drivers = ${allPredictions.length * 20} predictions`);
+    console.log('\nAll track predictions generated successfully!');
+    console.log(`Total predictions: ${allPredictions.length} tracks × 20 drivers = ${allPredictions.length * 20} predictions`);
 
     // Save predictions to file
     // Save predictions to file
@@ -172,21 +172,19 @@ async function generateAllTrackPredictions() {
     };
 
     fs.writeFileSync(
-      '2025_track_predictions.json',
+      '2026_track_predictions.json',
       JSON.stringify(predictionsData, null, 2)
     );
 
-    console.log('💾 Predictions saved to 2025_track_predictions.json');
+    console.log('Predictions saved to 2026_track_predictions.json');
 
   } catch (error) {
-    console.error('❌ Error generating track predictions:', error);
+    console.error('Error generating track predictions:', error);
     process.exit(1);
   }
 }
 
 // Run the script
-if (require.main === module) {
-  generateAllTrackPredictions();
-}
+generateAllTrackPredictions();
 
 export default generateAllTrackPredictions;
