@@ -24,4 +24,11 @@ class UserService:
             return None
 
 
-user_service = UserService()
+# Lazy initialization to prevent module-level side effects during startup
+_user_service = None
+
+def get_user_service():
+    global _user_service
+    if _user_service is None:
+        _user_service = UserService()
+    return _user_service

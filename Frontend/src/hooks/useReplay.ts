@@ -3,7 +3,7 @@ import { transformTimelineData, DRIVER_INFO } from "../utils/ReplayDataHelper";
 import { RaceTimeline } from '../types/domain';
 import { ReplayState } from "../utils/ReplayEngine";
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export function useReplay(raceId: string) {
     const [state, setState] = useState<ReplayState | null>(null);

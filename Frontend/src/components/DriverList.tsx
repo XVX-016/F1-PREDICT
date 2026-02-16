@@ -88,7 +88,7 @@ export default function DriverList({ drivers }: DriverListProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="flex items-center justify-between p-4 bg-black/80 backdrop-blur-sm rounded-xl hover:bg-black/60 transition-colors border border-white/10"
+            className="flex items-center justify-between p-4 bg-[#15151e] rounded-2xl hover:bg-black/60 transition-all border border-white/5 shadow-md group"
           >
             <div className="flex items-center space-x-4">
               <span className="text-xl font-bold text-gray-400">#{driver.position}</span>

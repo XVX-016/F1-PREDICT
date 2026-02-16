@@ -4,11 +4,8 @@ Supabase database client with connection pooling
 import os
 from typing import Optional
 from supabase import create_client, Client
-from dotenv import load_dotenv
 import logging
-
-# Load environment variables
-load_dotenv()
+# Environment variables loaded centrally in main.py
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +22,12 @@ class SupabaseClient:
             supabase_key = os.getenv("SUPABASE_SERVICE_KEY")
             
             if not supabase_url or not supabase_key:
+                missing = []
+                if not supabase_url: missing.append("SUPABASE_URL")
+                if not supabase_key: missing.append("SUPABASE_SERVICE_KEY")
                 raise ValueError(
-                    "SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in environment"
+                    f"Missing environment variables: {', '.join(missing)}. "
+                    f"Check your .env file at {os.path.abspath('.env')}"
                 )
             
             cls._instance = create_client(supabase_url, supabase_key)

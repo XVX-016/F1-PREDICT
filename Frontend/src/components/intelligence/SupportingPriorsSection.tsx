@@ -2,7 +2,7 @@ import React from 'react';
 import { SupportingPrior, DataEnvelope } from '../../types/intelligence';
 
 const PriorCard = ({ prior }: { prior: SupportingPrior }) => (
-    <div className="bg-[#1a1a23] rounded-lg border border-white/5 p-4 flex flex-col justify-between group relative h-32 hover:border-white/10 transition-colors">
+    <div className="bg-black/20 backdrop-blur-md rounded-lg border border-white/10 p-4 flex flex-col justify-between group relative h-32 hover:border-white/20 transition-colors">
         <div>
             <div className="flex justify-between items-start mb-1">
                 <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">{prior.title}</h4>

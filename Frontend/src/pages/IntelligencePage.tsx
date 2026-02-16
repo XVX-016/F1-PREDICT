@@ -94,23 +94,23 @@ const IntelligencePage = () => {
                     {/* Primary Grid: Podium & Baseline first */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                         {/* 01 // Podium Probability */}
-                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset min-h-[500px]">
+                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset h-[400px]">
                             <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                                 <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">01 // Estimated Podium Finish</span>
                                 <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: PROBABILITY %</span>
                             </div>
-                            <div className="flex-1 p-6">
+                            <div className="flex-1 p-6 overflow-hidden flex flex-col">
                                 <PodiumProbabilityCard envelope={podiumProbabilityEnvelope} />
                             </div>
                         </div>
 
                         {/* 02 // Baseline Race Order */}
-                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset min-h-[500px]">
+                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset h-[400px]">
                             <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                                 <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">02 // Baseline Race Order</span>
                                 <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: Δ LAP TIME (S)</span>
                             </div>
-                            <div className="flex-1 p-6">
+                            <div className="flex-1 p-6 overflow-hidden flex flex-col">
                                 <BaselineRaceOrderChart envelope={baselineOrderEnvelope} />
                             </div>
                         </div>

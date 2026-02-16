@@ -10,7 +10,7 @@ interface BaselineRaceOrderChartProps {
  * Shows expected green-flag race order with uncertainty bands and full grid support.
  */
 export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ envelope }) => {
-    const { data, validity, source, reason } = envelope;
+    const { data, validity, reason } = envelope;
 
     if (validity === 'UNAVAILABLE') {
         return (
@@ -97,14 +97,7 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
     };
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex justify-end mb-4">
-                <div className="text-right">
-                    <span className="text-[8px] text-white/20 font-mono uppercase block">Source: {source}</span>
-                    <span className="text-[8px] text-white/10 font-mono block uppercase">Status: {validity}</span>
-                </div>
-            </div>
-
+        <div className="flex flex-col h-full overflow-hidden">
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                 <ResponsiveContainer width="100%" height={sortedData.length * 28}>
                     <BarChart
@@ -150,28 +143,21 @@ export const BaselineRaceOrderChart: React.FC<BaselineRaceOrderChartProps> = ({ 
                 </ResponsiveContainer>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
-                <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <div className="mt-4 pt-4 border-t border-white/5 space-y-2 shrink-0">
+                <div className="flex flex-wrap gap-x-6 gap-y-1">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-sm bg-[#4A5568]"></div>
-                        <span className="text-[9px] text-white/40 uppercase font-bold tracking-widest">Base Pace (L0)</span>
+                        <div className="w-2 h-2 rounded-sm bg-[#4A5568]"></div>
+                        <span className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Base Pace</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-sm bg-[#E53E3E]"></div>
-                        <span className="text-[9px] text-white/40 uppercase font-bold tracking-widest">Max Delta (+1.2s)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-sm border border-white/30 border-dashed"></div>
-                        <span className="text-[9px] text-white/40 uppercase font-bold tracking-widest">Hollow: No Estimate</span>
+                        <div className="w-2 h-2 rounded-sm bg-[#E53E3E]"></div>
+                        <span className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Max Delta</span>
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <p className="text-[9px] text-white/30 uppercase tracking-[0.1em] italic">
-                        * Hollow bars indicate drivers without reliable baseline estimates for this circuit.
-                    </p>
-                    <p className="text-[9px] text-white/30 uppercase tracking-[0.1em] italic">
-                        * Color indicates relative pace delta, not performance rating.
+                <div className="flex flex-col gap-0.5">
+                    <p className="text-[8px] text-white/20 uppercase tracking-[0.1em] italic">
+                        * Hollow: No reliable baseline | Color: Relative pace delta
                     </p>
                 </div>
             </div>

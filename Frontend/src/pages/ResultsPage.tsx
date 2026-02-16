@@ -183,114 +183,120 @@ export default function ResultsPage() {
                 No session data for {selectedYear}
               </div>
             ) : (
-              <div className="border border-slateMid/40 bg-slateDark/20 overflow-hidden rounded-sm">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slateDark/40 border-b border-slateMid/40">
-                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Round</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Grand Prix</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Winner</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Podium</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Technical</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slateMid/20">
-                    {archiveRaces.map((r, i) => {
-                      const result = archiveResults?.[r.round];
-                      return (
-                        <tr key={r.round || i} className="hover:bg-slateDark/40 transition-colors group cursor-pointer">
-                          <td className="py-5 px-6 font-mono text-xs text-white">R{(r.round || '0').toString().padStart(2, '0')}</td>
-                          <td className="py-5 px-6">
-                            <p className="text-sm font-bold text-textPrimary uppercase tracking-tight">{r.raceName || 'Unknown Race'}</p>
-                            <p className="text-[10px] text-textSecondary uppercase tracking-widest">{r.date ? new Date(r.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}</p>
-                          </td>
-                          <td className="py-5 px-6">
-                            {result?.winner?.Driver?.familyName ? (
-                              <span className="text-sm font-black text-textPrimary uppercase tracking-tighter italic">
-                                {result.winner.Driver.familyName}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-slate-600 font-mono italic">DATA_PENDING</span>
-                            )}
-                          </td>
-                          <td className="py-5 px-6">
-                            <div className="flex gap-2">
-                              {result?.podium?.length ? result.podium.map((p, idx) => (
-                                <span key={p?.Driver?.driverId || idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600] border-[#E10600] text-white' : 'bg-slateDark/50 border-slateMid/20 text-white'
-                                  }`}>
-                                  {p?.Driver?.code || p?.Driver?.familyName?.slice(0, 3).toUpperCase() || '??'}
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div className="border border-slateMid/40 bg-slateDark/20 overflow-hidden rounded-sm min-w-[600px] sm:min-w-0">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slateDark/40 border-b border-slateMid/40">
+                        <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Round</th>
+                        <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Grand Prix</th>
+                        <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Winner</th>
+                        <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Podium</th>
+                        <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Technical</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slateMid/20">
+                      {archiveRaces.map((r, i) => {
+                        const result = archiveResults?.[r.round];
+                        return (
+                          <tr key={r.round || i} className="hover:bg-slateDark/40 transition-colors group cursor-pointer">
+                            <td className="py-5 px-6 font-mono text-xs text-white">R{(r.round || '0').toString().padStart(2, '0')}</td>
+                            <td className="py-5 px-6">
+                              <p className="text-sm font-bold text-textPrimary uppercase tracking-tight">{r.raceName || 'Unknown Race'}</p>
+                              <p className="text-[10px] text-textSecondary uppercase tracking-widest">{r.date ? new Date(r.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}</p>
+                            </td>
+                            <td className="py-5 px-6">
+                              {result?.winner?.Driver?.familyName ? (
+                                <span className="text-sm font-black text-textPrimary uppercase tracking-tighter italic">
+                                  {result.winner.Driver.familyName}
                                 </span>
-                              )) : <span className="text-[10px] font-mono text-slate-600">---</span>}
-                            </div>
-                          </td>
-                          <td className="py-5 px-6 text-right">
-                            <button className="text-[10px] font-bold text-slate-500 hover:text-f1Red uppercase tracking-widest transition-colors border-b border-dashed border-slate-700 hover:border-f1Red">
-                              Telemetry
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                              ) : (
+                                <span className="text-xs text-slate-600 font-mono italic">DATA_PENDING</span>
+                              )}
+                            </td>
+                            <td className="py-5 px-6">
+                              <div className="flex gap-2">
+                                {result?.podium?.length ? result.podium.map((p, idx) => (
+                                  <span key={p?.Driver?.driverId || idx} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xs border ${idx === 0 ? 'bg-[#E10600] border-[#E10600] text-white' : 'bg-slateDark/50 border-slateMid/20 text-white'
+                                    }`}>
+                                    {p?.Driver?.code || p?.Driver?.familyName?.slice(0, 3).toUpperCase() || '??'}
+                                  </span>
+                                )) : <span className="text-[10px] font-mono text-slate-600">---</span>}
+                              </div>
+                            </td>
+                            <td className="py-5 px-6 text-right">
+                              <button className="text-[10px] font-bold text-slate-500 hover:text-f1Red uppercase tracking-widest transition-colors border-b border-dashed border-slate-700 hover:border-f1Red">
+                                Telemetry
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
         ) : activeContentFilter === 'drivers' ? (
-          <div className="border border-slateMid/40 bg-slateDark/20 overflow-hidden rounded-sm">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slateDark/40 border-b border-slateMid/40">
-                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Pos</th>
-                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Driver</th>
-                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Team</th>
-                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Points</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slateMid/20">
-                {driverStandings?.map((d, i) => (
-                  <tr key={d.Driver?.driverId || i} className="hover:bg-slateDark/40 transition-colors">
-                    <td className="py-4 px-6 font-mono text-sm font-bold text-textPrimary">{d.position}</td>
-                    <td className="py-4 px-6">
-                      <span className="text-sm font-semibold text-textPrimary uppercase tracking-wide">
-                        {d.Driver?.givenName} {d.Driver?.familyName}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-xs text-white uppercase tracking-wider">
-                      {d.Constructors?.[0]?.name}
-                    </td>
-                    <td className="py-4 px-6 text-right font-mono text-sm text-textPrimary">{d.points}</td>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="border border-slateMid/40 bg-slateDark/20 overflow-hidden rounded-sm min-w-[500px] sm:min-w-0">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slateDark/40 border-b border-slateMid/40">
+                    <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Pos</th>
+                    <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Driver</th>
+                    <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Team</th>
+                    <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Points</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slateMid/20">
+                  {driverStandings?.map((d, i) => (
+                    <tr key={d.Driver?.driverId || i} className="hover:bg-slateDark/40 transition-colors">
+                      <td className="py-4 px-6 font-mono text-sm font-bold text-textPrimary">{d.position}</td>
+                      <td className="py-4 px-6">
+                        <span className="text-sm font-semibold text-textPrimary uppercase tracking-wide">
+                          {d.Driver?.givenName} {d.Driver?.familyName}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-xs text-white uppercase tracking-wider">
+                        {d.Constructors?.[0]?.name}
+                      </td>
+                      <td className="py-4 px-6 text-right font-mono text-sm text-textPrimary">{d.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : activeContentFilter === 'teams' ? (
-          <div className="border border-slateMid/40 bg-slateDark/20 overflow-hidden rounded-sm">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slateDark/40 border-b border-slateMid/40">
-                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Pos</th>
-                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Constructor</th>
-                  <th className="py-4 px-6 text-[10px] font-bold text-[#E10600] uppercase tracking-widest">Wins</th>
-                  <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Points</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slateMid/20">
-                {teamStandings?.map((t, i) => (
-                  <tr key={t.Constructor?.constructorId || i} className="hover:bg-slateDark/40 transition-colors">
-                    <td className="py-4 px-6 font-mono text-sm font-bold text-white">{t.position}</td>
-                    <td className="py-4 px-6">
-                      <span className="text-sm font-semibold text-white uppercase tracking-wide">
-                        {t.Constructor?.name}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 font-mono text-xs text-[#E10600] font-bold">{t.wins}</td>
-                    <td className="py-4 px-6 text-right font-mono text-sm text-white">{t.points}</td>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="border border-slateMid/40 bg-slateDark/20 overflow-hidden rounded-sm min-w-[500px] sm:min-w-0">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slateDark/40 border-b border-slateMid/40">
+                    <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Pos</th>
+                    <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest">Constructor</th>
+                    <th className="py-4 px-6 text-[10px] font-bold text-[#E10600] uppercase tracking-widest">Wins</th>
+                    <th className="py-4 px-6 text-[10px] font-bold text-white uppercase tracking-widest text-right">Points</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slateMid/20">
+                  {teamStandings?.map((t, i) => (
+                    <tr key={t.Constructor?.constructorId || i} className="hover:bg-slateDark/40 transition-colors">
+                      <td className="py-4 px-6 font-mono text-sm font-bold text-white">{t.position}</td>
+                      <td className="py-4 px-6">
+                        <span className="text-sm font-semibold text-white uppercase tracking-wide">
+                          {t.Constructor?.name}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 font-mono text-xs text-[#E10600] font-bold">{t.wins}</td>
+                      <td className="py-4 px-6 text-right font-mono text-sm text-white">{t.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : null}
       </div>

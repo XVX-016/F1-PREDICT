@@ -9,7 +9,7 @@ interface DriverRiskPriorsTableProps {
  * Full grid representation with internal scrolling and strict provenance metadata.
  */
 export const DriverRiskPriorsTable: React.FC<DriverRiskPriorsTableProps> = ({ envelope }) => {
-    const { data: drivers, source, computedAt, validity, reason } = envelope;
+    const { data: drivers, validity, reason } = envelope;
 
     const getIIRColor = (val: number | null) => {
         if (val === null) return 'text-white/20';
@@ -28,21 +28,6 @@ export const DriverRiskPriorsTable: React.FC<DriverRiskPriorsTableProps> = ({ en
     return (
         <div className="flex flex-col h-full">
             {/* Table layout */}
-            <div className="flex justify-end p-4 border-b border-white/10">
-                <div className="text-right flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-2">
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${validity === 'VALID' ? 'bg-[#4ade80]/10 text-[#4ade80]' : 'bg-[#ffb347]/10 text-[#ffb347]'}`}>
-                            {validity}
-                        </span>
-                        <span className="text-[9px] text-white/20 font-mono uppercase tracking-tighter">
-                            Source: {source}
-                        </span>
-                    </div>
-                    <div className="text-[8px] text-white/10 font-mono">
-                        UPDATED: {new Date(computedAt).toLocaleTimeString()}
-                    </div>
-                </div>
-            </div>
 
             {validity === 'UNAVAILABLE' ? (
                 <div className="flex-1 flex items-center justify-center p-8 text-center bg-black/20">
