@@ -40,6 +40,7 @@ const TeamsPage = () => {
                         <img
                           src={driver.image}
                           alt={driver.name}
+                          loading="lazy"
                           className="w-full h-full object-cover object-top"
                         />
                       </div>
@@ -58,6 +59,7 @@ const TeamsPage = () => {
               <img
                 src={team.carImage}
                 alt={`${team.name} Car`}
+                loading="lazy"
                 className="w-[85%] max-w-[400px] object-contain drop-shadow-2xl transform transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none'; // Hide if missing

@@ -1,4 +1,4 @@
-import React from 'react';
+import { motion } from 'framer-motion';
 
 interface PageContainerProps {
     children: React.ReactNode;
@@ -12,9 +12,15 @@ interface PageContainerProps {
  */
 const PageContainer: React.FC<PageContainerProps> = ({ children, className = "" }) => {
     return (
-        <div className={`pt-20 pb-12 px-8 max-w-7xl mx-auto relative z-10 ${className}`}>
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className={`pt-20 pb-12 px-8 max-w-7xl mx-auto relative z-10 ${className}`}
+        >
             {children}
-        </div>
+        </motion.div>
     );
 };
 

@@ -63,6 +63,7 @@ export default function DriversPage() {
                   <img
                     src={driver.image}
                     alt={driver.name}
+                    loading="lazy"
                     className="absolute top-[20%] right-8 h-[230%] w-auto max-w-none object-cover object-top transform transition-transform duration-500 group-hover:scale-[1.05] origin-top drop-shadow-2xl"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'https://placehold.co/200x400/111/444?text=' + driver.name;

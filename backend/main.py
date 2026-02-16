@@ -50,7 +50,7 @@ is_prod = os.getenv("ENV") == "production"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if (is_prod or os.getenv("STRICT_CORS")) else ["*"],
+    allow_origins=origins if (is_prod or os.getenv("STRICT_CORS")) else ["*"] if not os.getenv("ALLOW_CREDENTIALS", "True") == "True" else origins,
     allow_origin_regex=r"https://f1-predict-.*\.vercel\.app" if is_prod else None,
     allow_credentials=True,
     allow_methods=["*"],
