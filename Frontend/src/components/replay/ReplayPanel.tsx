@@ -1,6 +1,7 @@
 
 // Lucide icons would require installation, using simple text buttons if not available or assume installed
 
+import { useEffect } from "react";
 
 
 interface ReplayPanelProps {
@@ -15,10 +16,17 @@ import { useReplay } from "../../hooks/useReplay";
 export default function ReplayPanel({
     raceId,
     maxLap,
+    onLapChange,
     currentLapData
 }: ReplayPanelProps) {
 
-    const { lap, playing, setPlaying, speed, setCurrentTime } = useReplay(raceId);
+    const { playing, setPlaying, speed, setSpeed, currentTime, setCurrentTime } = useReplay(raceId);
+    const lap = maxLap > 0 ? Math.max(1, Math.min(maxLap, Math.round((currentTime / 6000) * maxLap) + 1)) : 1;
+
+    useEffect(() => {
+        onLapChange(lap);
+    }, [lap, onLapChange]);
+
     const setLap = (l: number) => {
         const time = (l - 1) * (maxLap > 0 ? 6000 / maxLap : 0); // Simplified mapping
         setCurrentTime(time);
@@ -63,6 +71,17 @@ export default function ReplayPanel({
                     <div className="text-xl font-mono text-white">Lap {lap}</div>
                     <div className="text-xs text-zinc-500">SPEED {speed}x</div>
                 </div>
+            </div>
+            <div className="flex gap-2">
+                {[1, 2, 5, 10].map(s => (
+                    <button
+                        key={s}
+                        onClick={() => setSpeed(s)}
+                        className={`px-2 py-1 rounded text-xs ${speed === s ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-300'}`}
+                    >
+                        {s}x
+                    </button>
+                ))}
             </div>
 
             {/* Snapshot */}

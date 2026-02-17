@@ -88,7 +88,7 @@ export const SEASON_2026_TEAMS: Team[] = [
         name: 'Cadillac',
         powerUnit: 'Ferrari',
         color: '#FFD700', // Gold/Yellow ish
-        carImage: '/models/2026cadillaccarright.avif',
+        carImage: '/models/2026cadillaccarright.webp',
         drivers: [
             { id: 'per', name: 'Sergio Pérez', number: 11, image: '/avatars/2026cadillacserper01right.avif', countryCode: 'MEX' },
             { id: 'bot', name: 'Valtteri Bottas', number: 77, image: '/avatars/2026cadillacvalbot01right.avif', countryCode: 'FIN' },

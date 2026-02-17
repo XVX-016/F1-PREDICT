@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { resolveAssetUrl } from '../utils/assets';
 
 interface HeroBackgroundProps {
     currentPage: string;
@@ -26,19 +27,19 @@ export default function HeroBackground({ currentPage }: HeroBackgroundProps) {
         };
 
         const config = configMap[currentPage] ?? configMap['home'];
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
         setStyle({
-            '--bg-blur': `${config.blur}px`,
-            backgroundImage: `url('${config.image}')`
+            '--bg-blur': `${isMobile ? Math.max(config.blur - 4, 0) : config.blur}px`,
+            backgroundImage: `url('${resolveAssetUrl(config.image)}')`
         });
     }, [currentPage]);
 
     return (
         <motion.div
-            key={currentPage} // Force re-render/re-animate on page change
-            initial={{ opacity: 0, scale: 1.1 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="hero-static-bg -z-10"
             style={style}
             aria-hidden="true"

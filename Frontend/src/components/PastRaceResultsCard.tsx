@@ -132,11 +132,14 @@ const PastRaceResultsCard: React.FC<PastRaceResultsCardProps> = ({ className = '
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
         }}
       >
-        {raceResults.length === 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center w-full min-h-[200px] border border-gray-700/50 rounded-lg bg-gray-800/30">
+            <Calendar className="w-12 h-12 text-gray-500 mb-3 opacity-50 animate-pulse" />
+            <p className="text-gray-400 text-sm">Loading race results...</p>
+          </div>
+        ) : raceResults.length === 0 ? (
           <div className="flex flex-col items-center justify-center w-full min-h-[200px] border border-gray-700/50 rounded-lg bg-gray-800/30">
             <Calendar className="w-12 h-12 text-gray-500 mb-3 opacity-50" />
             <p className="text-gray-400 text-sm">No race results available for the 2025 season yet.</p>

@@ -2,7 +2,6 @@ import { useEffect, useRef, useMemo } from 'react';
 import * as d3 from 'd3';
 import { useRaceStore } from '../../stores/raceStore';
 import { useShallow } from 'zustand/react/shallow';
-import { SimulationResult, LapState } from '../../sim/types';
 
 /**
  * Strategy Timeline Frame

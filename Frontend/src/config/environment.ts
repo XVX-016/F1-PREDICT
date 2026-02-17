@@ -5,6 +5,8 @@ export const ENV_CONFIG = {
   // ML & Backend Service Configuration (standardized to use same base for simplicity if deployed together)
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://f1-predict.onrender.com',
   BACKEND_URL: import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://f1-predict.onrender.com',
+  ML_SERVICE_URL: import.meta.env.VITE_ML_SERVICE_URL || import.meta.env.VITE_API_BASE_URL || 'https://f1-predict.onrender.com',
+  SUPABASE_ASSETS_BASE: 'https://uivvxlorutmjgouporrv.supabase.co/storage/v1/object/public/assets',
 
   // ML Service Proxy (Vite dev server)
   ML_SERVICE_PROXY: import.meta.env.VITE_MODEL_SERVICE_PROXY || '/ml',

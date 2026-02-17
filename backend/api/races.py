@@ -3,6 +3,9 @@ Race API endpoints
 Exposes track-first simulation and real strategy optimization.
 """
 from fastapi import APIRouter, HTTPException
+import os
+import json
+import glob
 import logging
 from typing import Dict, Any, Optional
 from services.simulation_engine import simulation_engine
@@ -62,7 +65,6 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
     try:
         # For now, we fetch from Redis (REPLAY source)
         # In a real app, this would query the race:{race_id}:replay:lap:* keys
-        import json
         r = get_redis_client()
         
         source = "redis"
@@ -107,34 +109,61 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
                 "generated_at": datetime.utcnow().isoformat()
             })
 
-        if not telemetry:
-            import glob
-            import os
-            cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
-            files = glob.glob(os.path.join(cache_dir, f"{race_id}_*.json"))
-            
-            if files:
-                logger.info(f"Found {len(files)} local cache files for {race_id}")
+        telemetry_urls = {}
+        cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
+        files = glob.glob(os.path.join(cache_dir, f"{race_id}_*.json"))
+        supabase_url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
+        if files and not telemetry:
+            if supabase_url:
+                logger.info(f"Mapping {len(files)} telemetry files to Supabase for {race_id}")
                 for fpath in files:
-                    try:
-                        with open(fpath, 'r') as f:
-                            data = json.load(f)
-                            for frames in data.values():
-                                telemetry.extend(frames)
-                    except Exception as e:
-                        logger.error(f"Failed to load cache file {fpath}: {e}")
+                    fname = os.path.basename(fpath)
+                    parts = fname.replace(".json", "").split("_")
+                    if len(parts) >= 2:
+                        driver_code = parts[-1]
+                        storage_url = f"{supabase_url}/storage/v1/object/public/race-telemetry/{fname}"
+                        telemetry_urls[driver_code] = storage_url
             else:
-                 logger.warning(f"No local cache files found in {cache_dir} for {race_id}")
+                # Local development fallback: stream telemetry via API endpoints.
+                logger.info(f"Mapping {len(files)} telemetry files to local API for {race_id}")
+                for fpath in files:
+                    fname = os.path.basename(fpath)
+                    parts = fname.replace(".json", "").split("_")
+                    if len(parts) >= 2:
+                        driver_code = parts[-1]
+                        telemetry_urls[driver_code] = f"/api/races/{race_id}/telemetry/{driver_code}"
+        elif not files:
+            logger.warning(f"No telemetry found for {race_id}")
 
         return RaceTimeline(
             meta=meta,
             laps=laps,
             telemetry=telemetry,
+            telemetry_urls=telemetry_urls if telemetry_urls else None,
             summary={"total_time_ms": 0}
         )
     except Exception as e:
         logger.error(f"Failed to fetch timeline: {e}")
         raise HTTPException(status_code=500, detail=f"Timeline fetch failed: {str(e)}")
+
+@router.get("/{race_id}/telemetry/{driver_code}")
+async def get_driver_telemetry(race_id: str, driver_code: str):
+    """
+    Local telemetry passthrough endpoint for replay development.
+    Returns cached JSON exactly as produced by ingestion scripts.
+    """
+    try:
+        cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
+        cache_file = os.path.join(cache_dir, f"{race_id}_{driver_code.upper()}.json")
+        if not os.path.exists(cache_file):
+            raise HTTPException(status_code=404, detail="Telemetry not found")
+        with open(cache_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Telemetry fetch failed for {race_id}/{driver_code}: {e}")
+        raise HTTPException(status_code=500, detail="Telemetry fetch failed")
 
 @router.get("/{race_id}/markets")
 async def get_race_markets(race_id: str):

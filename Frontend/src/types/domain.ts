@@ -44,7 +44,8 @@ export interface RaceTimeline {
         lap_count?: number;
     };
     laps: LapFrame[];
-    telemetry: TelemetryFrame[];
+    telemetry?: TelemetryFrame[];
+    telemetry_urls?: Record<string, string>;
     summary: {
         total_time_ms: number;
         [key: string]: any;

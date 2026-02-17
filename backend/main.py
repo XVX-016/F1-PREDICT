@@ -18,6 +18,9 @@ import api.constructors as constructors
 import api.status as status
 import api.user as user
 import api.weather as weather
+import api.baseline as baseline
+import api.intelligence as intelligence
+import api.live as live
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -67,12 +70,15 @@ if not is_prod and not os.getenv("STRICT_CORS"):
     pass
 
 # Include routers
-app.include_router(drivers.router, prefix="/api/drivers", tags=["drivers"])
-app.include_router(constructors.router, prefix="/api/constructors", tags=["constructors"])
+app.include_router(drivers.router, tags=["drivers"])
+app.include_router(constructors.router, tags=["constructors"])
 app.include_router(races.router, prefix="/api/races", tags=["races"])
 app.include_router(status.router, prefix="/api", tags=["status"])
-app.include_router(user.router, prefix="/api/users", tags=["users"])
+app.include_router(user.router, tags=["users"])
 app.include_router(weather.router, prefix="/api", tags=["weather"])
+app.include_router(baseline.router)
+app.include_router(intelligence.router)
+app.include_router(live.router)
 
 import api.live_telemetry as telemetry
 import api.ws_race as ws_race

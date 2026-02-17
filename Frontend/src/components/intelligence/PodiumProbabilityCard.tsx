@@ -81,16 +81,7 @@ export const PodiumProbabilityCard: React.FC<PodiumProbabilityCardProps> = ({ en
             <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-2 shrink-0">
                 <div className="flex justify-between items-center text-[8px] uppercase tracking-widest font-mono">
                     <span className="text-white/20">Simulation Runs: 10,000</span>
-                    <span className="text-[#4ade80]/60 font-bold">Result: Converged</span>
                 </div>
-                {envelope.data.some(d => d.confidence === 'LOW') && (
-                    <div className="flex items-center gap-1.5 bg-[#E10600]/5 border border-[#E10600]/10 px-2 py-1 rounded">
-                        <span className="w-1 h-1 rounded-full bg-[#E10600]"></span>
-                        <p className="text-[8px] text-[#E10600]/60 uppercase font-black tracking-tighter">
-                            High Chaos Variance Detected: Expected finishers may shift.
-                        </p>
-                    </div>
-                )}
                 <p className="text-[8px] text-white/10 uppercase tracking-[0.1em] italic leading-tight text-center mt-2">
                     Note: This analysis assumes clean-air baseline conditions.
                 </p>

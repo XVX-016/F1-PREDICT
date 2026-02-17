@@ -4,12 +4,8 @@ import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import LoadingSpinner from "./LoadingSpinner";
 
 function CarModel({ url }: { url: string }) {
-  try {
-    const { scene } = useGLTF(url);
-    return <primitive object={scene} />;
-  } catch (error) {
-    return <Html center><div style={{ color: 'white' }}>Model failed to load</div></Html>;
-  }
+  const { scene } = useGLTF(url);
+  return <primitive object={scene} />;
 }
 
 const CarModelViewer: React.FC<{ url: string; autoRotate?: boolean }> = ({ url, autoRotate }) => {

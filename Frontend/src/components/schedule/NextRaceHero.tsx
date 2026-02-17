@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather';
+import { resolveAssetUrl } from '../../utils/assets';
 
 interface NextRaceHeroProps {
     race: any;
@@ -9,13 +10,13 @@ interface NextRaceHeroProps {
 }
 
 export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: NextRaceHeroProps) {
+    // Fetch Weather (always call hooks at the top level)
+    const { data: weather, isLoading: weatherLoading } = useWeather(race?.city || race?.country);
+
     if (!race) return null;
 
     // Calculate days until
     const daysUntil = Math.ceil((new Date(race.startISO).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-
-    // Fetch Weather
-    const { data: weather, isLoading: weatherLoading } = useWeather(race.city || race.country);
 
     return (
         <motion.div
@@ -27,7 +28,7 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
                 {race.bannerImg ? (
-                    <img src={race.bannerImg} className="w-full h-full object-cover opacity-100 transition-transform duration-700 group-hover:scale-105" alt="Next Race" />
+                    <img src={resolveAssetUrl(race.bannerImg)} className="w-full h-full object-cover opacity-100 transition-transform duration-700 group-hover:scale-105" alt="Next Race" />
                 ) : (
                     <div className="w-full h-full bg-[#15151e]" />
                 )}

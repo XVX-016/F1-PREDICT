@@ -1,5 +1,6 @@
 import PageContainer from "../components/layout/PageContainer";
 import { SEASON_2026_DRIVERS } from "../data/season2026";
+import { resolveAssetUrl } from "../utils/assets";
 
 export default function DriversPage() {
   return (
@@ -53,7 +54,7 @@ export default function DriversPage() {
                 {/* Right Content: Driver Image - Upper Body Crop */}
                 <div className="w-[45%] sm:w-[50%] h-full relative z-20 overflow-hidden">
                   <img
-                    src={driver.image}
+                    src={resolveAssetUrl(driver.image)}
                     alt={driver.name}
                     loading="lazy"
                     className="absolute top-2 right-0 sm:right-4 h-[180%] sm:h-[220%] w-auto max-w-none object-contain object-top transform transition-transform duration-500 group-hover:scale-[1.03] origin-top drop-shadow-2xl opacity-90 group-hover:opacity-100"

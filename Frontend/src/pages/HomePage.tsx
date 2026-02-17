@@ -5,37 +5,41 @@ import { Race } from '../types/predictions';
 import { Activity, Zap, BarChart3 } from 'lucide-react';
 import { useWeather } from '../hooks/useWeather';
 import { SEASON_2026_SCHEDULE } from '../data/season2026';
+import { getAssetUrl } from '../utils/assets';
 
 export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
   const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(2025);
   const [nextRace, setNextRace] = useState<Race | null>(null);
+
   const toCircuitBannerImage = (circuitName: string, raceName: string): string => {
     const key = `${raceName} ${circuitName}`.toLowerCase();
-    if (key.includes('bahrain')) return '/circuits/f1_2024_bhr_outline.png';
-    if (key.includes('melbourne') || key.includes('albert park')) return '/circuits/f1_2024_aus_outline.png';
-    if (key.includes('jeddah')) return '/circuits/f1_2024_sau_outline.png';
-    if (key.includes('suzuka')) return '/circuits/f1_2024_jap_outline.png';
-    if (key.includes('shanghai')) return '/circuits/f1_2024_chn_outline.png';
-    if (key.includes('miami')) return '/circuits/f1_2024_mia_outline.png';
-    if (key.includes('imola')) return '/circuits/f1_2024_ero_outline.png';
-    if (key.includes('monaco')) return '/circuits/f1_2024_mco_outline.png';
-    if (key.includes('barcelona')) return '/circuits/f1_2024_spn_outline.png';
-    if (key.includes('montreal') || key.includes('villeneuve')) return '/circuits/f1_2024_can_outline.png';
-    if (key.includes('spielberg') || key.includes('red bull ring')) return '/circuits/f1_2024_aut_outline.png';
-    if (key.includes('silverstone')) return '/circuits/f1_2024_gbr_outline.png';
-    if (key.includes('hungaroring')) return '/circuits/f1_2024_hun_outline.png';
-    if (key.includes('spa')) return '/circuits/f1_2024_bel_outline.png';
-    if (key.includes('zandvoort')) return '/circuits/f1_2024_nld_outline.png';
-    if (key.includes('monza')) return '/circuits/f1_2024_ita_outline.png';
-    if (key.includes('baku')) return '/circuits/f1_2024_aze_outline.png';
-    if (key.includes('marina bay')) return '/circuits/f1_2024_sgp_outline.png';
-    if (key.includes('austin') || key.includes('americas')) return '/circuits/f1_2024_usa_outline.png';
-    if (key.includes('mexico')) return '/circuits/f1_2024_mex_outline.png';
-    if (key.includes('interlagos') || key.includes('sao paulo')) return '/circuits/f1_2024_bra_outline.png';
-    if (key.includes('las vegas')) return '/circuits/f1_2024_lve_outline.png';
-    if (key.includes('lusail')) return '/circuits/f1_2024_qat_outline.png';
-    if (key.includes('yas marina')) return '/circuits/f1_2024_abu_outline.png';
-    return '/circuits/f1_2024_aus_outline.png';
+    let filename = 'f1_2024_aus_outline.png';
+    if (key.includes('bahrain')) filename = 'f1_2024_bhr_outline.png';
+    else if (key.includes('melbourne') || key.includes('albert park')) filename = 'f1_2024_aus_outline.png';
+    else if (key.includes('jeddah')) filename = 'f1_2024_sau_outline.png';
+    else if (key.includes('suzuka')) filename = 'f1_2024_jap_outline.png';
+    else if (key.includes('shanghai')) filename = 'f1_2024_chn_outline.png';
+    else if (key.includes('miami')) filename = 'f1_2024_mia_outline.png';
+    else if (key.includes('imola')) filename = 'f1_2024_ero_outline.png';
+    else if (key.includes('monaco')) filename = 'f1_2024_mco_outline.png';
+    else if (key.includes('barcelona')) filename = 'f1_2024_spn_outline.png';
+    else if (key.includes('montreal') || key.includes('villeneuve')) filename = 'f1_2024_can_outline.png';
+    else if (key.includes('spielberg') || key.includes('red bull ring')) filename = 'f1_2024_aut_outline.png';
+    else if (key.includes('silverstone')) filename = 'f1_2024_gbr_outline.png';
+    else if (key.includes('hungaroring')) filename = 'f1_2024_hun_outline.png';
+    else if (key.includes('spa')) filename = 'f1_2024_bel_outline.png';
+    else if (key.includes('zandvoort')) filename = 'f1_2024_nld_outline.png';
+    else if (key.includes('monza')) filename = 'f1_2024_ita_outline.png';
+    else if (key.includes('baku')) filename = 'f1_2024_aze_outline.png';
+    else if (key.includes('marina bay')) filename = 'f1_2024_sgp_outline.png';
+    else if (key.includes('austin') || key.includes('americas')) filename = 'f1_2024_usa_outline.png';
+    else if (key.includes('mexico')) filename = 'f1_2024_mex_outline.png';
+    else if (key.includes('interlagos') || key.includes('sao paulo')) filename = 'f1_2024_bra_outline.png';
+    else if (key.includes('las vegas')) filename = 'f1_2024_lve_outline.png';
+    else if (key.includes('lusail')) filename = 'f1_2024_qat_outline.png';
+    else if (key.includes('yas marina')) filename = 'f1_2024_abu_outline.png';
+
+    return getAssetUrl(`/circuits/${filename}`);
   };
 
   useEffect(() => {
@@ -75,7 +79,7 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
           timezone: "UTC",
           has_sprint: !!next.isSprint,
           status: "upcoming"
-        } as any);
+        } as Race);
       }
     }
   }, [apiRaces, apiLoading, apiError]);

@@ -1,4 +1,3 @@
-import React from 'react';
 import GlassWrapper from './GlassWrapper';
 
 interface RaceItem { id: string; name: string; startDate: string; }
@@ -28,5 +27,4 @@ export default function MiniSeasonCalendar({ races, onViewFull, onSelectRace }: 
 		</GlassWrapper>
 	);
 }
-
 

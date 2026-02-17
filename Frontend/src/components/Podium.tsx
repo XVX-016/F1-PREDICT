@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { DriverPrediction } from '../types/predictions';
 
@@ -8,7 +7,6 @@ interface PodiumProps {
 
 export default function Podium({ top3 }: PodiumProps) {
   const heights = [0.8, 1.0, 0.7]; // 2nd, 1st, 3rd scale
-  const order = [1, 0, 2]; // render middle (winner) last for emphasis
 
   const getTeamColor = (team: string) => {
     const teamColors: { [key: string]: string } = {

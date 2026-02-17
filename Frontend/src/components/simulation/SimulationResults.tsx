@@ -94,7 +94,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
                             )
                         })}
                         <p className="text-[8px] font-mono text-slate-600 uppercase leading-relaxed mt-4">
-                            Model stability based on P05-P95 pace variation over {results.meta.iterations} iterations.
+                            Model stability based on P05-P95 pace variation over {results.metadata.iterations} iterations.
                         </p>
                     </div>
 

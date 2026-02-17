@@ -37,7 +37,7 @@ interface SchedulePageProps {
 }
 
 export default function SchedulePage({ }: SchedulePageProps) {
-  const [selectedYear, setSelectedYear] = useState(2026);
+  const [selectedYear] = useState(2026);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'live' | 'completed'>('all');
   const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(selectedYear);
 

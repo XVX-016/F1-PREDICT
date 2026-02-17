@@ -1,4 +1,3 @@
-import React from 'react';
 import GlassWrapper from './GlassWrapper';
 
 interface ModelSummaryProps {
@@ -32,5 +31,4 @@ export default function ModelSummary({ biasNotes = 'No significant bias detected
 		</GlassWrapper>
 	);
 }
-
 

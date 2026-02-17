@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface StrategyComparisonProps {
     baseline: {

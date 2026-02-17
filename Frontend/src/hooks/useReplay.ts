@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { transformTimelineData, DRIVER_INFO } from "../utils/ReplayDataHelper";
 import { RaceTimeline } from '../types/domain';
-import { ReplayState } from "../utils/ReplayEngine";
+import { ReplayState, TelemetrySample } from "../utils/ReplayEngine";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -68,17 +68,116 @@ export function useReplay(raceId: string) {
                 if (!res.ok) throw new Error('Failed to fetch timeline');
                 const timeline: RaceTimeline = await res.json();
 
-                if (!timeline || (!timeline.telemetry && !timeline.laps)) {
+                if (!timeline || (!timeline.telemetry && !timeline.laps && !timeline.telemetry_urls)) {
                     throw new Error('Malformed timeline data received');
                 }
 
-                const { metadata, telemetry } = transformTimelineData(timeline);
+                let finalTelemetry = {};
+                let finalMetadata = [];
 
-                // Enhance metadata with DRIVER_INFO
-                const enhancedMetadata = metadata.map(m => ({
-                    ...m,
-                    ...(DRIVER_INFO[m.id] || {})
-                }));
+                if (timeline.telemetry_urls) {
+                    console.log('[useReplay] Fetching distributed telemetry...');
+                    const driverCodes = Object.keys(timeline.telemetry_urls);
+                    const telemetryPromises = driverCodes.map(async (code) => {
+                        const url = timeline.telemetry_urls![code];
+                        const resolvedUrl = /^https?:\/\//i.test(url)
+                            ? url
+                            : `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+                        const fallbackLocalUrl = `${API_BASE}/api/races/${raceId}/telemetry/${code}`;
+                        try {
+                            let tRes = await fetch(resolvedUrl);
+                            if (!tRes.ok && fallbackLocalUrl !== resolvedUrl) {
+                                tRes = await fetch(fallbackLocalUrl);
+                            }
+                            if (!tRes.ok) return null;
+                            const data = await tRes.json();
+                            return { code, frames: data };
+                        } catch (e) {
+                            console.error(`Failed primary telemetry URL for ${code}, trying local fallback...`, e);
+                            try {
+                                const localRes = await fetch(fallbackLocalUrl);
+                                if (!localRes.ok) return null;
+                                const localData = await localRes.json();
+                                return { code, frames: localData };
+                            } catch (localErr) {
+                                console.error(`Failed local telemetry fallback for ${code}:`, localErr);
+                                return null;
+                            }
+                        }
+                    });
+
+                    const results = await Promise.all(telemetryPromises);
+                    const mergedTelemetry: Record<string, TelemetrySample[]> = {};
+
+                    results.forEach(res => {
+                        if (res) {
+                            // Extract frames from supported formats:
+                            // 1) [] flat list
+                            // 2) { CODE: [] }
+                            // 3) { "1": [], "2": [], ... } lap-keyed map
+                            let frames: any[] = [];
+                            if (Array.isArray(res.frames)) {
+                                frames = res.frames;
+                            } else if (res.frames && typeof res.frames === 'object') {
+                                const byCode = res.frames[res.code];
+                                if (Array.isArray(byCode)) {
+                                    frames = byCode;
+                                } else {
+                                    frames = Object.entries(res.frames)
+                                        .filter(([, value]) => Array.isArray(value))
+                                        .sort(([a], [b]) => Number(a) - Number(b))
+                                        .flatMap(([lapKey, value]) =>
+                                            (value as any[]).map((f: any) => ({
+                                                ...f,
+                                                lap: f.lap ?? Number(lapKey)
+                                            }))
+                                        );
+                                }
+                            }
+                            const telemetryScale = (() => {
+                                if (!frames.length) return 1;
+                                const firstT = Number(frames[0]?.t || 0);
+                                const secondT = Number(frames[Math.min(1, frames.length - 1)]?.t || firstT);
+                                const dt = Math.abs(secondT - firstT);
+                                return dt > 0 && dt < 2 ? 1000 : 1;
+                            })();
+
+                            mergedTelemetry[res.code] = frames.map((f: any) => ({
+                                t: (f.t || 0) * telemetryScale,
+                                lap: f.lap || 1,
+                                progress: f.rel_dist || f.progress || 0,
+                                speed: f.speed || 0,
+                                throttle: f.throttle || 0,
+                                brake: f.brake || 0,
+                                gear: f.gear || 1,
+                                drs: !!f.drs,
+                                isPitting: f.is_pitting || f.isPitting || false
+                            }));
+                        }
+                    });
+
+                    if (Object.keys(mergedTelemetry).length > 0) {
+                        finalTelemetry = mergedTelemetry;
+                        finalMetadata = Object.keys(mergedTelemetry).map(id => ({
+                            ...(DRIVER_INFO[id] || { name: id, team: 'Unknown', color: '#666', number: 0 }),
+                            id
+                        }));
+                    } else {
+                        const { metadata, telemetry } = transformTimelineData(timeline);
+                        finalTelemetry = telemetry;
+                        finalMetadata = metadata.map(m => ({
+                            ...m,
+                            ...(DRIVER_INFO[m.id] || {})
+                        }));
+                    }
+                } else {
+                    const { metadata, telemetry } = transformTimelineData(timeline);
+                    finalTelemetry = telemetry;
+                    finalMetadata = metadata.map(m => ({
+                        ...m,
+                        ...(DRIVER_INFO[m.id] || {})
+                    }));
+                }
 
                 // Mark as loaded BEFORE posting to prevent race conditions
                 dataLoadedRef.current = raceId;
@@ -86,7 +185,7 @@ export function useReplay(raceId: string) {
                 if (workerRef.current) {
                     workerRef.current.postMessage({
                         type: 'LOAD',
-                        payload: { metadata: enhancedMetadata, telemetry }
+                        payload: { metadata: finalMetadata, telemetry: finalTelemetry }
                     });
                 } else {
                     console.error('[useReplay] Worker lost during fetch');

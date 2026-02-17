@@ -1,6 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { X, Map as MapIcon } from 'lucide-react';
+import { resolveAssetUrl } from '../../utils/assets';
 
 interface RaceDetailViewProps {
     race: any;
@@ -95,14 +96,14 @@ export default function RaceDetailView({ race, onClose, getCountryFlag }: RaceDe
                             {/* Map Image */}
                             <div className="flex-1 w-full flex justify-center">
                                 <img
-                                    src={race.circuitMap || `/f1_tracks/${race.country}_${race.circuitName.replace(/\s+/g, '_')}.png`}
+                                    src={resolveAssetUrl(race.circuitMap || `/f1_tracks/${race.country}_${race.circuitName.replace(/\s+/g, '_')}.png`)}
                                     alt="Circuit Map"
                                     className="max-h-[300px] md:max-h-[400px] w-full object-contain filter invert opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                                     onError={(e) => {
                                         if (race.trackImg) {
-                                            (e.target as HTMLImageElement).src = race.trackImg;
+                                            (e.target as HTMLImageElement).src = resolveAssetUrl(race.trackImg);
                                         } else {
-                                            (e.target as HTMLImageElement).src = '/circuits/f1_2024_aus_outline.png';
+                                            (e.target as HTMLImageElement).src = resolveAssetUrl('/circuits/f1_2024_aus_outline.png');
                                         }
                                     }}
                                 />

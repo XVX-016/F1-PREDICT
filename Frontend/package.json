@@ -6,6 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "smoke:pipelines": "node ../scripts/smoke_check_pipelines.mjs",
     "preview": "vite preview",
     "generate-predictions": "tsx scripts/generateAllTrackPredictions.ts",
     "test": "jest",

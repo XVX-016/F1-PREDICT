@@ -1,41 +1,5 @@
-import { RaceTimeline, TelemetryFrame } from '../types/domain';
+import { RaceTimeline } from '../types/domain';
 import { TelemetrySample, DriverMetadata } from './ReplayEngine';
-
-/**
- * Generates sample telemetry for demo purposes when API returns no data.
- */
-function generateSampleTelemetry(): TelemetryFrame[] {
-    const drivers = ['VER', 'NOR', 'LEC', 'HAM', 'SAI', 'PER', 'RUS', 'PIA', 'ALO', 'STR'];
-    const frames: TelemetryFrame[] = [];
-
-    // Generate 60 seconds of data at 1Hz per driver
-    const durationMs = 60000;
-    const interval = 1000;
-
-    for (let t = 0; t < durationMs; t += interval) {
-        drivers.forEach((driverId, idx) => {
-            // Progress: each driver starts offset by position
-            const baseProgress = (t / 90000) + (idx * 0.02);
-            const progress = baseProgress % 1;
-
-            frames.push({
-                t,
-                driver_id: driverId,
-                x: 0,
-                y: 0,
-                dist: progress * 5412,
-                rel_dist: progress,
-                speed: 280 + Math.random() * 40,
-                gear: 7,
-                drs: progress > 0.4 && progress < 0.6 ? 1 : 0,
-                throttle: 0.9,
-                brake: 0.0
-            });
-        });
-    }
-
-    return frames;
-}
 
 /**
  * Transforms backend RaceTimeline into ReplayEngine-compatible telemetry and metadata.
@@ -47,11 +11,9 @@ export function transformTimelineData(timeline: RaceTimeline): {
     const telemetry: Record<string, TelemetrySample[]> = {};
     const driverIds = new Set<string>();
 
-    // Defensive: Use sample data if telemetry is missing
-    const rawTelemetry = timeline?.telemetry ?? generateSampleTelemetry();
-
-    if (!timeline?.telemetry || timeline.telemetry.length === 0) {
-        console.warn('[ReplayDataHelper] No telemetry from API, using sample data.');
+    const rawTelemetry = timeline?.telemetry ?? [];
+    if (rawTelemetry.length === 0) {
+        console.warn('[ReplayDataHelper] No telemetry returned for replay timeline.');
     }
 
     // 1. Process Telemetry Frames

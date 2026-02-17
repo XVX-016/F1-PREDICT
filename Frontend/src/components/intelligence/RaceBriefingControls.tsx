@@ -1,9 +1,9 @@
 import React from 'react';
-import { SEASON_2026_SCHEDULE } from '../../data/season2026';
+import { SEASON_2025_SCHEDULE } from '../../data/season2025';
 
 interface RaceBriefingControlsProps {
     selectedCircuit: string;
-    onCircuitChange: (id: string) => void;
+    onCircuitChange: (raceId: string) => void;
     selectedSession: 'RACE' | 'SPRINT';
     onSessionChange: (session: 'RACE' | 'SPRINT') => void;
     selectedCondition: 'DRY' | 'INTERMEDIATE' | 'WET';
@@ -26,14 +26,14 @@ export const RaceBriefingControls: React.FC<RaceBriefingControlsProps> = ({
         <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-wrap gap-6 items-center">
             {/* Circuit Selector */}
             <div className="flex flex-col gap-1.5 min-w-[220px]">
-                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Target Circuit</label>
+                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Target Race</label>
                 <select
                     value={selectedCircuit}
                     onChange={(e) => onCircuitChange(e.target.value)}
                     className="bg-[#1e1e24] text-white text-sm border border-white/10 rounded px-3 py-2 outline-none focus:border-[#E10600] transition-colors appearance-none cursor-pointer w-full font-mono"
                 >
-                    {SEASON_2026_SCHEDULE.map(race => (
-                        <option key={race.round} value={race.raceName}>
+                    {SEASON_2025_SCHEDULE.map(race => (
+                        <option key={race.round} value={`${race.round}_2025`}>
                             {race.raceName.toUpperCase()}
                         </option>
                     ))}

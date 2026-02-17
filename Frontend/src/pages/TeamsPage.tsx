@@ -1,5 +1,6 @@
 import PageContainer from "../components/layout/PageContainer";
 import { SEASON_2026_TEAMS } from "../data/season2026";
+import { getAssetUrl } from "../utils/assets";
 
 const TeamsPage = () => {
   return (
@@ -38,7 +39,7 @@ const TeamsPage = () => {
                     <div key={driver.id} className="flex items-center gap-2 flex-row">
                       <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 bg-black/20">
                         <img
-                          src={driver.image}
+                          src={getAssetUrl(driver.image)}
                           alt={driver.name}
                           loading="lazy"
                           className="w-full h-full object-cover object-top"
@@ -57,7 +58,7 @@ const TeamsPage = () => {
             {/* Car Image - Anchored Bottom Left - Adjusted for spacing */}
             <div className="absolute bottom-4 left-4 w-full z-10 pointer-events-none">
               <img
-                src={team.carImage}
+                src={getAssetUrl(team.carImage)}
                 alt={`${team.name} Car`}
                 loading="lazy"
                 className="w-[85%] max-w-[400px] object-contain drop-shadow-2xl transform transition-transform duration-500 group-hover:scale-105"

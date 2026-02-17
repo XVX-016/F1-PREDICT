@@ -34,6 +34,10 @@ export default function RacePositionChart() {
         if (!fullSeries || fullSeries.length === 0) return 58;
         return Math.max(...fullSeries.flatMap(d => d.points.map(p => p.lap)));
     }, [fullSeries]);
+    const maxFieldSize = useMemo(() => {
+        if (!fullSeries || fullSeries.length === 0) return 20;
+        return Math.max(20, fullSeries.length);
+    }, [fullSeries]);
 
     // Render Effect
     useEffect(() => {
@@ -60,7 +64,7 @@ export default function RacePositionChart() {
             .range([margin.left, width - margin.right]);
 
         const y = d3.scaleLinear()
-            .domain([1, 20])
+            .domain([1, maxFieldSize])
             .range([margin.top, height - margin.bottom]);
 
         // Line Generator
@@ -113,10 +117,10 @@ export default function RacePositionChart() {
 
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(y).ticks(10))
+            .call(d3.axisLeft(y).ticks(Math.min(maxFieldSize, 10)))
             .attr("color", "#666");
 
-    }, [visibleSeries, maxLap, selectedDriverId, simulationState]);
+    }, [visibleSeries, maxLap, maxFieldSize, selectedDriverId, simulationState]);
 
     // Gate: Empty State UI
     if (simulationState === "empty") {

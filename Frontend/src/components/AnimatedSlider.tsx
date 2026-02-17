@@ -111,6 +111,8 @@ export default function AnimatedSlider({
     <div
       className={`relative h-1.5 ${className}`}
       ref={sliderRef}
+      onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
     >
       {/* Background track - strict console style */}

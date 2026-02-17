@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getDriverStandings, getRaces, getResults } from '../api/jolpica';
-import { Trophy, Flag, Clock, MapPin } from 'lucide-react';
+import { getDriverStandings, getRaces } from '../api/jolpica';
+import { Flag, Clock, MapPin } from 'lucide-react';
 
 // Helper functions for images
 const getDriverAvatar = (driverName: string) => {

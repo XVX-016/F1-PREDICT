@@ -96,7 +96,8 @@ class ErrorBoundary extends React.Component<
 }
 
 // Lazy load all pages for better performance with retry logic
-const lazyWithRetry = (importFn: () => Promise<any>, retries = 2) => {
+const lazyWithRetry = (importFn: () => Promise<{ default: React.ComponentType<any> }>, retries = 2) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return lazy(async () => {
     for (let i = 0; i < retries; i++) {
       try {
@@ -111,17 +112,29 @@ const lazyWithRetry = (importFn: () => Promise<any>, retries = 2) => {
   });
 };
 
-const HomePage = lazyWithRetry(() => import('./pages/HomePage'));
-const DriversPage = lazyWithRetry(() => import('./pages/DriversPage'));
-const TelemetryPage = lazyWithRetry(() => import('./pages/TelemetryPage'));
-const SchedulePage = lazyWithRetry(() => import('./pages/SchedulePage'));
-const TeamsPage = lazyWithRetry(() => import('./pages/TeamsPage'));
-const SimulationPage = lazyWithRetry(() => import('./pages/SimulationPage'));
-const ResultsPage = lazyWithRetry(() => import('./pages/ResultsPage'));
-const IntelligencePage = lazyWithRetry(() => import('./pages/IntelligencePage'));
-const ReplayPage = lazyWithRetry(() => import('./pages/ReplayPage'));
-const CalibrationPage = lazyWithRetry(() => import('./pages/CalibrationPage'));
-const AboutPage = lazyWithRetry(() => import('./pages/AboutPage'));
+const importHomePage = () => import('./pages/HomePage');
+const importDriversPage = () => import('./pages/DriversPage');
+const importTelemetryPage = () => import('./pages/TelemetryPage');
+const importSchedulePage = () => import('./pages/SchedulePage');
+const importTeamsPage = () => import('./pages/TeamsPage');
+const importSimulationPage = () => import('./pages/SimulationPage');
+const importResultsPage = () => import('./pages/ResultsPage');
+const importIntelligencePage = () => import('./pages/IntelligencePage');
+const importReplayPage = () => import('./pages/ReplayPage');
+const importCalibrationPage = () => import('./pages/CalibrationPage');
+const importAboutPage = () => import('./pages/AboutPage');
+
+const HomePage = lazyWithRetry(importHomePage);
+const DriversPage = lazyWithRetry(importDriversPage);
+const TelemetryPage = lazyWithRetry(importTelemetryPage);
+const SchedulePage = lazyWithRetry(importSchedulePage);
+const TeamsPage = lazyWithRetry(importTeamsPage);
+const SimulationPage = lazyWithRetry(importSimulationPage);
+const ResultsPage = lazyWithRetry(importResultsPage);
+const IntelligencePage = lazyWithRetry(importIntelligencePage);
+const ReplayPage = lazyWithRetry(importReplayPage);
+const CalibrationPage = lazyWithRetry(importCalibrationPage);
+const AboutPage = lazyWithRetry(importAboutPage);
 
 function App() {
   // Helper to extract page name from hash (ignoring query params)
@@ -136,11 +149,10 @@ function App() {
   };
 
   const [currentPage, setCurrentPageState] = useState(getInitialPage());
-  // const [raceData, setRaceData] = useState<any>(null); // Unused currently
 
 
   // Update hash on page change
-  const setCurrentPage = (page: string, _data?: any) => {
+  const setCurrentPage = (page: string) => {
     // Check if page string already has params
     const pageName = page.split('?')[0];
     setCurrentPageState(pageName);
@@ -163,6 +175,21 @@ function App() {
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  // Light route prefetching to reduce first-open flicker for heavy pages.
+  React.useEffect(() => {
+    const prefetch = () => {
+      const alwaysPrefetch = [importSimulationPage, importIntelligencePage, importReplayPage];
+      alwaysPrefetch.forEach((loader) => loader().catch(() => null));
+    };
+
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(prefetch, { timeout: 1200 });
+    } else {
+      const t = setTimeout(prefetch, 600);
+      return () => clearTimeout(t);
+    }
   }, []);
 
   const renderPage = () => {

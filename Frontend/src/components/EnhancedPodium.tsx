@@ -18,11 +18,13 @@ interface EnhancedPodiumProps {
 export default function EnhancedPodium({ drivers, className = '' }: EnhancedPodiumProps) {
   // Desired layout: 2 - 1 - 3
   const layoutOrder = [2, 1, 3];
-  const podiumConfig: Record<number, { height: string; bgColor: string; borderColor: string; icon: any; iconColor: string }> = {
+  const podiumConfig: Record<number, { height: string; bgColor: string; borderColor: string; icon: React.ElementType; iconColor: string }> = {
     1: { height: 'h-60', bgColor: 'bg-gradient-to-b from-yellow-400 to-yellow-600', borderColor: 'border-yellow-300', icon: Trophy, iconColor: 'text-yellow-800' },
     2: { height: 'h-56', bgColor: 'bg-gradient-to-b from-gray-300 to-gray-500', borderColor: 'border-gray-200', icon: Medal, iconColor: 'text-gray-700' },
     3: { height: 'h-52', bgColor: 'bg-gradient-to-b from-orange-400 to-orange-600', borderColor: 'border-orange-300', icon: Star, iconColor: 'text-orange-800' }
   };
+
+  const STORAGE_BASE = `https://uivvxlorutmjgouporrv.supabase.co/storage/v1/object/public/assets/avatars`;
 
   // Build a safe avatar filename strictly from driver name
   const getAvatarSrc = (driverName: string) => {
@@ -32,8 +34,7 @@ export default function EnhancedPodium({ drivers, className = '' }: EnhancedPodi
       .toLowerCase()
       .replace(/[^a-z\s]/g, '')
       .replace(/\s+/g, '');
-    const candidate = `/avatars/${normalized}.png`;
-    return candidate;
+    return `${STORAGE_BASE}/${normalized}.png`;
   };
 
   return (
@@ -70,7 +71,8 @@ export default function EnhancedPodium({ drivers, className = '' }: EnhancedPodi
                   alt={driver.driverName}
                   className="w-full h-full object-cover object-top"
                   style={{ objectPosition: 'center top' }}
-                  onError={(e) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onError={(e: any) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
                   }}

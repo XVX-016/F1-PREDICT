@@ -4,6 +4,7 @@
 // Use Vite dev server proxies to avoid CORS and port coupling
 const LOCAL_BASE_URL = "/ergast/f1";
 const FAST_F1_BASE_URL = "/fastf1";
+const INTERNAL_API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 // API cache for better performance
 const cache = new Map<string, { data: any; timestamp: number }>();
@@ -125,17 +126,17 @@ export const getConstructorStandings = async () => {
 // Intelligence & Baseline Endpoints
 export const getIntelligence = async (raceId: string, drivers?: string) => {
   const url = drivers
-    ? `/api/intelligence/${raceId}?drivers=${drivers}`
-    : `/api/intelligence/${raceId}`;
+    ? `${INTERNAL_API_BASE}/api/intelligence/${raceId}?drivers=${drivers}`
+    : `${INTERNAL_API_BASE}/api/intelligence/${raceId}`;
   return fetchWithTimeout(url);
 };
 
 export const getBaseline = async (raceId: string) => {
-  return fetchWithTimeout(`/api/baseline/${raceId}`);
+  return fetchWithTimeout(`${INTERNAL_API_BASE}/api/baseline/${raceId}`);
 };
 
 export const getBaselineSummary = async (raceId: string, drivers: string) => {
-  return fetchWithTimeout(`/api/baseline/${raceId}/summary?drivers=${drivers}`);
+  return fetchWithTimeout(`${INTERNAL_API_BASE}/api/baseline/${raceId}/summary?drivers=${drivers}`);
 };
 
 // Archive API functions
