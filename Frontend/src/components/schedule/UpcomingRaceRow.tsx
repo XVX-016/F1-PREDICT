@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { resolveAssetUrl } from '../../utils/assets';
 
 interface UpcomingRaceRowProps {
     races: any[];
@@ -29,7 +30,7 @@ export default function UpcomingRaceRow({ races, getCountryFlag, onViewDetails }
                         {/* Track BG */}
                         <div className="absolute inset-0 opacity-20 pointer-events-none p-4 flex items-center justify-center">
                             {race.trackImg ? (
-                                <img src={race.trackImg} className="w-full h-full object-contain filter invert" alt="" />
+                                <img src={resolveAssetUrl(race.trackImg)} className="w-full h-full object-contain filter invert" alt="" />
                             ) : null}
                         </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import GlassWrapper from './GlassWrapper';
 
 
@@ -145,5 +145,4 @@ export default function TrackOverview({ raceName, circuitName, laps, lengthKm, f
 		</GlassWrapper>
 	);
 }
-
 

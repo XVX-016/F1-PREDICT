@@ -1,6 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { X, Map as MapIcon } from 'lucide-react';
+import { resolveAssetUrl } from '../../utils/assets';
 
 interface RaceDetailViewProps {
     race: any;
@@ -41,7 +42,7 @@ export default function RaceDetailView({ race, onClose, getCountryFlag }: RaceDe
                         {/* Background Elements */}
                         <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-red-900/20 to-transparent opacity-50" />
 
-                        <div className="relative z-10 p-12 md:p-16">
+                        <div className="relative z-10 p-6 md:p-16">
                             {/* Top Badge Row */}
                             <div className="flex items-center gap-4 mb-6">
                                 <span className="px-4 py-1.5 bg-[#E10600] text-white text-[10px] font-black uppercase tracking-wider rounded-full">
@@ -80,7 +81,7 @@ export default function RaceDetailView({ race, onClose, getCountryFlag }: RaceDe
                     </div>
 
                     {/* Circuit Layout Section */}
-                    <div className="relative w-full bg-[#15151e] border-t-4 border-[#E10600] rounded-3xl p-12 md:p-16 mb-20">
+                    <div className="relative w-full bg-[#15151e] border-t-4 border-[#E10600] rounded-2xl p-4 md:p-16 mb-20 shadow-md">
                         {/* Circuit Label */}
                         <div className="flex items-center gap-3 mb-12">
                             <MapIcon className="w-5 h-5 text-[#E10600]" />
@@ -95,11 +96,15 @@ export default function RaceDetailView({ race, onClose, getCountryFlag }: RaceDe
                             {/* Map Image */}
                             <div className="flex-1 w-full flex justify-center">
                                 <img
-                                    src={race.trackImg || '/circuits/f1_2024_aus_outline.png'}
+                                    src={resolveAssetUrl(race.circuitMap || `/f1_tracks/${race.country}_${race.circuitName.replace(/\s+/g, '_')}.png`)}
                                     alt="Circuit Map"
-                                    className="max-h-[400px] w-full object-contain filter invert opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                                    className="max-h-[300px] md:max-h-[400px] w-full object-contain filter invert opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src = '/circuits/f1_2024_aus_outline.png';
+                                        if (race.trackImg) {
+                                            (e.target as HTMLImageElement).src = resolveAssetUrl(race.trackImg);
+                                        } else {
+                                            (e.target as HTMLImageElement).src = resolveAssetUrl('/circuits/f1_2024_aus_outline.png');
+                                        }
                                     }}
                                 />
                             </div>

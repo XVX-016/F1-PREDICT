@@ -78,6 +78,7 @@ export class ReplayEngine {
     private speedMultiplier = 1;
     private isPlaying = false;
     private duration = 0;
+    private maxLap = 1;
 
     // Pit Constants
     private readonly PIT_LANE_SPEED_GREEN = 80 / 3.6; // ~22.2 m/s
@@ -97,6 +98,7 @@ export class ReplayEngine {
     loadData(metadata: DriverMetadata[], telemetry: Record<string, TelemetrySample[]>) {
         this.metadata = {};
         metadata.forEach(m => this.metadata[m.id] = m);
+        this.maxLap = 1;
 
         // Ensure telemetry samples are sorted by time (t)
         this.telemetry = {};
@@ -116,6 +118,7 @@ export class ReplayEngine {
         Object.values(this.telemetry).forEach(samples => {
             if (samples.length > 0) {
                 maxT = Math.max(maxT, samples[samples.length - 1].t);
+                this.maxLap = Math.max(this.maxLap, samples[samples.length - 1].lap || 1);
             }
         });
         this.duration = maxT;
@@ -305,7 +308,7 @@ export class ReplayEngine {
             playing: this.isPlaying,
             speed: this.speedMultiplier,
             currentLap: leader?.lap || 1,
-            totalLaps: 57,
+            totalLaps: this.maxLap,
             drivers: Object.freeze(drivers),
             config: this.config
         });

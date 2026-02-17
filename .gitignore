@@ -111,3 +111,14 @@ Frontend/node_modules/
 backend/__pycache__/
 .fastf1-cache/
 .fastf1_cache/
+
+# Large Assets (Supabase Migration)
+backend/data/replay_cache/*.json
+Frontend/public/avatars/
+Frontend/public/circuits/
+Frontend/public/f1_tracks/
+Frontend/public/hero/
+Frontend/public/models/
+Frontend/public/team-logos/
+Frontend/public/track_schedule/
+Frontend/public/carbon-pattern.png

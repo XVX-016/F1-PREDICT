@@ -1,5 +1,6 @@
 
 import { motion } from 'framer-motion';
+import { resolveAssetUrl } from '../../utils/assets';
 
 interface RaceCardProps {
     race: any;
@@ -30,13 +31,13 @@ const RaceCard = ({ race, getCountryFlag, onViewDetails, isNext }: RaceCardProps
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative bg-[#15151e] border-t-4 border-[#e10600] text-white overflow-hidden rounded-br-2xl shadow-2xl transition-transform hover:scale-[1.02] flex flex-col h-full group cursor-pointer"
+            className="relative bg-[#15151e] text-white overflow-hidden rounded-2xl shadow-md transition-transform hover:scale-[1.02] flex flex-col h-full group cursor-pointer border border-white/5"
             onClick={() => onViewDetails(race)}
         >
             {/* Top Banner Area */}
             <div className="relative h-40 w-full bg-black/50">
                 {race.bannerImg ? (
-                    <img src={race.bannerImg} loading="lazy" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-80" alt={race.raceName} />
+                    <img src={resolveAssetUrl(race.bannerImg)} loading="lazy" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-80" alt={race.raceName} />
                 ) : (
                     <div className="w-full h-full bg-slate-800 opacity-60" />
                 )}
@@ -55,13 +56,13 @@ const RaceCard = ({ race, getCountryFlag, onViewDetails, isNext }: RaceCardProps
             </div>
 
             {/* Content Area */}
-            <div className="p-6 flex justify-between items-end flex-grow">
-                <div className="flex-1 pr-4">
-                    <h2 className="text-lg font-black uppercase italic leading-tight mb-1">{race.country}</h2>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4 line-clamp-1">{race.raceName}</p>
+            <div className="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-end flex-grow gap-4">
+                <div className="flex-1 pr-0 md:pr-4 space-y-2">
+                    <h2 className="text-lg md:text-xl font-black uppercase italic leading-tight break-words">{race.country}</h2>
+                    <p className="text-sm text-gray-400 font-bold uppercase tracking-wider line-clamp-2">{race.raceName}</p>
 
-                    <div className="border-l-2 border-[#e10600] pl-3">
-                        <p className="text-lg font-mono font-bold tracking-tight text-white">{formatDateRange(race.date)}</p>
+                    <div className="border-l-2 border-[#e10600] pl-3 mt-4">
+                        <p className="text-base md:text-lg font-mono font-bold tracking-tight text-white">{formatDateRange(race.date)}</p>
                     </div>
                 </div>
 
@@ -69,7 +70,7 @@ const RaceCard = ({ race, getCountryFlag, onViewDetails, isNext }: RaceCardProps
                 {race.trackImg && (
                     <div className="w-20 h-20 flex-shrink-0">
                         <img
-                            src={race.trackImg}
+                            src={resolveAssetUrl(race.trackImg)}
                             loading="lazy"
                             className="w-full h-full object-contain filter invert brightness-200 opacity-80"
                             alt="Track Layout"

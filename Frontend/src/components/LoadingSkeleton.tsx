@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface LoadingSkeletonProps {
   type?: 'card' | 'podium' | 'list' | 'grid' | 'stats';
   className?: string;
@@ -93,5 +91,4 @@ export default function LoadingSkeleton({ type = 'card', className = '' }: Loadi
     </div>
   );
 }
-
 

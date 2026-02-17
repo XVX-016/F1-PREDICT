@@ -1,4 +1,5 @@
 import CarModelViewer from "./CarModelViewer";
+import { resolveAssetUrl } from "../utils/assets";
 
 const TeamCard = ({ team, focused, autoRotate }: { team: any, focused: boolean, autoRotate: boolean }) => (
   <div
@@ -10,7 +11,7 @@ const TeamCard = ({ team, focused, autoRotate }: { team: any, focused: boolean, 
       {team.drivers.map((driver: any) => (
         <div key={driver.name} className="flex flex-col items-center mx-2">
           <div className="relative">
-            <img src={driver.avatar} alt={driver.name} loading="lazy" className="w-16 h-16 rounded-full border-2 border-white" />
+            <img src={resolveAssetUrl(driver.avatar)} alt={driver.name} loading="lazy" className="w-16 h-16 rounded-full border-2 border-white" />
             <span className="absolute -bottom-2 -right-2 bg-black rounded-full border border-white px-2 py-1 text-lg">{driver.flag}</span>
           </div>
           <div className="text-white font-bold">{driver.name}</div>
@@ -19,7 +20,7 @@ const TeamCard = ({ team, focused, autoRotate }: { team: any, focused: boolean, 
       ))}
     </div>
     <div className="w-full h-64">
-      <CarModelViewer url={team.carModel} autoRotate={autoRotate} />
+      <CarModelViewer url={resolveAssetUrl(team.carModel)} autoRotate={autoRotate} />
     </div>
   </div>
 );

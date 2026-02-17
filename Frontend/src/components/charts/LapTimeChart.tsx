@@ -96,7 +96,7 @@ export default function LapTimeChart() {
         const cfLine = d3.line<LapPacePoint>()
             .defined(d => d.counterfactual !== undefined)
             .x(d => x(d.lap))
-            .y(d => y(d.counterfactual!))
+            .y(d => y(d.counterfactual!) - 1) // Offset to prevent perfect overlap with baseline
             .curve(d3.curveMonotoneX);
 
         // Baseline Line (Solid - F1 Red)
@@ -134,7 +134,7 @@ export default function LapTimeChart() {
             if (currentDatum.counterfactual !== undefined) {
                 svg.append("circle")
                     .attr("cx", x(currentDatum.lap))
-                    .attr("cy", y(currentDatum.counterfactual))
+                    .attr("cy", y(currentDatum.counterfactual) - 1)
                     .attr("r", 4)
                     .attr("fill", "#00CED1");
             }
@@ -179,7 +179,7 @@ export default function LapTimeChart() {
             <svg ref={svgRef} className="w-full h-full text-white" />
 
             {/* Legend */}
-            <div className="absolute bottom-2 left-14 flex items-center gap-4 text-[9px] font-mono">
+            <div className="absolute bottom-2 left-14 flex items-center gap-8 text-[9px] font-mono">
                 <div className="flex items-center gap-1.5">
                     <div className="w-4 h-0.5 bg-[#E10600]" />
                     <span className="text-gray-400">Baseline</span>

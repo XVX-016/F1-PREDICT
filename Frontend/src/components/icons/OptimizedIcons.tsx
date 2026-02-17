@@ -40,9 +40,9 @@ import {
   Filter,
   Download,
   Upload,
-  Refresh,
+  RefreshCw,
   Info,
-  Warning,
+  AlertTriangle,
   CheckCircle,
   XCircle
 } from 'lucide-react';
@@ -89,9 +89,9 @@ export {
   Filter,
   Download,
   Upload,
-  Refresh,
+  RefreshCw as Refresh,
   Info,
-  Warning,
+  AlertTriangle as Warning,
   CheckCircle,
   XCircle
 };

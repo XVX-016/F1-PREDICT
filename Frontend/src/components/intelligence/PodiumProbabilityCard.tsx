@@ -22,14 +22,10 @@ export const PodiumProbabilityCard: React.FC<PodiumProbabilityCardProps> = ({ en
         );
     }
 
-    // Top 8 only
-    const topDrivers = data.slice(0, 8);
-
     return (
-        <div className="flex flex-col h-full">
-
-            <div className="space-y-5 flex-1 p-1">
-                {topDrivers.map((d, i) => (
+        <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-5 p-1">
+                {data.map((d, i) => (
                     <div key={d.driverId} className="group relative">
                         <div className="flex justify-between items-end mb-1.5 px-0.5">
                             <div className="flex items-center gap-2">
@@ -53,7 +49,7 @@ export const PodiumProbabilityCard: React.FC<PodiumProbabilityCardProps> = ({ en
                             ></div>
                         </div>
 
-                        {/* Outcome Tooltip (Internal CSS approach) */}
+                        {/* Outcome Tooltip */}
                         <div className="opacity-0 group-hover:opacity-100 pointer-events-none absolute left-0 -top-20 z-10 transition-opacity bg-[#1e1e24] border border-white/10 rounded-lg p-3 shadow-2xl min-w-[140px]">
                             <p className="text-[10px] font-black text-white/40 mb-2 uppercase tracking-tighter">Prob. Breakdown</p>
                             <div className="space-y-1">
@@ -82,19 +78,10 @@ export const PodiumProbabilityCard: React.FC<PodiumProbabilityCardProps> = ({ en
                 ))}
             </div>
 
-            <div className="mt-8 pt-4 border-t border-white/5 flex flex-col gap-2">
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-2 shrink-0">
                 <div className="flex justify-between items-center text-[8px] uppercase tracking-widest font-mono">
                     <span className="text-white/20">Simulation Runs: 10,000</span>
-                    <span className="text-[#4ade80]/60 font-bold">Result: Converged</span>
                 </div>
-                {envelope.data.some(d => d.confidence === 'LOW') && (
-                    <div className="flex items-center gap-1.5 bg-[#E10600]/5 border border-[#E10600]/10 px-2 py-1 rounded">
-                        <span className="w-1 h-1 rounded-full bg-[#E10600]"></span>
-                        <p className="text-[8px] text-[#E10600]/60 uppercase font-black tracking-tighter">
-                            High Chaos Variance Detected: Expected finishers may shift.
-                        </p>
-                    </div>
-                )}
                 <p className="text-[8px] text-white/10 uppercase tracking-[0.1em] italic leading-tight text-center mt-2">
                     Note: This analysis assumes clean-air baseline conditions.
                 </p>

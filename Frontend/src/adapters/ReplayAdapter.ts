@@ -75,10 +75,11 @@ export class ReplayAdapter {
         // 1. Find the telemetry frames for each driver closest to time t
         const drivers: Record<string, DriverReplayState> = {};
         let currentLap = 1;
+        const telemetryFrames = timeline.telemetry ?? [];
 
         // Group telemetry by driver
         const telemetryByDriver: Record<string, TelemetryFrame[]> = {};
-        timeline.telemetry.forEach(f => {
+        telemetryFrames.forEach(f => {
             if (!telemetryByDriver[f.driver_id]) telemetryByDriver[f.driver_id] = [];
             telemetryByDriver[f.driver_id].push(f);
         });

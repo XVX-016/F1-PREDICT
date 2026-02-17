@@ -42,6 +42,16 @@ class DriverModel(BaseModel):
     dnf_rate: float = Field(..., ge=0, le=1)
     restart_skill: RestartSkill = Field(default_factory=RestartSkill)
 
+class DriverPrior(BaseModel):
+    """
+    Lightweight prior used by baseline/intelligence services.
+    Values are relative pace deltas in seconds and consistency score in [0,1].
+    """
+    driver_id: str
+    pace_delta_mean: float
+    pace_delta_std: float = Field(..., ge=0)
+    consistency_score: float = Field(..., ge=0, le=1)
+
 # --- Strategy Domain ---
 
 class StrategyStint(BaseModel):
@@ -82,6 +92,23 @@ class LapFrame(BaseModel):
     # Optional metadata
     explanation: Optional[str] = None
 
+class TelemetryFrame(BaseModel):
+    """
+    High-fidelity (25Hz+) sub-lap telemetry frame.
+    """
+    t: float
+    driver_id: str
+    x: float
+    y: float
+    dist: float
+    rel_dist: float
+    speed: float
+    gear: int
+    drs: int
+    throttle: float
+    brake: float
+    compound: Optional[str] = None
+
 class RaceTimeline(BaseModel):
     """
     Unified output schema for ALL agents (Backend, Replay, D3).
@@ -91,6 +118,8 @@ class RaceTimeline(BaseModel):
         description="Must include source, race_id, strategy_id(opt), model_version(opt), seed(opt)"
     )
     laps: List[LapFrame]
+    telemetry: Optional[List[TelemetryFrame]] = None
+    telemetry_urls: Optional[Dict[str, str]] = None
     summary: Dict[str, Any] = Field(
         ...,
         description="Must include total_time_ms. For sim: p05, p50, p95, risk_spread_ms."

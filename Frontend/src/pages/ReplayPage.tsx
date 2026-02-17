@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     SimulationLayout,
     SimulationSidebar,
@@ -8,11 +8,13 @@ import { Play, Pause, Activity, Navigation, Timer } from 'lucide-react';
 import { useReplay } from '../hooks/useReplay';
 import { TrackMap } from '../components/replay/TrackMap';
 import { DriverState } from '../utils/ReplayEngine';
+import { SEASON_2025_SCHEDULE } from '../data/season2025';
+import { resolveAssetUrl } from '../utils/assets';
 
 // --- Overlay Components (Refined for High-Density Telemetry) ---
 
 const LeaderboardOverlay = ({ drivers }: { drivers: DriverState[] }) => (
-    <div className="absolute top-4 right-4 w-64 bg-black/80 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden flex flex-col max-h-[80vh] shadow-2xl">
+    <div className="absolute top-4 right-4 w-56 lg:w-64 bg-black/80 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden flex flex-col max-h-[70vh] lg:max-h-[80vh] shadow-2xl">
         <div className="p-2 bg-white/5 border-b border-white/10 flex justify-between items-center px-4">
             <span className="text-[10px] font-mono font-black uppercase text-white tracking-[0.2em] flex items-center gap-2">
                 <Navigation className="w-3 h-3 text-[#E10600]" />
@@ -21,7 +23,7 @@ const LeaderboardOverlay = ({ drivers }: { drivers: DriverState[] }) => (
             <span className="text-[9px] font-mono text-white/40 uppercase">120HZ BASE</span>
         </div>
         <div className="overflow-y-auto custom-scrollbar p-1 space-y-0.5">
-            {drivers.map((d) => (
+            {drivers.map((d: DriverState) => (
                 <div key={d.id} className="flex items-center justify-between p-1.5 hover:bg-white/10 rounded transition-colors group cursor-pointer border border-transparent hover:border-white/5">
                     <div className="flex items-center gap-3">
                         <div className="w-1 h-6 rounded-sm" style={{ backgroundColor: d.teamColor }} />
@@ -48,7 +50,7 @@ const LeaderboardOverlay = ({ drivers }: { drivers: DriverState[] }) => (
 const TelemetryOverlay = ({ driver }: { driver: DriverState | null }) => {
     if (!driver) return null;
     return (
-        <div className="absolute bottom-24 left-4 w-72 bg-black/80 backdrop-blur-xl border border-white/20 rounded-xl p-5 space-y-5 shadow-2xl ring-1 ring-white/5">
+        <div className="absolute bottom-24 left-4 w-64 lg:w-72 bg-black/80 backdrop-blur-xl border border-white/20 rounded-xl p-4 lg:p-5 space-y-4 lg:space-y-5 shadow-2xl ring-1 ring-white/5">
             <div className="flex items-center gap-4 border-b border-white/10 pb-4">
                 <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black text-lg text-white/20 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
@@ -138,7 +140,7 @@ const TimelineScrubber = ({
     };
 
     return (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl h-16 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-2xl px-6 flex items-center gap-8 shadow-2xl ring-1 ring-white/10">
+        <div className="absolute bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 w-[95%] lg:w-[90%] max-w-4xl h-14 lg:h-16 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-2xl px-3 lg:px-6 flex items-center gap-3 lg:gap-8 shadow-2xl ring-1 ring-white/10">
             <button
                 onClick={() => setPlaying(!playing)}
                 className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shrink-0 shadow-lg"
@@ -179,9 +181,11 @@ const TimelineScrubber = ({
 };
 
 const ReplayPage = () => {
-    const [selectedRace] = useState('bahrain_2024');
+    const [selectedRace, setSelectedRace] = useState(`${SEASON_2025_SCHEDULE[0].round}_2025`);
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
     const [selectedDriverId] = useState<string | null>(null);
+    const [hasStarted, setHasStarted] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     const {
         state,
@@ -195,9 +199,30 @@ const ReplayPage = () => {
         maxTime
     } = useReplay(selectedRace);
 
+    // Trigger hasStarted when play is first clicked
+    useEffect(() => {
+        if (playing && !hasStarted) {
+            setHasStarted(true);
+        }
+    }, [playing, hasStarted]);
+
+    useEffect(() => {
+        const applyMobileState = () => {
+            const mobile = window.innerWidth < 1024;
+            setIsMobile(mobile);
+            setSidebarCollapsed(mobile);
+        };
+        applyMobileState();
+        window.addEventListener('resize', applyMobileState);
+        return () => window.removeEventListener('resize', applyMobileState);
+    }, []);
+
     const driversSorted = state?.drivers
         ? Object.values(state.drivers).sort((a, b) => a.position - b.position)
         : [];
+
+    const selectedRound = Number(selectedRace.split('_')[0]);
+    const selectedRaceInfo = SEASON_2025_SCHEDULE.find((r) => r.round === selectedRound);
 
     const activeDriver = selectedDriverId && state?.drivers[selectedDriverId]
         ? state.drivers[selectedDriverId]
@@ -212,75 +237,84 @@ const ReplayPage = () => {
                 >
                     <div className="p-6">
                         <div className="mb-8">
-                            <h3 className="text-[10px] font-mono font-black text-white/20 uppercase tracking-[0.3em] mb-6">Archive Explorer</h3>
-                            <div className="space-y-3">
-                                <button className="w-full text-left p-4 rounded-xl bg-[#E10600]/10 border border-[#E10600]/30 text-white relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#E10600]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <div className="text-[11px] font-mono font-black uppercase tracking-widest relative z-10">BHR - Sakhir</div>
-                                    <div className="text-[9px] font-mono text-[#E10600]/60 mt-1 relative z-10">2024 • ROUND 1 • OFFICIAL</div>
-                                </button>
-
-                                <div className="px-2 py-4 border-t border-white/5 mt-6">
-                                    <h4 className="text-[9px] font-mono font-bold text-white/40 uppercase tracking-widest mb-4">Quick Legend</h4>
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-[#E10600] shadow-[0_0_8px_rgba(225,6,0,0.6)]" />
-                                            <span className="text-[9px] font-mono text-white/40 uppercase tracking-tighter">Deterministic Spline</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
-                                            <span className="text-[9px] font-mono text-white/40 uppercase tracking-tighter">Interpolated Physics</span>
-                                        </div>
+                            {/* Race Selection Dropdown */}
+                            <div className="mb-6">
+                                <label className="text-[9px] font-mono font-bold text-white/40 uppercase tracking-widest block mb-2">Select Event</label>
+                                <div className="relative">
+                                    <select
+                                        value={selectedRace}
+                                        onChange={(e) => {
+                                            setSelectedRace(e.target.value);
+                                            setHasStarted(false);
+                                        }}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs font-mono font-bold text-white focus:outline-none focus:border-[#E10600]/50 transition-colors appearance-none cursor-pointer"
+                                    >
+                                        <optgroup label="2025 Season" className="bg-[#15151e]">
+                                            {SEASON_2025_SCHEDULE.map(r => (
+                                                <option key={r.round} value={`${r.round}_2025`}>
+                                                    {r.raceName}
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
+                                        <Navigation className="w-3 h-3 rotate-180" />
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-white/40">
+                                    <div className="text-[11px] font-mono font-black uppercase tracking-widest">
+                                        {selectedRaceInfo?.raceName || 'Unknown Event'}
+                                    </div>
+                                    <div className="text-[9px] font-mono mt-1 uppercase">Official Session Telemetry</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-5 bg-white/5 border border-white/10 rounded-2xl">
-                            <div className="flex items-center gap-2 mb-3 text-[#E10600]">
-                                <Activity className="w-3 h-3 animate-pulse" />
+                        <div className="p-5 bg-white/5 border border-white/10 rounded-2xl opacity-40">
+                            <div className="flex items-center gap-2 mb-3 text-white/60">
+                                <Activity className="w-3 h-3" />
                                 <span className="text-[10px] font-black uppercase tracking-widest">Replay Engine V2</span>
                             </div>
                             <p className="text-[10px] text-white/40 leading-relaxed font-mono">
-                                <span className="text-white/60">120HZ COMPUTE</span><br />
-                                Deterministic playback of session data via WebWorker. Zero-jitter interpolation.
+                                <span className="text-white/30">120HZ COMPUTE</span><br />
+                                Deterministic playback of session data.
                             </p>
                         </div>
                     </div>
                 </SimulationSidebar>
 
                 <SimulationMain>
-                    <div className="relative w-full h-[calc(100vh-4rem)] bg-[#050505] overflow-hidden flex flex-col">
+                    <div className="relative w-full h-[calc(100svh-4rem)] bg-[#050505] overflow-hidden flex flex-col">
 
                         {/* 1. Main Canvas Area (Track Map) Area */}
                         <div className="absolute inset-0 z-0">
                             <TrackMap
                                 drivers={driversSorted}
                                 loading={loading}
+                                circuitImage={resolveAssetUrl(selectedRaceInfo?.trackImg)}
+                                circuitLabel={selectedRaceInfo?.circuit}
                             />
                         </div>
 
                         {/* 2. Top Bar (Overlay) */}
-                        <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-start z-10 pointer-events-none">
-                            <div className="max-w-md">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="px-2 py-1 bg-[#E10600] text-black text-[10px] font-black uppercase tracking-tighter rounded italic">PREMIUM REPLAY</div>
-                                    <div className="text-[10px] font-mono text-white/40 uppercase tracking-[0.3em]">RECONSTRUCTED STREAM</div>
-                                </div>
-                                <h1 className="text-5xl font-black text-white tracking-tighter italic uppercase drop-shadow-2xl">
-                                    SAKHIR <span className="text-white/20">REPLAY</span>
+                        <div className="absolute top-0 left-0 right-0 p-4 lg:p-8 flex justify-center items-start z-10 pointer-events-none">
+                            <div className="text-center">
+                                <h1 className="text-3xl lg:text-6xl font-black text-white tracking-[0.2em] uppercase">
+                                    REPLAY
                                 </h1>
-                                <div className="flex items-center gap-6 mt-4">
-                                    <div className="bg-black/80 backdrop-blur-xl px-4 py-2 border border-white/20 rounded-xl flex items-baseline gap-3 shadow-2xl">
+                                <div className="flex items-center justify-center gap-2 lg:gap-6 mt-3 lg:mt-6">
+                                    <div className="bg-black/60 backdrop-blur-xl px-4 py-2 border border-white/10 rounded-xl flex items-baseline gap-3">
                                         <span className="text-[10px] font-mono font-black text-white/30 uppercase tracking-widest">LAP</span>
-                                        <span className="text-[#E10600] text-2xl font-black font-mono italic leading-none">{state?.currentLap || 1}</span>
+                                        <span className="text-[#E10600] text-2xl font-black font-mono leading-none">{state?.currentLap || 1}</span>
                                         <span className="text-white/20 font-mono text-xs">/ {state?.totalLaps || 53}</span>
                                     </div>
-                                    <div className="bg-black/80 backdrop-blur-xl px-4 py-2 border border-white/20 rounded-xl flex items-center gap-3 shadow-2xl">
-                                        <span className="text-[10px] font-mono font-black text-white/30 uppercase tracking-widest">STATUS</span>
+                                    <div className="bg-black/60 backdrop-blur-xl px-4 py-2 border border-white/10 rounded-xl flex items-center gap-3">
                                         <div className="flex items-center gap-2">
-                                            <span className={`w-2 h-2 rounded-full ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]'}`} />
-                                            <span className={`text-[10px] font-mono font-black uppercase tracking-widest ${loading ? 'text-yellow-500' : 'text-white'}`}>
+                                            <span className={`w-2 h-2 rounded-full ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
+                                            <span className={`text-[10px] font-mono font-black uppercase tracking-widest ${loading ? 'text-yellow-500' : 'text-white/40'}`}>
                                                 {loading ? 'SYNCHRONIZING' : 'OPERATIONAL'}
                                             </span>
                                         </div>
@@ -290,17 +324,21 @@ const ReplayPage = () => {
                         </div>
 
                         {/* 3. Leaderboard Overlay (Right) */}
-                        <div className="z-10 pointer-events-auto">
-                            <LeaderboardOverlay drivers={driversSorted} />
-                        </div>
+                        {hasStarted && !isMobile && (
+                            <div className="z-10 pointer-events-auto">
+                                <LeaderboardOverlay drivers={driversSorted} />
+                            </div>
+                        )}
 
                         {/* 4. Telemetry Overlay (Left) */}
-                        <div className="z-10 pointer-events-auto">
+                        {!isMobile && (
+                            <div className="z-10 pointer-events-auto">
                             <TelemetryOverlay driver={activeDriver} />
-                        </div>
+                            </div>
+                        )}
 
                         {/* 5. Controls Overlay (Bottom) */}
-                        <div className="z-20 pointer-events-auto mt-auto mb-8">
+                        <div className="z-20 pointer-events-auto mt-auto mb-2 lg:mb-8">
                             <TimelineScrubber
                                 currentTime={currentTime}
                                 maxTime={maxTime}

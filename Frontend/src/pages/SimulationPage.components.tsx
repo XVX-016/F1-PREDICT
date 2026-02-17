@@ -2,6 +2,8 @@ import { useRaceStore } from '../stores/raceStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect, useRef, useState } from 'react';
 import { Settings, Play, Pause, ChevronRight, ChevronLeft } from 'lucide-react';
+import { SEASON_2026_SCHEDULE } from '../data/season2026';
+import { SEASON_2025_SCHEDULE } from '../data/season2025';
 
 // Components
 import LapTimeChart from '../components/charts/LapTimeChart';
@@ -51,7 +53,7 @@ export const SimulationProvider = ({ children }: { children: React.ReactNode }) 
     return <div className="min-h-screen w-full bg-black/20 text-white flex flex-col">{children}</div>;
 };
 
-export const SimulationLayout = ({ children }: { children: React.ReactNode }) => <div className="flex flex-1 overflow-hidden border-t border-white/10">{children}</div>;
+export const SimulationLayout = ({ children }: { children: React.ReactNode }) => <div className="flex flex-col lg:flex-row flex-1 border-t border-white/10">{children}</div>;
 
 export const SimulationSidebar = ({
     children,
@@ -65,7 +67,7 @@ export const SimulationSidebar = ({
     const isCollapsed = propIsCollapsed !== undefined ? propIsCollapsed : false;
 
     return (
-        <aside className={`${isCollapsed ? 'w-16' : 'w-80'} shrink-0 transition-all duration-300 border-r border-white/10 bg-white/5 backdrop-blur-xl flex flex-col overflow-y-auto overflow-x-hidden relative h-screen sticky top-0 z-[50]`}>
+        <aside className={`${isCollapsed ? 'w-16 lg:w-16' : 'w-full lg:w-80'} shrink-0 transition-all duration-300 lg:border-r border-white/10 bg-white/5 backdrop-blur-xl flex flex-col overflow-y-auto overflow-x-hidden relative lg:h-screen lg:sticky top-0 z-[50]`}>
             <button
                 onClick={onToggle}
                 className={`absolute top-6 ${isCollapsed ? 'left-1/2 -translate-x-1/2' : 'right-4'} text-white/40 hover:text-white transition-all duration-300 z-50 hover:scale-110 active:scale-90`}
@@ -115,8 +117,8 @@ export const SidebarSection = ({ title, children, isFirst = false }: { title: st
 );
 
 export const SimulationMain = ({ children }: { children: React.ReactNode }) => <main className="flex-1 flex flex-col min-w-0 bg-transparent relative">{children}</main>;
-export const SimulationControlBar = ({ children }: { children: React.ReactNode }) => <div className="h-16 flex items-center px-6 gap-4 bg-black/60 backdrop-blur-xl sticky top-0 z-40 border-b border-white/5">{children}</div>;
-export const ReplayTimeline = ({ children }: { children: React.ReactNode }) => <div className="h-24 border-b border-white/10 bg-black/60 backdrop-blur-xl px-6 py-4 flex flex-col justify-center gap-2 sticky top-16 z-40">{children}</div>;
+export const SimulationControlBar = ({ children }: { children: React.ReactNode }) => <div className="min-h-16 flex items-center px-4 lg:px-6 gap-3 lg:gap-4 bg-black/60 backdrop-blur-xl sticky top-0 z-40 border-b border-white/5 overflow-x-auto no-scrollbar">{children}</div>;
+export const ReplayTimeline = ({ children }: { children: React.ReactNode }) => <div className="min-h-24 border-b border-white/10 bg-black/60 backdrop-blur-xl px-4 lg:px-6 py-4 flex flex-col justify-center gap-2 sticky top-16 z-40">{children}</div>;
 export const SimulationViewport = ({ children }: { children: React.ReactNode }) => <div className="flex-1 relative p-0">{children}</div>;
 
 export const ViewportTabs = ({ children }: { children: React.ReactNode }) => <div className="h-full flex flex-col">{children}</div>;
@@ -132,16 +134,147 @@ export const SimulationInspector = ({ children }: { children: React.ReactNode })
 export const InspectorTabs = ({ children }: { children: React.ReactNode }) => <div className="p-4 space-y-4">{children}</div>;
 
 // Input components
-export const SeasonSelect = () => <select className="w-full bg-black border border-white/20 p-2 text-xs rounded text-white"><option>2026 Season</option></select>;
-export const RaceSelect = () => <select className="w-full bg-black border border-white/20 p-2 text-xs rounded text-white"><option>Australian Grand Prix</option></select>;
-export const TrackInfoBadge = () => <div className="text-[10px] text-gray-500 font-mono">ALBERT PARK CIRCUIT</div>;
+const TRACK_LAPS: Record<string, number> = {
+    albert_park: 58,
+    shanghai: 56,
+    suzuka: 53,
+    bahrain: 57,
+    jeddah: 50,
+    miami: 57,
+    imola: 63,
+    monaco: 78,
+    catalunya: 66,
+    montreal: 70,
+    spielberg: 71,
+    silverstone: 52,
+    spa: 44,
+    hungaroring: 70,
+    zandvoort: 72,
+    monza: 53,
+    baku: 51,
+    marina_bay: 62,
+    cota: 56,
+    mexico_city: 71,
+    interlagos: 71,
+    las_vegas: 50,
+    lusail: 57,
+    yas_marina: 58,
+};
+
+const normalizeCircuitId = (circuitName: string): string => {
+    const cleaned = circuitName
+        .toLowerCase()
+        .replace(/grand prix/g, '')
+        .replace(/circuit/g, '')
+        .replace(/autodrome|autodromo|international|street|raceway/g, '')
+        .replace(/[^\w\s]/g, '')
+        .trim()
+        .replace(/\s+/g, '_');
+    const aliases: Record<string, string> = {
+        bahrain_international: 'bahrain',
+        jeddah_corniche: 'jeddah',
+        circuit_de_monaco: 'monaco',
+        red_bull_ring: 'spielberg',
+        circuit_de_spafrancorchamps: 'spa',
+        marina_bay: 'marina_bay',
+        circuit_of_the_americas: 'cota',
+        autdromo_hermanos_rodrguez: 'mexico_city',
+        autodromo_hermanos_rodriguez: 'mexico_city',
+        interlagos: 'interlagos',
+        las_vegas_strip: 'las_vegas',
+        lusail: 'lusail',
+        yas_marina: 'yas_marina',
+    };
+    return aliases[cleaned] || cleaned;
+};
+
+export const SeasonSelect = () => {
+    const context = useRaceStore(useShallow(s => s.context));
+    const loadRaceContext = useRaceStore(s => s.loadRaceContext);
+
+    return (
+        <select
+            className="w-full bg-black border border-white/20 p-2 text-xs rounded text-white"
+            value={context?.season ?? 2026}
+            onChange={(e) => {
+                const season = Number(e.target.value);
+                const schedule = season === 2026 ? SEASON_2026_SCHEDULE : SEASON_2025_SCHEDULE;
+                const firstRace = schedule[0];
+                const circuitId = normalizeCircuitId(firstRace.circuit);
+                loadRaceContext({
+                    season,
+                    round: firstRace.round,
+                    raceName: firstRace.raceName,
+                    circuitId,
+                    totalLaps: TRACK_LAPS[circuitId] || 58
+                });
+            }}
+        >
+            <option value={2026}>2026 Season</option>
+            <option value={2025}>2025 Season</option>
+        </select>
+    );
+};
+
+export const RaceSelect = () => {
+    const context = useRaceStore(useShallow(s => s.context));
+    const loadRaceContext = useRaceStore(s => s.loadRaceContext);
+    const season = context?.season ?? 2026;
+    const schedule = season === 2026 ? SEASON_2026_SCHEDULE : SEASON_2025_SCHEDULE;
+
+    return (
+        <select
+            className="w-full bg-black border border-white/20 p-2 text-xs rounded text-white"
+            value={context?.round ?? schedule[0].round}
+            onChange={(e) => {
+                const round = Number(e.target.value);
+                const race = schedule.find(r => r.round === round) || schedule[0];
+                const circuitId = normalizeCircuitId(race.circuit);
+                loadRaceContext({
+                    season,
+                    round: race.round,
+                    raceName: race.raceName,
+                    circuitId,
+                    totalLaps: TRACK_LAPS[circuitId] || 58
+                });
+            }}
+        >
+            {schedule.map(r => (
+                <option key={r.round} value={r.round}>
+                    R{r.round} - {r.raceName}
+                </option>
+            ))}
+        </select>
+    );
+};
+
+export const TrackInfoBadge = () => {
+    const context = useRaceStore(useShallow(s => s.context));
+    return (
+        <div className="text-[10px] text-gray-500 font-mono uppercase">
+            {context?.circuitId?.replace(/_/g, ' ') || 'ALBERT PARK'} | {context?.totalLaps ?? 58} LAPS
+        </div>
+    );
+};
 
 export const DriverSelector = () => {
     const currentFrame = useRaceStore(useShallow(s => s.currentFrame));
+    const simulationResult = useRaceStore(useShallow(s => s.simulationResult));
     const selectedDriverId = useRaceStore(useShallow(s => s.selectedDriverId));
     const selectDriver = useRaceStore(s => s.selectDriver);
 
-    const drivers = currentFrame ? Object.values(currentFrame.drivers).sort((a, b) => a.position - b.position) : [];
+    const drivers = currentFrame
+        ? Object.values(currentFrame.drivers).sort((a, b) => a.position - b.position)
+        : simulationResult
+            ? Object.values(simulationResult.baseline.drivers)
+                .sort((a, b) => a.finishPosition - b.finishPosition)
+                .map(d => ({
+                    driverId: d.driverId,
+                    name: d.driverId,
+                    teamId: 'FIELD',
+                    position: d.finishPosition
+                }))
+            : [];
 
     return (
         <div className="space-y-2">

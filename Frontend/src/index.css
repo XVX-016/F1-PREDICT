@@ -80,6 +80,23 @@ body {
   filter: blur(var(--bg-blur, 0px));
 }
 
+@media (max-width: 768px) {
+  .hero-static-bg {
+    filter: blur(0px) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .bg-overlay {
   position: fixed;
   inset: 0;
@@ -159,7 +176,6 @@ input::placeholder {
 @layer base {
   * {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   h1,
@@ -747,4 +763,13 @@ textarea {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Restrict transitions to interactive elements to avoid first-paint flicker */
+button,
+a,
+input,
+select,
+textarea {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

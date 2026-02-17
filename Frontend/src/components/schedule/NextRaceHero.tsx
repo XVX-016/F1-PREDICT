@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
+import { useWeather } from '../../hooks/useWeather';
+import { resolveAssetUrl } from '../../utils/assets';
 
 interface NextRaceHeroProps {
     race: any;
@@ -8,6 +10,9 @@ interface NextRaceHeroProps {
 }
 
 export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: NextRaceHeroProps) {
+    // Fetch Weather (always call hooks at the top level)
+    const { data: weather, isLoading: weatherLoading } = useWeather(race?.city || race?.country);
+
     if (!race) return null;
 
     // Calculate days until
@@ -17,13 +22,13 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative w-full rounded-2xl overflow-hidden cursor-pointer group shadow-2xl shadow-red-900/20"
+            className="relative w-full rounded-2xl overflow-hidden cursor-pointer group shadow-md"
             onClick={() => onViewDetails(race)}
         >
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
                 {race.bannerImg ? (
-                    <img src={race.bannerImg} className="w-full h-full object-cover opacity-100 transition-transform duration-700 group-hover:scale-105" alt="Next Race" />
+                    <img src={resolveAssetUrl(race.bannerImg)} className="w-full h-full object-cover opacity-100 transition-transform duration-700 group-hover:scale-105" alt="Next Race" />
                 ) : (
                     <div className="w-full h-full bg-[#15151e]" />
                 )}
@@ -32,7 +37,7 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
             </div>
 
-            <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
+            <div className="relative z-10 p-4 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-12">
 
                 {/* Left Side: Race Info */}
                 <div className="space-y-4">
@@ -46,18 +51,18 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
                     </div>
 
                     <div>
-                        <h2 className="text-6xl md:text-8xl font-black italic text-white uppercase tracking-tighter leading-[0.9]">
+                        <h2 className="text-4xl md:text-8xl font-black italic text-white uppercase tracking-tighter leading-[0.9] break-words">
                             {race.country}
                         </h2>
                         <div className="flex items-center gap-4 mt-2">
-                            <span className="text-4xl">{getCountryFlag(race.country)}</span>
-                            <p className="text-xl text-white/90 font-bold uppercase tracking-wide">
+                            <span className="text-2xl md:text-4xl">{getCountryFlag(race.country)}</span>
+                            <p className="text-lg md:text-xl text-white/90 font-bold uppercase tracking-wide break-words">
                                 {race.raceName}
                             </p>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-6 mt-6">
+                    <div className="flex items-center gap-6 mt-6 min-h-[40px]">
                         <div className="flex flex-col">
                             <span className="text-[10px] text-white/60 uppercase font-bold tracking-widest">Date</span>
                             <span className="text-lg font-mono font-bold text-white">{new Date(race.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }).toUpperCase()}</span>
@@ -67,6 +72,18 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
                             <span className="text-[10px] text-white/60 uppercase font-bold tracking-widest">Time</span>
                             <span className="text-lg font-mono font-bold text-white">{race.time}</span>
                         </div>
+                        {weather && !weatherLoading && (
+                            <>
+                                <div className="w-px h-8 bg-white/20" />
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] text-white/60 uppercase font-bold tracking-widest">Weather</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg font-mono font-bold text-white">{weather.temp_c}°C</span>
+                                        <span className="text-[10px] bg-white/10 text-white px-2 py-0.5 rounded uppercase font-black">{weather.condition.text}</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -79,10 +96,7 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
                             <p className="text-2xl font-mono font-black text-white">{daysUntil} DAYS</p>
                         </div>
                     </div>
-
-
                 </div>
-
             </div>
 
             {/* Top Right Badge */}

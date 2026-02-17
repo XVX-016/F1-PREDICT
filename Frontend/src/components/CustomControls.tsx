@@ -1,4 +1,3 @@
-import React from 'react';
 import GlassWrapper from './GlassWrapper';
 import { motion } from 'framer-motion';
 import AnimatedSlider from './AnimatedSlider';
@@ -129,5 +128,4 @@ export default function CustomControls({
 		</GlassWrapper>
 	);
 }
-
 
