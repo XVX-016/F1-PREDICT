@@ -1,0 +1,142 @@
+[
+  {
+    "driver": "VER",
+    "position": 1,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "1:31:44.742"
+  },
+  {
+    "driver": "PER",
+    "position": 2,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+22.457"
+  },
+  {
+    "driver": "SAI",
+    "position": 3,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+25.110"
+  },
+  {
+    "driver": "LEC",
+    "position": 4,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+39.669"
+  },
+  {
+    "driver": "RUS",
+    "position": 5,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+46.788"
+  },
+  {
+    "driver": "NOR",
+    "position": 6,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+48.458"
+  },
+  {
+    "driver": "HAM",
+    "position": 7,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+50.324"
+  },
+  {
+    "driver": "PIA",
+    "position": 8,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+56.082"
+  },
+  {
+    "driver": "ALO",
+    "position": 9,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+1:14.887"
+  },
+  {
+    "driver": "STR",
+    "position": 10,
+    "status": "Finished",
+    "laps_completed": 57,
+    "total_time": "+1:33.216"
+  },
+  {
+    "driver": "ZHO",
+    "position": 11,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+6.759"
+  },
+  {
+    "driver": "MAG",
+    "position": 12,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+8.316"
+  },
+  {
+    "driver": "RIC",
+    "position": 13,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+8.958"
+  },
+  {
+    "driver": "TSU",
+    "position": 14,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+9.482"
+  },
+  {
+    "driver": "ALB",
+    "position": 15,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+11.886"
+  },
+  {
+    "driver": "HUL",
+    "position": 16,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+17.632"
+  },
+  {
+    "driver": "OCO",
+    "position": 17,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+31.450"
+  },
+  {
+    "driver": "GAS",
+    "position": 18,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+32.417"
+  },
+  {
+    "driver": "BOT",
+    "position": 19,
+    "status": "Lapped",
+    "laps_completed": 56,
+    "total_time": "+1:23.230"
+  },
+  {
+    "driver": "SAR",
+    "position": 20,
+    "status": "Lapped",
+    "laps_completed": 55,
+    "total_time": "+20.795"
+  }
+]

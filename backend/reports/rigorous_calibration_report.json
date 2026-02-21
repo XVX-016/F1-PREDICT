@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-02-17T04:19:19.126512+00:00",
+  "races": [
+    "bahrain",
+    "abu_dhabi"
+  ],
+  "seed": 42,
+  "iterations": 220,
+  "trials": 6,
+  "best_loss_mae": 2.148409,
+  "best_error_breakdown": {
+    "VER": 4.375,
+    "NOR": 4.013636363636363,
+    "PIA": 2.9727272727272718,
+    "LEC": 2.5772727272727267,
+    "HAM": 2.234090909090909,
+    "RUS": 1.7613636363636362,
+    "SAI": 1.46590909090909,
+    "ALO": 0.875,
+    "STR": 1.1227272727272721,
+    "GAS": 0.1568181818181822,
+    "OCO": 0.35000000000000053,
+    "ALB": 0.44318181818181834,
+    "TSU": 1.6727272727272737,
+    "HUL": 1.581818181818183,
+    "LAW": 1.9659090909090917,
+    "HAD": 2.3136363636363617,
+    "ANT": 2.118181818181819,
+    "BEA": 3.022727272727275,
+    "BOR": 3.3795454545454566,
+    "COL": 4.5659090909090905
+  },
+  "best_race_breakdown": {
+    "bahrain": 2.124090909090909,
+    "abu_dhabi": 2.1727272727272724
+  },
+  "history": [
+    {
+      "trial": 0,
+      "loss_mae": 2.2668181818181816,
+      "accepted": true
+    },
+    {
+      "trial": 1,
+      "loss_mae": 2.265682,
+      "accepted": true
+    },
+    {
+      "trial": 2,
+      "loss_mae": 2.256364,
+      "accepted": true
+    },
+    {
+      "trial": 3,
+      "loss_mae": 2.313636,
+      "accepted": false
+    },
+    {
+      "trial": 4,
+      "loss_mae": 2.161818,
+      "accepted": true
+    },
+    {
+      "trial": 5,
+      "loss_mae": 2.190227,
+      "accepted": false
+    },
+    {
+      "trial": 6,
+      "loss_mae": 2.148409,
+      "accepted": true
+    }
+  ],
+  "output_params_file": "data/rigorous_model_params.v1.calibrated.json"
+}

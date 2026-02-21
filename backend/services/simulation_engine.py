@@ -1,10 +1,13 @@
 import numpy as np
 import logging
 import time
+import os
+import json
 from typing import Dict, List, Any, Optional
 from engine.simulation.simulator import RaceSimulator
+from engine.simulation.rigorous import RigorousSimulationEngine
 from services.strategy_optimizer import StrategyOptimizer
-from models.domain import TrackModel, DriverModel, StrategyResult, StrategyStint, SimulationRequest, SimulationResponse, TrackTyreWearFactors
+from models.domain import TrackModel, DriverModel, StrategyResult, StrategyStint, SimulationRequest, SimulationResponse, TrackTyreWearFactors, SimulationRunOutput
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +18,32 @@ class SimulationEngine:
     
     def __init__(self):
         self.simulator = RaceSimulator()
+        self.rigorous_simulator = RigorousSimulationEngine()
         self.optimizer = StrategyOptimizer(self.simulator)
         self.model_version = "v3.0.0-engineering"
+        self.default_rigorous_params = self._load_default_rigorous_params()
+
+    def _load_default_rigorous_params(self) -> Dict[str, float]:
+        """
+        Loads default rigorous model parameters from versioned JSON artifact.
+        """
+        candidates = [
+            os.path.join(os.path.dirname(__file__), "..", "data", "rigorous_model_params.v1.calibrated.json"),
+            os.path.join(os.path.dirname(__file__), "..", "data", "rigorous_model_params.v1.json"),
+        ]
+        for path in candidates:
+            try:
+                if not os.path.exists(path):
+                    continue
+                with open(path, "r", encoding="utf-8") as f:
+                    payload = json.load(f)
+                params = payload.get("params", {})
+                if isinstance(params, dict):
+                    logger.info(f"Loaded rigorous params from {os.path.basename(path)}")
+                    return {str(k): float(v) for k, v in params.items()}
+            except Exception as e:
+                logger.warning(f"Failed to load rigorous params from {path}: {e}")
+        return {}
 
     def _get_track_context(self, track_id: str) -> TrackModel:
         """
@@ -49,7 +76,15 @@ class SimulationEngine:
         }
         return tracks.get(track_id, tracks["abu_dhabi"])
 
-    def _get_driver_profiles(self, track_id: str, use_ml: bool, seed: Optional[int] = None) -> Dict[str, DriverModel]:
+    def _get_driver_profiles(
+        self,
+        track_id: str,
+        use_ml: bool,
+        seed: Optional[int] = None,
+        pace_spread_scale: float = 1.0,
+        forced_rank_offsets_ms: Optional[Dict[str, float]] = None,
+        driver_ids_override: Optional[List[str]] = None,
+    ) -> Dict[str, DriverModel]:
         """
         Aggregates driver capabilities including calibrated RestartSkill.
         """
@@ -71,25 +106,89 @@ class SimulationEngine:
         }
         default_skill = RestartSkill()
         
-        driver_ids = ["VER", "NOR", "LEC", "PIA", "SAI", "HAM", "RUS", "ALO", "PER", "STR"]
+        driver_rows = []
+        try:
+            from data.enhanced_drivers_2025 import DRIVERS_2025
+            driver_rows = list(DRIVERS_2025.values())
+        except Exception:
+            driver_rows = []
+
+        fallback_driver_ids = [
+            "VER", "NOR", "LEC", "PIA", "SAI", "HAM", "RUS", "ALO", "PER", "STR",
+            "GAS", "OCO", "ALB", "TSU", "HUL", "MAG", "BOT", "ZHO", "RIC", "SAR"
+        ]
+        if driver_ids_override:
+            driver_ids = [str(x).upper() for x in driver_ids_override]
+        else:
+            driver_ids = [row.driver_id for row in driver_rows] if driver_rows else fallback_driver_ids
         profiles = {}
+        raw_pace_by_driver: Dict[str, float] = {}
         for i, d in enumerate(driver_ids):
             ml_offset = 0.0
             if use_ml:
                 ml_offset = (i * 10) - 50
                 ml_offset += rng.normal(0, 10)
-                
+
+            row = next((x for x in driver_rows if x.driver_id == d), None)
+            team_name = row.constructor if row else "FIELD"
+            base_pace = 90000 + ml_offset
+            if row:
+                # Convert tier multipliers to pace deltas (faster tier -> lower lap time).
+                base_pace += (1.10 - row.tier_multiplier) * 900
+            raw_pace_by_driver[d] = float(base_pace)
+
             profiles[d] = DriverModel(
                 id=d,
-                name=d,
-                team="FIELD",
-                pace_base_ms=90000 + ml_offset,
-                tyre_management=0.85 if d=="HAM" else (0.95 if d=="VER" else 0.75),
-                racecraft=0.9 if d=="VER" else 0.8,
-                dnf_rate=0.02,
+                name=row.name if row else d,
+                team=team_name,
+                pace_base_ms=base_pace,
+                tyre_management=float(np.clip(row.tire_management if row else (0.85 if d=="HAM" else (0.95 if d=="VER" else 0.75)), 0.0, 1.0)),
+                racecraft=float(np.clip((row.race_pace / 1.3) if row else (0.9 if d=="VER" else 0.8), 0.0, 1.0)),
+                dnf_rate=0.02 if not row else max(0.005, 0.03 * (1.2 - row.car_reliability)),
                 restart_skill=restart_calibrations.get(d, default_skill)
             )
+        if profiles:
+            scale = float(np.clip(pace_spread_scale, 0.5, 4.0))
+            pace_values = np.array([raw_pace_by_driver[d] for d in profiles.keys()], dtype=float)
+            center = float(np.mean(pace_values))
+            for d in profiles.keys():
+                old = raw_pace_by_driver[d]
+                profiles[d].pace_base_ms = float(center + (old - center) * scale)
+            if isinstance(forced_rank_offsets_ms, dict) and forced_rank_offsets_ms:
+                for d in profiles.keys():
+                    if d in forced_rank_offsets_ms:
+                        profiles[d].pace_base_ms = float(center + float(forced_rank_offsets_ms[d]))
         return profiles
+
+    def run_rigorous_output(self, request: SimulationRequest) -> SimulationRunOutput:
+        base_seed = request.dict().get("seed")
+        track = self._get_track_context(request.track_id)
+        request_params = request.params if isinstance(request.params, dict) else {}
+        pace_spread_scale = float(request_params.get("pace_spread_scale", 1.0))
+        forced_rank_offsets_ms = request_params.get("forced_rank_offsets_ms")
+        driver_ids_override = request_params.get("driver_ids")
+        driver_profiles = self._get_driver_profiles(
+            request.track_id,
+            request.use_ml,
+            seed=base_seed,
+            pace_spread_scale=pace_spread_scale,
+            forced_rank_offsets_ms=forced_rank_offsets_ms if isinstance(forced_rank_offsets_ms, dict) else None,
+            driver_ids_override=driver_ids_override if isinstance(driver_ids_override, list) else None,
+        )
+        overrides = request_params.get("model_params", {})
+        merged_params = dict(self.default_rigorous_params)
+        if isinstance(overrides, dict):
+            merged_params.update(overrides)
+        return self.rigorous_simulator.run(
+            race_id=request.track_id,
+            track=track,
+            driver_profiles=driver_profiles,
+            iterations=request.iterations,
+            seed=base_seed,
+            focus_driver=request_params.get("focus_driver", "VER"),
+            model_params=merged_params,
+            strategy_plan=request_params.get("strategy_plan"),
+        )
 
     def run_simulation(self, request: SimulationRequest) -> SimulationResponse:
         """
@@ -98,7 +197,17 @@ class SimulationEngine:
         base_seed = request.dict().get("seed")
         
         track = self._get_track_context(request.track_id)
-        driver_profiles = self._get_driver_profiles(request.track_id, request.use_ml, seed=base_seed)
+        pace_spread_scale = float(request.params.get("pace_spread_scale", 1.0))
+        forced_rank_offsets_ms = request.params.get("forced_rank_offsets_ms")
+        driver_ids_override = request.params.get("driver_ids")
+        driver_profiles = self._get_driver_profiles(
+            request.track_id,
+            request.use_ml,
+            seed=base_seed,
+            pace_spread_scale=pace_spread_scale,
+            forced_rank_offsets_ms=forced_rank_offsets_ms if isinstance(forced_rank_offsets_ms, dict) else None,
+            driver_ids_override=driver_ids_override if isinstance(driver_ids_override, list) else None,
+        )
         
         # 1. Optimize Strategy for Focus Driver (VER)
         focus_driver = "VER"
@@ -248,6 +357,10 @@ class SimulationEngine:
                 "baseline_win_prob": float(baseline_win_prob)
             }
 
+        run_output = None
+        if request.params.get("rigorous_output", False):
+            run_output = self.run_rigorous_output(request).model_dump()
+
         # 4. Final Response Construction
         return SimulationResponse(
             win_probability={d: count / iterations for d, count in win_counts.items()},
@@ -267,7 +380,8 @@ class SimulationEngine:
                 "params": request.params,
                 "events": [e.dict() for e in request.events]
             },
-            trace=final_trace
+            trace=final_trace,
+            run_output=run_output
         )
     def run_comparison(self, request: SimulationRequest, strategies: List[StrategyResult]) -> List[SimulationResponse]:
         """
@@ -276,7 +390,17 @@ class SimulationEngine:
         """
         base_seed = request.dict().get("seed")
         track = self._get_track_context(request.track_id)
-        driver_profiles = self._get_driver_profiles(request.track_id, request.use_ml, seed=base_seed)
+        pace_spread_scale = float(request.params.get("pace_spread_scale", 1.0))
+        forced_rank_offsets_ms = request.params.get("forced_rank_offsets_ms")
+        driver_ids_override = request.params.get("driver_ids")
+        driver_profiles = self._get_driver_profiles(
+            request.track_id,
+            request.use_ml,
+            seed=base_seed,
+            pace_spread_scale=pace_spread_scale,
+            forced_rank_offsets_ms=forced_rank_offsets_ms if isinstance(forced_rank_offsets_ms, dict) else None,
+            driver_ids_override=driver_ids_override if isinstance(driver_ids_override, list) else None,
+        )
         focus_driver = "VER"
         
         iterations = request.iterations

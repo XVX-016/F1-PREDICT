@@ -1,0 +1,109 @@
+{
+  "generated_at": "2026-02-17T07:56:31.789451+00:00",
+  "race_id": "2024_1_bahrain",
+  "track_id": "bahrain",
+  "iterations_per_run": 200,
+  "runs": 1,
+  "seed_base": 42,
+  "focus_driver": "VER",
+  "gold_manifest_sha256": "fe79bb235f84e066cbee8bfb8d829077efade34f7f65f7fccd8004856b6aab33",
+  "engine_model_version": "v4.1.0-rigorous-crn",
+  "model_params_signature": "7cabc900eda22243",
+  "deterministic_mode": true,
+  "zero_gamma": false,
+  "pure_additive_test": false,
+  "pace_spread_scale": 1.0,
+  "force_gold_rank_intrinsic": true,
+  "force_rank_step_ms": 100.0,
+  "metrics": {
+    "position_mae": {
+      "mean": 2.2,
+      "std": 0.0
+    },
+    "kendall_tau": {
+      "mean": 0.7052631578947369,
+      "std": 0.0
+    },
+    "pit_mae": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "topology_match": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "podium_accuracy": {
+      "mean": 0.6666666666666666,
+      "std": 0.0
+    },
+    "lap_spread_ms": {
+      "mean": 2127.2566315789154,
+      "std": 0.0
+    },
+    "race_time_deltas_ms": {
+      "p1_vs_p20_ms": {
+        "mean": 17512.82180001773,
+        "std": 0.0
+      },
+      "p1_vs_p5_ms": {
+        "mean": 3165.329250019975,
+        "std": 0.0
+      },
+      "p10_vs_p15_ms": {
+        "mean": 4558.2793599981815,
+        "std": 0.0
+      }
+    },
+    "rank_changes_vs_gold": {
+      "mean": 15.0,
+      "std": 0.0
+    }
+  },
+  "driver_set_summary": {
+    "model_count": 20,
+    "gold_count": 20,
+    "overlap_count": 20,
+    "missing_in_model": [],
+    "extra_in_model": []
+  },
+  "scm": {
+    "mean": 0.11421052631578946,
+    "std": 0.0
+  },
+  "topology_mode": "compound_sequence_exact",
+  "run_details": [
+    {
+      "race_id": "2024_1_bahrain",
+      "track_id": "bahrain",
+      "seed": 42,
+      "metrics": {
+        "position_mae": 2.2,
+        "kendall_tau": 0.7052631578947369,
+        "pit_mae": 0.0,
+        "topology_match": 1.0,
+        "topology_mode": "compound_sequence_exact",
+        "podium_accuracy": 0.6666666666666666,
+        "scm": 0.11421052631578946,
+        "lap_spread_ms": 2127.2566315789154,
+        "race_time_deltas_ms": {
+          "p1_vs_p20_ms": 17512.82180001773,
+          "p1_vs_p5_ms": 3165.329250019975,
+          "p10_vs_p15_ms": 4558.2793599981815
+        },
+        "rank_changes_vs_gold": 15
+      },
+      "engine": {
+        "model_version": "v4.1.0-rigorous-crn",
+        "model_params_signature": "7cabc900eda22243",
+        "num_iterations": 200
+      },
+      "driver_set": {
+        "model_count": 20,
+        "gold_count": 20,
+        "overlap_count": 20,
+        "missing_in_model": [],
+        "extra_in_model": []
+      }
+    }
+  ]
+}

@@ -16,7 +16,7 @@ export const ENV_CONFIG = {
   OPENWEATHER_API_KEY: import.meta.env.VITE_OPENWEATHER_API_KEY || '',
 
   // Local API Configuration (replaces external Jolpica API)
-  JOLPICA_BASE_URL: import.meta.env.VITE_JOLPICA_BASE_URL || '/ergast/f1',
+  JOLPICA_BASE_URL: import.meta.env.VITE_JOLPICA_BASE_URL || 'https://api.jolpi.ca/ergast/f1',
   FAST_F1_BASE_URL: import.meta.env.VITE_FAST_F1_BASE_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
 
   // Feature Flags

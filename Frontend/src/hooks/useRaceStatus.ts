@@ -19,32 +19,31 @@ export const useRaceStatus = () => {
     return useQuery<RaceStatus>({
         queryKey: ['raceStatus'],
         queryFn: async () => {
-            try {
-                // Determine if we should hit local or production
-                const url = `${API_BASE_URL}/api/race-status`;
-                const response = await fetch(url);
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        console.warn(`Race status endpoint 404 at ${url}. Running in Demo Mode.`);
-                    }
-                    throw new Error('Network response was not ok');
-                }
+            const statusUrl = `${API_BASE_URL}/api/race-status`;
+            const response = await fetch(statusUrl);
+            if (response.ok) {
                 return await response.json();
-            } catch (error) {
-                // Return fallback status if backend offline
+            }
+
+            // Backend might still be healthy even if race-status endpoint is missing/misconfigured.
+            const healthUrl = `${API_BASE_URL}/health`;
+            const healthRes = await fetch(healthUrl);
+            if (healthRes.ok) {
                 return {
-                    raceId: "offline-demo",
-                    name: "F1 PREDICT DEMO",
-                    round: 1,
-                    session: "PRE-SEASON",
+                    raceId: "backend-online",
+                    name: "Backend Online",
+                    round: 0,
+                    session: "N/A",
                     status: "UPCOMING",
-                    trackTemp: "28.5",
-                    airTemp: "22.3",
-                    humidity: "45",
-                    windSpeed: "12.4",
-                    nextSessionTime: new Date(Date.now() + 86400000).toISOString()
+                    trackTemp: "N/A",
+                    airTemp: "N/A",
+                    humidity: "N/A",
+                    windSpeed: "N/A",
+                    nextSessionTime: new Date().toISOString()
                 } as RaceStatus;
             }
+
+            throw new Error(`Race status unavailable (${response.status})`);
         },
         refetchInterval: 30000, // Increase interval in demo mode to reduce noise
         staleTime: 10000,

@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-02-17T06:59:58.369069+00:00",
+  "race_id": "2024_1_bahrain",
+  "track_id": "bahrain",
+  "iterations_per_run": 200,
+  "runs": 1,
+  "seed_base": 42,
+  "focus_driver": "VER",
+  "gold_manifest_sha256": "fe79bb235f84e066cbee8bfb8d829077efade34f7f65f7fccd8004856b6aab33",
+  "engine_model_version": "v4.1.0-rigorous-crn",
+  "model_params_signature": "98be8bd9009df43c",
+  "deterministic_mode": true,
+  "metrics": {
+    "position_mae": {
+      "mean": 3.357142857142857,
+      "std": 0.0
+    },
+    "kendall_tau": {
+      "mean": 0.45054945054945056,
+      "std": 0.0
+    },
+    "pit_mae": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "topology_match": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "podium_accuracy": {
+      "mean": 0.3333333333333333,
+      "std": 0.0
+    }
+  },
+  "scm": {
+    "mean": 0.19920474262579527,
+    "std": 0.0
+  },
+  "topology_mode": "compound_sequence_exact",
+  "run_details": [
+    {
+      "race_id": "2024_1_bahrain",
+      "track_id": "bahrain",
+      "seed": 42,
+      "metrics": {
+        "position_mae": 3.357142857142857,
+        "kendall_tau": 0.45054945054945056,
+        "pit_mae": 0.0,
+        "topology_match": 1.0,
+        "topology_mode": "compound_sequence_exact",
+        "podium_accuracy": 0.3333333333333333,
+        "scm": 0.19920474262579527
+      },
+      "engine": {
+        "model_version": "v4.1.0-rigorous-crn",
+        "model_params_signature": "98be8bd9009df43c",
+        "num_iterations": 200
+      }
+    }
+  ]
+}

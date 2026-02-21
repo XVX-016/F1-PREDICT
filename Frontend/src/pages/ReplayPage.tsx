@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     SimulationLayout,
-    SimulationSidebar,
     SimulationMain,
 } from './SimulationPage.components';
 import { Play, Pause, Activity, Navigation, Timer } from 'lucide-react';
@@ -11,9 +10,19 @@ import { DriverState } from '../utils/ReplayEngine';
 import { SEASON_2025_SCHEDULE } from '../data/season2025';
 import { resolveAssetUrl } from '../utils/assets';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 // --- Overlay Components (Refined for High-Density Telemetry) ---
 
-const LeaderboardOverlay = ({ drivers }: { drivers: DriverState[] }) => (
+const LeaderboardOverlay = ({
+    drivers,
+    selectedDriverId,
+    onSelectDriver,
+}: {
+    drivers: DriverState[];
+    selectedDriverId?: string | null;
+    onSelectDriver?: (id: string) => void;
+}) => (
     <div className="absolute top-4 right-4 w-56 lg:w-64 bg-black/80 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden flex flex-col max-h-[70vh] lg:max-h-[80vh] shadow-2xl">
         <div className="p-2 bg-white/5 border-b border-white/10 flex justify-between items-center px-4">
             <span className="text-[10px] font-mono font-black uppercase text-white tracking-[0.2em] flex items-center gap-2">
@@ -24,12 +33,22 @@ const LeaderboardOverlay = ({ drivers }: { drivers: DriverState[] }) => (
         </div>
         <div className="overflow-y-auto custom-scrollbar p-1 space-y-0.5">
             {drivers.map((d: DriverState) => (
-                <div key={d.id} className="flex items-center justify-between p-1.5 hover:bg-white/10 rounded transition-colors group cursor-pointer border border-transparent hover:border-white/5">
+                <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => onSelectDriver?.(d.id)}
+                    className={`w-full text-left flex items-center justify-between p-1.5 rounded transition-colors group cursor-pointer border ${
+                        selectedDriverId === d.id
+                            ? 'bg-white/10 border-white/20'
+                            : 'border-transparent hover:border-white/5 hover:bg-white/10'
+                    }`}
+                >
                     <div className="flex items-center gap-3">
                         <div className="w-1 h-6 rounded-sm" style={{ backgroundColor: d.teamColor }} />
-                        <span className="text-xs font-mono font-black text-white/40 w-4 text-right">{d.position}</span>
                         <div className="flex flex-col">
-                            <span className="text-xs font-bold text-white uppercase leading-none tracking-tight">{d.name}</span>
+                            <span className="text-xs font-bold text-white uppercase leading-none tracking-tight">
+                                P{d.position} {d.name}
+                            </span>
                             <span className="text-[8px] font-mono text-white/40 uppercase tracking-widest">{d.id}</span>
                         </div>
                     </div>
@@ -41,7 +60,7 @@ const LeaderboardOverlay = ({ drivers }: { drivers: DriverState[] }) => (
                             {d.drs ? 'DRS' : ''}
                         </span>
                     </div>
-                </div>
+                </button>
             ))}
         </div>
     </div>
@@ -134,13 +153,18 @@ const TimelineScrubber = ({
     setSpeed
 }: TimelineScrubberProps) => {
     const formatTime = (seconds: number) => {
-        const m = Math.floor(seconds / 60);
-        const s = Math.floor(seconds % 60);
+        const total = Math.max(0, Math.floor(seconds));
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        const s = Math.floor(total % 60);
+        if (h > 0) {
+            return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
         return `${m}:${s.toString().padStart(2, '0')}`;
     };
 
     return (
-        <div className="absolute bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 w-[95%] lg:w-[90%] max-w-4xl h-14 lg:h-16 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-2xl px-3 lg:px-6 flex items-center gap-3 lg:gap-8 shadow-2xl ring-1 ring-white/10">
+        <div className="absolute bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 w-[95%] lg:w-[90%] max-w-4xl h-14 lg:h-16 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-2xl px-4 lg:px-6 flex items-center gap-4 shadow-2xl ring-1 ring-white/10">
             <button
                 onClick={() => setPlaying(!playing)}
                 className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shrink-0 shadow-lg"
@@ -160,7 +184,6 @@ const TimelineScrubber = ({
                 />
                 <div className="flex justify-between text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] font-bold">
                     <span>{formatTime(currentTime)}</span>
-                    <span className="bg-white/5 px-2 py-0.5 rounded border border-white/5 text-white/60">REPLAY MASTER</span>
                     <span>{formatTime(maxTime)}</span>
                 </div>
             </div>
@@ -181,9 +204,22 @@ const TimelineScrubber = ({
 };
 
 const ReplayPage = () => {
-    const [selectedRace, setSelectedRace] = useState(`${SEASON_2025_SCHEDULE[0].round}_2025`);
-    const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
-    const [selectedDriverId] = useState<string | null>(null);
+    const replay2024 = [
+        {
+            id: 'Bahrain',
+            raceName: 'Bahrain Grand Prix',
+            circuit: 'Bahrain International Circuit',
+            trackImg: '/circuits/f1_2024_bhr_outline.png',
+        },
+    ];
+    const replay2025 = SEASON_2025_SCHEDULE.map((race) => ({
+        ...race,
+        id: `${race.round}_2025`,
+    }));
+
+    const [availableReplayIds, setAvailableReplayIds] = useState<string[] | null>(null);
+    const [selectedRace, setSelectedRace] = useState(replay2025[0]?.id ?? replay2024[0].id);
+    const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
     const [hasStarted, setHasStarted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -196,8 +232,57 @@ const ReplayPage = () => {
         setCurrentTime,
         loading,
         currentTime,
-        maxTime
+        maxTime,
+        trackPath
     } = useReplay(selectedRace);
+    const showCircuitImage = false;
+
+    useEffect(() => {
+        let isMounted = true;
+        const fetchAvailable = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/races/replay/available`);
+                if (!res.ok) return;
+                const payload = await res.json();
+                if (!isMounted) return;
+                if (payload?.available && Array.isArray(payload.available)) {
+                    setAvailableReplayIds(payload.available);
+                } else {
+                    setAvailableReplayIds([]);
+                }
+            } catch {
+                if (isMounted) setAvailableReplayIds(null);
+            }
+        };
+        fetchAvailable();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const { filtered2024, filtered2025, allReplayOptions } = useMemo(() => {
+        const hasAvailability = (availableReplayIds?.length ?? 0) > 0;
+        const availableSet = new Set(availableReplayIds ?? []);
+        const filtered2024 = hasAvailability
+            ? replay2024.filter((race) => availableSet.has(race.id))
+            : replay2024;
+        const filtered2025 = hasAvailability
+            ? replay2025.filter((race) => availableSet.has(race.id))
+            : replay2025;
+        return {
+            filtered2024,
+            filtered2025,
+            allReplayOptions: [...filtered2024, ...filtered2025],
+        };
+    }, [availableReplayIds]);
+
+    useEffect(() => {
+        if (allReplayOptions.length === 0) return;
+        const stillValid = allReplayOptions.some((race) => race.id === selectedRace);
+        if (!stillValid) {
+            setSelectedRace(allReplayOptions[0].id);
+        }
+    }, [allReplayOptions, selectedRace]);
 
     // Trigger hasStarted when play is first clicked
     useEffect(() => {
@@ -210,7 +295,6 @@ const ReplayPage = () => {
         const applyMobileState = () => {
             const mobile = window.innerWidth < 1024;
             setIsMobile(mobile);
-            setSidebarCollapsed(mobile);
         };
         applyMobileState();
         window.addEventListener('resize', applyMobileState);
@@ -221,8 +305,8 @@ const ReplayPage = () => {
         ? Object.values(state.drivers).sort((a, b) => a.position - b.position)
         : [];
 
-    const selectedRound = Number(selectedRace.split('_')[0]);
-    const selectedRaceInfo = SEASON_2025_SCHEDULE.find((r) => r.round === selectedRound);
+    const selectedRaceInfo = allReplayOptions.find((race) => race.id === selectedRace)
+        ?? [...replay2024, ...replay2025].find((race) => race.id === selectedRace);
 
     const activeDriver = selectedDriverId && state?.drivers[selectedDriverId]
         ? state.drivers[selectedDriverId]
@@ -231,61 +315,6 @@ const ReplayPage = () => {
     return (
         <div className="min-h-screen w-full text-white flex flex-col pt-16 bg-[#050505]">
             <SimulationLayout>
-                <SimulationSidebar
-                    isCollapsed={isSidebarCollapsed}
-                    onToggle={() => setSidebarCollapsed(!isSidebarCollapsed)}
-                >
-                    <div className="p-6">
-                        <div className="mb-8">
-                            {/* Race Selection Dropdown */}
-                            <div className="mb-6">
-                                <label className="text-[9px] font-mono font-bold text-white/40 uppercase tracking-widest block mb-2">Select Event</label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedRace}
-                                        onChange={(e) => {
-                                            setSelectedRace(e.target.value);
-                                            setHasStarted(false);
-                                        }}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs font-mono font-bold text-white focus:outline-none focus:border-[#E10600]/50 transition-colors appearance-none cursor-pointer"
-                                    >
-                                        <optgroup label="2025 Season" className="bg-[#15151e]">
-                                            {SEASON_2025_SCHEDULE.map(r => (
-                                                <option key={r.round} value={`${r.round}_2025`}>
-                                                    {r.raceName}
-                                                </option>
-                                            ))}
-                                        </optgroup>
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
-                                        <Navigation className="w-3 h-3 rotate-180" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-white/40">
-                                    <div className="text-[11px] font-mono font-black uppercase tracking-widest">
-                                        {selectedRaceInfo?.raceName || 'Unknown Event'}
-                                    </div>
-                                    <div className="text-[9px] font-mono mt-1 uppercase">Official Session Telemetry</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="p-5 bg-white/5 border border-white/10 rounded-2xl opacity-40">
-                            <div className="flex items-center gap-2 mb-3 text-white/60">
-                                <Activity className="w-3 h-3" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Replay Engine V2</span>
-                            </div>
-                            <p className="text-[10px] text-white/40 leading-relaxed font-mono">
-                                <span className="text-white/30">120HZ COMPUTE</span><br />
-                                Deterministic playback of session data.
-                            </p>
-                        </div>
-                    </div>
-                </SimulationSidebar>
-
                 <SimulationMain>
                     <div className="relative w-full h-[calc(100svh-4rem)] bg-[#050505] overflow-hidden flex flex-col">
 
@@ -294,29 +323,72 @@ const ReplayPage = () => {
                             <TrackMap
                                 drivers={driversSorted}
                                 loading={loading}
-                                circuitImage={resolveAssetUrl(selectedRaceInfo?.trackImg)}
+                                circuitImage={showCircuitImage ? resolveAssetUrl(selectedRaceInfo?.trackImg) : undefined}
                                 circuitLabel={selectedRaceInfo?.circuit}
+                                trackPath={trackPath}
                             />
                         </div>
 
                         {/* 2. Top Bar (Overlay) */}
-                        <div className="absolute top-0 left-0 right-0 p-4 lg:p-8 flex justify-center items-start z-10 pointer-events-none">
-                            <div className="text-center">
-                                <h1 className="text-3xl lg:text-6xl font-black text-white tracking-[0.2em] uppercase">
-                                    REPLAY
-                                </h1>
-                                <div className="flex items-center justify-center gap-2 lg:gap-6 mt-3 lg:mt-6">
-                                    <div className="bg-black/60 backdrop-blur-xl px-4 py-2 border border-white/10 rounded-xl flex items-baseline gap-3">
-                                        <span className="text-[10px] font-mono font-black text-white/30 uppercase tracking-widest">LAP</span>
-                                        <span className="text-[#E10600] text-2xl font-black font-mono leading-none">{state?.currentLap || 1}</span>
-                                        <span className="text-white/20 font-mono text-xs">/ {state?.totalLaps || 53}</span>
-                                    </div>
-                                    <div className="bg-black/60 backdrop-blur-xl px-4 py-2 border border-white/10 rounded-xl flex items-center gap-3">
-                                        <div className="flex items-center gap-2">
+                        <div className="absolute top-0 left-0 right-0 p-4 lg:p-8 z-10 pointer-events-none">
+                            <div className="relative flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                                <div className="pointer-events-auto">
+                                    <h1 className="text-3xl lg:text-5xl font-extrabold text-white tracking-[0.14em] uppercase">
+                                        REPLAY
+                                    </h1>
+                                    <div className="flex items-center gap-3 lg:gap-4 mt-3">
+                                        <div className="h-9 bg-black/70 backdrop-blur-xl px-3 border border-white/10 rounded-lg flex items-center gap-2">
+                                            <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Lap</span>
+                                            <span className="text-[#E10600] text-lg font-black leading-none">{state?.currentLap || 1}</span>
+                                            <span className="text-white/30 text-[10px]">/ {state?.totalLaps || 53}</span>
+                                        </div>
+                                        <div className="h-9 bg-black/70 backdrop-blur-xl px-3 border border-white/10 rounded-lg flex items-center gap-2">
                                             <span className={`w-2 h-2 rounded-full ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
-                                            <span className={`text-[10px] font-mono font-black uppercase tracking-widest ${loading ? 'text-yellow-500' : 'text-white/40'}`}>
+                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${loading ? 'text-yellow-500' : 'text-white/40'}`}>
                                                 {loading ? 'SYNCHRONIZING' : 'OPERATIONAL'}
                                             </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pointer-events-auto w-full lg:w-auto flex justify-center lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-0">
+                                    <div className="w-full max-w-xs lg:max-w-sm">
+                                        <label className="text-[9px] font-mono font-bold text-white/40 uppercase tracking-widest block mb-2 text-center">Select Event</label>
+                                        <div className="relative">
+                                            <select
+                                                value={selectedRace}
+                                                onChange={(e) => {
+                                                    setSelectedRace(e.target.value);
+                                                    setHasStarted(false);
+                                                }}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs font-mono font-bold text-white focus:outline-none focus:border-[#E10600]/50 transition-colors appearance-none cursor-pointer"
+                                            >
+                                                <optgroup label="2024 Replay Cache" className="bg-[#15151e]" style={{ color: '#000', backgroundColor: '#fff' }}>
+                                                    {filtered2024.map((r) => (
+                                                        <option
+                                                            key={r.id}
+                                                            value={r.id}
+                                                            style={{ color: '#000', backgroundColor: '#fff' }}
+                                                        >
+                                                            {r.raceName} (2024)
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                                <optgroup label="2025 Season" className="bg-[#15151e]" style={{ color: '#000', backgroundColor: '#fff' }}>
+                                                    {filtered2025.map(r => (
+                                                        <option
+                                                            key={r.id}
+                                                            value={r.id}
+                                                            style={{ color: '#000', backgroundColor: '#fff' }}
+                                                        >
+                                                            {r.raceName}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                            </select>
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
+                                                <Navigation className="w-3 h-3 rotate-180" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -326,7 +398,11 @@ const ReplayPage = () => {
                         {/* 3. Leaderboard Overlay (Right) */}
                         {hasStarted && !isMobile && (
                             <div className="z-10 pointer-events-auto">
-                                <LeaderboardOverlay drivers={driversSorted} />
+                                <LeaderboardOverlay
+                                    drivers={driversSorted}
+                                    selectedDriverId={selectedDriverId}
+                                    onSelectDriver={setSelectedDriverId}
+                                />
                             </div>
                         )}
 

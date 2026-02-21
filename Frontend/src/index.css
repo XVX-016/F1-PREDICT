@@ -60,7 +60,7 @@ body {
 
 .carbon-fiber {
   background-color: var(--bg-carbon);
-  background-image: url('/carbon-pattern.png');
+  background-image: url('https://uivvxlorutmjgouporrv.supabase.co/storage/v1/object/public/assets/carbon-pattern.png');
   background-size: 240px;
   background-repeat: repeat;
   /* Opacity controlled by overlay or utility */

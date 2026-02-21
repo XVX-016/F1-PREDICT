@@ -131,12 +131,52 @@ export const getIntelligence = async (raceId: string, drivers?: string) => {
   return fetchWithTimeout(url);
 };
 
+const postWithTimeout = async (url: string, body: any, retries = 1): Promise<any> => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
+
+      const response = await Promise.race([
+        fetch(url, {
+          method: 'POST',
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        }),
+        createTimeout(TIMEOUT_DURATION)
+      ]) as Response;
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.warn(`Local API POST attempt ${attempt + 1} failed for ${url}:`, error);
+      if (attempt === retries) {
+        throw new Error(`Failed POST after ${retries + 1} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+    }
+  }
+};
+
 export const getBaseline = async (raceId: string) => {
   return fetchWithTimeout(`${INTERNAL_API_BASE}/api/baseline/${raceId}`);
 };
 
 export const getBaselineSummary = async (raceId: string, drivers: string) => {
   return fetchWithTimeout(`${INTERNAL_API_BASE}/api/baseline/${raceId}/summary?drivers=${drivers}`);
+};
+
+export const getRigorousSimulation = async (raceId: string, body: Record<string, any>) => {
+  return postWithTimeout(`${INTERNAL_API_BASE}/api/races/${raceId}/simulate-rigorous`, body, 0);
 };
 
 // Archive API functions

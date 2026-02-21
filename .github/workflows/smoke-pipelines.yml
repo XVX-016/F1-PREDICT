@@ -14,6 +14,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -28,6 +33,18 @@ jobs:
 
       - name: Install frontend deps
         run: npm --prefix Frontend ci
+
+      - name: Install backend deps
+        run: pip install -r backend/requirements.txt
+
+      - name: Run rigorous unit tests
+        run: python -m pytest -q backend/tests/unit/test_rigorous_engine.py
+
+      - name: Run gold manifest integrity tests
+        run: python -m pytest -q backend/tests/unit/test_gold_manifest_integrity.py
+
+      - name: Run rigorous validation gate
+        run: npm run rigorous:validate
 
       - name: Run smoke check
         run: npm run smoke:pipelines
