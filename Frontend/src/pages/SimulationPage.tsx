@@ -31,10 +31,22 @@ import {
 } from './SimulationPage.components';
 import SafetyCarTimelineChart from '../components/charts/SafetyCarTimelineChart';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function SimulationPage() {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const applyMobileLayout = () => {
+            const mobile = window.innerWidth < 1024;
+            setIsMobile(mobile);
+            setIsSidebarCollapsed(mobile);
+        };
+        applyMobileLayout();
+        window.addEventListener('resize', applyMobileLayout);
+        return () => window.removeEventListener('resize', applyMobileLayout);
+    }, []);
 
     return (
         <SimulationProvider>
@@ -95,36 +107,36 @@ export default function SimulationPage() {
                     </ReplayTimeline>
 
                     <SimulationViewport>
-                        <div className="p-4 lg:p-6 pt-24 lg:pt-40">
+                        <div className="mx-auto w-full max-w-[1500px] p-3 sm:p-4 lg:p-6 pt-6 lg:pt-8">
                             {/* CORE ANALYSIS: PACE & GAPS */}
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
-                                <div className="h-[380px] lg:h-[500px] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 items-stretch">
+                                <div className="h-[340px] sm:h-[380px] lg:h-[460px] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
                                     <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                                         <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">01 // Lap Pace (Baseline vs Counterfactual)</span>
                                         <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: MS / LAP</span>
                                     </div>
-                                    <div className="flex-1 p-6">
+                                    <div className="flex-1 min-h-0 p-3 sm:p-4 lg:p-6">
                                         <LapTimeChart />
                                     </div>
                                 </div>
 
-                                <div className="h-[380px] lg:h-[500px] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
+                                <div className="h-[340px] sm:h-[380px] lg:h-[460px] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
                                     <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                                         <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">02 // Field Compression (Gap to Leader)</span>
                                         <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: SEC / GAP</span>
                                     </div>
-                                    <div className="flex-1 p-6">
+                                    <div className="flex-1 min-h-0 p-3 sm:p-4 lg:p-6">
                                         <GapToLeaderChart />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-8 h-[260px] lg:h-[320px] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
+                            <div className="mt-4 lg:mt-6 h-[300px] sm:h-[340px] lg:h-[380px] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
                                 <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                                     <span className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em]">03 // Safety Car Timeline</span>
                                     <span className="text-[9px] text-white/40 font-mono italic uppercase tracking-wider">UNIT: LAP STATE</span>
                                 </div>
-                                <div className="flex-1 p-4 lg:p-6">
+                                <div className="flex-1 min-h-0 p-3 sm:p-4 lg:p-6">
                                     <SafetyCarTimelineChart />
                                 </div>
                             </div>
@@ -136,7 +148,7 @@ export default function SimulationPage() {
             </SimulationLayout>
 
             {/* Footer Disclaimer - True Page Centered */}
-            <div className="mt-16 lg:mt-48 pb-16 lg:pb-32 flex flex-col items-center justify-center">
+            <div className={`pb-16 lg:pb-24 flex flex-col items-center justify-center ${isMobile ? 'mt-10' : 'mt-20 lg:mt-32'}`}>
                 <div className="h-px w-full max-w-7xl bg-white/10 mb-16" />
                 <p className="text-[10px] text-white/20 uppercase tracking-[0.2em] leading-relaxed font-mono text-center max-w-2xl px-8">
                     Physics Sandbox: These charts reflect deterministic trajectories under selected parameters.

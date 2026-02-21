@@ -2,12 +2,8 @@ import { create } from 'zustand';
 import { DriverId, RaceContext, ReplayFrame, StrategyVariant } from '../types/race';
 import { SEASON_2026_DRIVERS, SEASON_2026_SCHEDULE } from '../data/season2026';
 import { SEASON_2025_SCHEDULE } from '../data/season2025';
-import {
-    SimulationResult,
-    SimulationConfig as SimConfig,
-    runWithCounterfactual,
-    TyreCompound
-} from '../sim';
+import { SimulationResult } from '../sim/types';
+import { adaptRigorousPairToSimulationResult, RigorousSimulationRunOutput } from '../sim/rigorousAdapter';
 
 export type SimulationState = "empty" | "sample" | "running" | "complete" | "error";
 export type DataSource = "sample" | "simulation";
@@ -62,7 +58,7 @@ export interface RaceStoreState {
     selectStrategy: (id: string | null) => void;
 
     ingestFrame: (frame: ReplayFrame) => void;
-    runSimulation: () => void;
+    runSimulation: () => Promise<void>;
     computeCounterfactual: (strategy: StrategyVariant) => Promise<void>;
 }
 
@@ -149,6 +145,26 @@ function getBaseRaceContext(season: number, round: number): RaceContext {
     };
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
+async function fetchRigorousSimulation(
+    raceId: string,
+    body: Record<string, unknown>
+): Promise<RigorousSimulationRunOutput> {
+    const response = await fetch(`${API_BASE}/api/races/${raceId}/simulate-rigorous`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || `Rigorous simulation failed (${response.status})`);
+    }
+
+    return response.json();
+}
+
 export const useRaceStore = create<RaceStoreState>((set, get) => ({
     // Defaults
     mode: "SIMULATION",
@@ -219,52 +235,47 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
      * Phase 2A: Baseline vs Counterfactual (same seed, one parameter change)
      * Results are FROZEN and immutable.
      */
-    runSimulation: () => {
+    runSimulation: async () => {
         const { config, context } = get();
 
         set({ simulationState: "running", isPlaying: false });
 
         try {
-            // Build baseline simulation config from UI config
             const season = context?.season ?? 2026;
             const drivers = getDriversForSeason(season);
-            const totalLaps = context?.totalLaps ?? 58;
             const baseSCProb = config.enableSafetyCar ? config.scProbability : 0;
 
-            const baseConfig: SimConfig = {
-                circuit: context?.circuitId ?? 'albert_park',
-                totalLaps,
-                drivers,
-                strategies: drivers.map((driverId, idx) => ({
-                    driverId,
-                    pitLaps: idx % 2 === 0
-                        ? [Math.floor(totalLaps * 0.35), Math.floor(totalLaps * 0.7)]
-                        : [Math.floor(totalLaps * 0.4), Math.floor(totalLaps * 0.75)],
-                    tyreSequence: ['MEDIUM', 'HARD', 'SOFT'] as TyreCompound[]
-                })),
-                baseLapTime: Object.fromEntries(
-                    drivers.map((id, idx) => [id, 81000 + idx * 85]) // compact full-field spread
-                ),
-                pitLossSeconds: 2.5,
-                hazardConfig: {
-                    safetyCarProb: baseSCProb,
-                    dnfProb: 0.001
+            const sharedSeed = Date.now();
+            const raceId = context?.circuitId || 'bahrain';
+            const focusDriver = get().selectedDriverId || drivers[0] || 'VER';
+
+            const baseRequest = {
+                track_id: raceId,
+                iterations: 1000,
+                seed: sharedSeed,
+                use_ml: true,
+                params: {
+                    focus_driver: focusDriver,
+                    sc_probability: baseSCProb,
                 },
-                tyreDegMultiplier: config.tyreDegMultiplier,
-                fuelBurnMultiplier: config.fuelBurnMultiplier,
-                seed: Date.now(),
-                runs: 1
             };
 
-            // Run with counterfactual: +50% SC probability
-            const result = runWithCounterfactual(
-                baseConfig,
-                {
-                    hazardConfig: {
-                        ...baseConfig.hazardConfig,
-                        safetyCarProb: baseSCProb * 1.5
-                    }
+            const counterfactualRequest = {
+                ...baseRequest,
+                params: {
+                    ...baseRequest.params,
+                    sc_probability: baseSCProb * 1.5,
                 },
+            };
+
+            const [baseline, counterfactual] = await Promise.all([
+                fetchRigorousSimulation(raceId, baseRequest),
+                fetchRigorousSimulation(raceId, counterfactualRequest),
+            ]);
+
+            const result: SimulationResult = adaptRigorousPairToSimulationResult(
+                baseline,
+                counterfactual,
                 "SC Prob +50%"
             );
 
@@ -274,11 +285,11 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
                 dataSource: "simulation",
                 currentLap: 1,
                 isPlaying: true,
-                selectedDriverId: drivers[0] || null
+                selectedDriverId: focusDriver
             });
         } catch (error) {
             console.error("Simulation failed:", error);
-            set({ simulationState: "error" });
+            set({ simulationState: "error", isPlaying: false });
         }
     },
 

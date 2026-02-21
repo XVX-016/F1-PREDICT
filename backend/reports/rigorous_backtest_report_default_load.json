@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-02-17T04:14:22.182364+00:00",
+  "engine": "rigorous",
+  "cases": [
+    {
+      "race_id": "bahrain",
+      "seed": 17,
+      "iterations": 300,
+      "runtime_ms": 524.491,
+      "reproducible": true,
+      "fingerprint": "372c779b74f61082f95a7eea5bd445150cfef8d1652a581d7cdc0fc4cbc64f00",
+      "model_params_signature": "6a88e73694f92884",
+      "focus_driver": "VER",
+      "convergence_l1": {
+        "250_vs_target": 0.162667,
+        "500_vs_target": 0.0
+      }
+    }
+  ],
+  "summary": {
+    "num_cases": 1,
+    "all_reproducible": true,
+    "avg_runtime_ms": 524.491,
+    "max_runtime_ms": 524.491
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-02-17T07:39:43.037494+00:00",
+  "race_id": "2024_1_bahrain",
+  "track_id": "bahrain",
+  "iterations_per_run": 200,
+  "runs": 1,
+  "seed_base": 42,
+  "focus_driver": "VER",
+  "gold_manifest_sha256": "fe79bb235f84e066cbee8bfb8d829077efade34f7f65f7fccd8004856b6aab33",
+  "engine_model_version": "v4.1.0-rigorous-crn",
+  "model_params_signature": "4ca04a724876ee23",
+  "deterministic_mode": true,
+  "zero_gamma": true,
+  "pace_spread_scale": 1.0,
+  "force_gold_rank_intrinsic": true,
+  "force_rank_step_ms": 100.0,
+  "metrics": {
+    "position_mae": {
+      "mean": 3.2857142857142856,
+      "std": 0.0
+    },
+    "kendall_tau": {
+      "mean": 0.6923076923076924,
+      "std": 0.0
+    },
+    "pit_mae": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "topology_match": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "podium_accuracy": {
+      "mean": 0.3333333333333333,
+      "std": 0.0
+    },
+    "lap_spread_ms": {
+      "mean": 1953.474210526343,
+      "std": 0.0
+    },
+    "race_time_deltas_ms": {
+      "p1_vs_p20_ms": {
+        "mean": 18367.971700307913,
+        "std": 0.0
+      },
+      "p1_vs_p5_ms": {
+        "mean": 4440.409550306387,
+        "std": 0.0
+      },
+      "p10_vs_p15_ms": {
+        "mean": 5104.67911176011,
+        "std": 0.0
+      }
+    }
+  },
+  "scm": {
+    "mean": 0.13744939271255058,
+    "std": 0.0
+  },
+  "topology_mode": "compound_sequence_exact",
+  "run_details": [
+    {
+      "race_id": "2024_1_bahrain",
+      "track_id": "bahrain",
+      "seed": 42,
+      "metrics": {
+        "position_mae": 3.2857142857142856,
+        "kendall_tau": 0.6923076923076924,
+        "pit_mae": 0.0,
+        "topology_match": 1.0,
+        "topology_mode": "compound_sequence_exact",
+        "podium_accuracy": 0.3333333333333333,
+        "scm": 0.13744939271255058,
+        "lap_spread_ms": 1953.474210526343,
+        "race_time_deltas_ms": {
+          "p1_vs_p20_ms": 18367.971700307913,
+          "p1_vs_p5_ms": 4440.409550306387,
+          "p10_vs_p15_ms": 5104.67911176011
+        }
+      },
+      "engine": {
+        "model_version": "v4.1.0-rigorous-crn",
+        "model_params_signature": "4ca04a724876ee23",
+        "num_iterations": 200
+      }
+    }
+  ]
+}

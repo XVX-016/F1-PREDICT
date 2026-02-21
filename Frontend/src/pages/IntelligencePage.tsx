@@ -35,12 +35,32 @@ const normalizeCircuitId = (circuitName: string): string => {
         .replace(/\s+/g, '_');
 
     const aliases: Record<string, string> = {
+        albert_park: 'albert_park',
+        shanghai: 'shanghai',
+        suzuka: 'suzuka',
         bahrain_international: 'bahrain',
         jeddah_corniche: 'jeddah',
-        suzuka: 'suzuka',
-        shanghai: 'shanghai',
-        albert_park: 'melbourne',
-        circuit_de_monaco: 'monaco'
+        miami: 'miami',
+        imola: 'imola',
+        circuit_de_monaco: 'monaco',
+        de_barcelonacatalunya: 'catalunya',
+        barcelonacatalunya: 'catalunya',
+        gilles_villeneuve: 'montreal',
+        red_bull_ring: 'spielberg',
+        de_spafrancorchamps: 'spa',
+        hungaroring: 'hungaroring',
+        zandvoort: 'zandvoort',
+        monza: 'monza',
+        baku_city: 'baku',
+        marina_bay: 'marina_bay',
+        of_the_americas: 'cota',
+        the_americas: 'cota',
+        autdromo_hermanos_rodrguez: 'mexico_city',
+        autodromo_hermanos_rodriguez: 'mexico_city',
+        interlagos: 'interlagos',
+        las_vegas_strip: 'las_vegas',
+        lusail: 'lusail',
+        yas_marina: 'abu_dhabi'
     };
 
     return aliases[cleaned] || cleaned;
@@ -55,7 +75,14 @@ const IntelligencePage = () => {
     const selectedRace = SEASON_2025_SCHEDULE.find((r) => r.round === selectedRound) || SEASON_2025_SCHEDULE[0];
     const raceId = normalizeCircuitId(selectedRace.circuit);
 
-    const { intelligence, baselineSummary, isLoading, isError } = useIntelligence(raceId, SEASON_2025_DRIVER_IDS);
+    const {
+        intelligence,
+        baselineSummary,
+        rigorous,
+        isLoading,
+        isError,
+        rigorousUnavailable
+    } = useIntelligence(raceId, SEASON_2025_DRIVER_IDS, selectedSession, selectedCondition);
 
     const computedAt = intelligence?.generated_at || new Date().toISOString();
     const baseContext = useMemo(() => ({
@@ -69,7 +96,7 @@ const IntelligencePage = () => {
 
     const baselineOrderEnvelope: DataEnvelope<BaselineOrderItem[]> = {
         context: baseContext,
-        validity: isError ? 'UNAVAILABLE' : (baselineSummary && baselineSummary.length >= 20 ? 'VALID' : 'DEGRADED'),
+        validity: isError ? 'UNAVAILABLE' : (baselineSummary && baselineSummary.length > 0 ? 'VALID' : 'DEGRADED'),
         reason: isError ? 'Backend baseline service unavailable.' : undefined,
         source: 'HYBRID',
         computedAt,
@@ -141,6 +168,24 @@ const IntelligencePage = () => {
         })
     };
 
+    const rigorousDrivers = Array.isArray(rigorous?.drivers) ? rigorous.drivers : [];
+    const pitDecision = rigorous?.pit_decision_profile;
+    const volatilityIndex = (rigorous?.metadata as any)?.position_volatility_index || {};
+
+    const topVolatility: Array<{ driverId: string; score: number }> = Object.entries(volatilityIndex as Record<string, unknown>)
+        .map(([driverId, score]) => ({ driverId, score: Number(score) || 0 }))
+        .sort((a: { driverId: string; score: number }, b: { driverId: string; score: number }) => b.score - a.score)
+        .slice(0, 5);
+
+    const dnfSnapshot: Array<{ driverId: string; cumulative: number }> = rigorousDrivers
+        .map((d: any) => {
+            const timeline = Array.isArray(d.dnf_hazard_timeline) ? d.dnf_hazard_timeline : [];
+            const cumulative = timeline.reduce((acc: number, x: number) => acc + (Number(x) || 0), 0);
+            return { driverId: d.driver_id, cumulative };
+        })
+        .sort((a: { driverId: string; cumulative: number }, b: { driverId: string; cumulative: number }) => b.cumulative - a.cumulative)
+        .slice(0, 5);
+
 
     const isFallbackOrDegraded =
         driverPriorsEnvelope.validity !== 'VALID' ||
@@ -183,6 +228,11 @@ const IntelligencePage = () => {
                             <p className="text-yellow-200/80 text-xs font-mono">
                                 One or more intelligence streams are degraded. Backend responses are partial or unavailable for the selected context.
                             </p>
+                            {rigorousUnavailable && (
+                                <p className="text-yellow-200/70 text-[10px] font-mono mt-2 uppercase tracking-wider">
+                                    Rigorous side-panel analytics unavailable for this context.
+                                </p>
+                            )}
                         </div>
                     </div>
                 )}
@@ -199,6 +249,46 @@ const IntelligencePage = () => {
                 </div>
 
                 <main className="space-y-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 p-4 lg:p-5">
+                            <div className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em] mb-3">Decision // Pit Window</div>
+                            {pitDecision ? (
+                                <div className="space-y-2 text-xs font-mono">
+                                    <div className="text-white">Optimal Lap: <span className="text-[#E10600] font-black">L{pitDecision.optimal_lap}</span></div>
+                                    <div className="text-white/70">Optimal Band: L{pitDecision.confidence_bands?.optimal?.[0]}-{pitDecision.confidence_bands?.optimal?.[1]}</div>
+                                    <div className="text-white/70">Viable Band: L{pitDecision.confidence_bands?.viable?.[0]}-{pitDecision.confidence_bands?.viable?.[1]}</div>
+                                    <div className="text-white/50">Closed: {pitDecision.confidence_bands?.closed?.[0]}+</div>
+                                </div>
+                            ) : (
+                                <div className="text-xs text-white/40 font-mono">Rigorous pit profile unavailable</div>
+                            )}
+                        </div>
+
+                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 p-4 lg:p-5">
+                            <div className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em] mb-3">Analytics // Volatility</div>
+                            <div className="space-y-1.5 text-[11px] font-mono">
+                                {topVolatility.length > 0 ? topVolatility.map((row) => (
+                                    <div key={row.driverId} className="flex justify-between text-white/80">
+                                        <span>{row.driverId}</span>
+                                        <span>{row.score.toFixed(2)}</span>
+                                    </div>
+                                )) : <div className="text-white/40">No volatility data</div>}
+                            </div>
+                        </div>
+
+                        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 p-4 lg:p-5">
+                            <div className="text-[10px] font-mono font-black text-white uppercase tracking-[0.2em] mb-3">Risk // DNF Hazard</div>
+                            <div className="space-y-1.5 text-[11px] font-mono">
+                                {dnfSnapshot.length > 0 ? dnfSnapshot.map((row: { driverId: string; cumulative: number }) => (
+                                    <div key={row.driverId} className="flex justify-between text-white/80">
+                                        <span>{row.driverId}</span>
+                                        <span>{(row.cumulative * 100).toFixed(1)}%</span>
+                                    </div>
+                                )) : <div className="text-white/40">No hazard data</div>}
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
                         <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset min-h-[360px] lg:h-[400px]">
                             <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">

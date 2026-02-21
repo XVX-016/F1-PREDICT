@@ -90,7 +90,7 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
   const getTrackImage = (circuit: string, name: string) => {
     // Try to find in 2026 schedule first for verified paths
     const staticRace = SEASON_2026_SCHEDULE.find(r => r.circuit === circuit || r.raceName === name);
-    if (staticRace?.trackImg) return staticRace.trackImg;
+    if (staticRace?.trackImg) return getAssetUrl(staticRace.trackImg);
     return toCircuitBannerImage(circuit, name);
   };
 
@@ -99,7 +99,7 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
       {/* 1. HERO SECTION */}
       <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[url('/hero/home-bg-new.jpg')] bg-cover bg-center opacity-40"></div>
+          <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url('${getAssetUrl('/hero/home-bg-new.jpg')}')` }}></div>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A0A0A]/50 to-[#0A0A0A]"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A]/80 to-transparent"></div>
         </div>

@@ -15,6 +15,8 @@ export interface TelemetrySample {
     t: number;      // ms since race start
     lap: number;
     progress: number; // 0-1 relative distance on main track
+    x?: number; // normalized map-space [0,1]
+    y?: number; // normalized map-space [0,1]
     speed: number;
     throttle: number;
     brake: number;
@@ -95,7 +97,11 @@ export class ReplayEngine {
         private config: TrackConfig
     ) { }
 
-    loadData(metadata: DriverMetadata[], telemetry: Record<string, TelemetrySample[]>) {
+    loadData(
+        metadata: DriverMetadata[],
+        telemetry: Record<string, TelemetrySample[]>,
+        totalLapsHint?: number
+    ) {
         this.metadata = {};
         metadata.forEach(m => this.metadata[m.id] = m);
         this.maxLap = 1;
@@ -118,9 +124,16 @@ export class ReplayEngine {
         Object.values(this.telemetry).forEach(samples => {
             if (samples.length > 0) {
                 maxT = Math.max(maxT, samples[samples.length - 1].t);
-                this.maxLap = Math.max(this.maxLap, samples[samples.length - 1].lap || 1);
+                // Do not trust "last sample lap" because some feeds reset or jitter timestamps.
+                // We derive the authoritative lap count from the max lap seen in all samples.
+                for (let i = 0; i < samples.length; i++) {
+                    this.maxLap = Math.max(this.maxLap, samples[i].lap || 1);
+                }
             }
         });
+        if (Number.isFinite(totalLapsHint) && (totalLapsHint || 0) > 1) {
+            this.maxLap = Math.max(this.maxLap, Number(totalLapsHint));
+        }
         this.duration = maxT;
         this.currentTime = 0;
     }
@@ -247,8 +260,10 @@ export class ReplayEngine {
         if (sorted.length > 0) leader = sorted[0];
 
         sorted.forEach((s, i) => {
-            // Get interpolated position from Main Track
-            let pos = positionFromProgress(this.mainTrack, s.progress);
+            // Use telemetry-derived normalized x/y when available, fallback to spline.
+            let pos = (Number.isFinite(s.x) && Number.isFinite(s.y))
+                ? { x: Number(s.x), y: Number(s.y) }
+                : positionFromProgress(this.mainTrack, s.progress);
 
             // Defensive: Ensure pitContext exists
             let pitCtx = this.driverPitStates[s.id];
@@ -283,7 +298,7 @@ export class ReplayEngine {
             // Guard against NaN
             if (!Number.isFinite(pos.x) || !Number.isFinite(pos.y)) {
                 console.warn(`[ReplayEngine] NaN position for ${s.id}, falling back.`);
-                pos = { x: 0, y: 0 };
+                pos = { x: 0.5, y: 0.5 };
             }
 
             // Meta
@@ -381,6 +396,8 @@ export class ReplayEngine {
             t: t,
             lap: a.lap,
             progress: this.lerp(a.progress, b.progress, factor),
+            x: this.lerp(a.x ?? 0.5, b.x ?? (a.x ?? 0.5), factor),
+            y: this.lerp(a.y ?? 0.5, b.y ?? (a.y ?? 0.5), factor),
             speed: this.lerp(a.speed, b.speed, factor),
             throttle: this.lerp(a.throttle, b.throttle, factor),
             brake: this.lerp(a.brake, b.brake, factor),

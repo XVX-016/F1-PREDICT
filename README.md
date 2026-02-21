@@ -53,6 +53,48 @@ npm run dev
 * **Linting**: ESLint (strict)
 * **Data**: Fallback supported when API unavailable
 
+## Rigorous Validation
+
+Use the governed simulation checks before merging model changes:
+
+```bash
+npm run rigorous:calibrate
+npm run rigorous:validate
+```
+
+Concordance runner (Gold race vs model outputs):
+
+```bash
+python backend/scripts/run_concordance.py --race-id 2024_1_bahrain --iterations 300 --runs 5
+```
+
+Governance policy and thresholds are documented in:
+
+`docs/rigorous_governance.md`
+
+## Gold Dataset Pipeline
+
+Ground-truth event layer tooling (classification, pit events, SC/VSC, DNF):
+
+```bash
+# build one race (example)
+python backend/scripts/build_gold_dataset.py --season 2025 --round 1 --race Bahrain --slug bahrain
+
+# audit all races in v1
+npm run gold:audit
+
+# freeze checksums/manifest for v1
+npm run gold:freeze
+```
+
+Audit now enforces semantic invariants (classification continuity, pit/SC/DNF bounds, overlap checks)
+and emits a per-race `source_agreement_score`; races below `0.95` require manual review.
+`gold:freeze` emits race-level cryptographic hashes plus pipeline commit and Python version metadata.
+
+Specification:
+
+`docs/gold_dataset_spec.md`
+
 ## Known Limitations
 
 * **No live telemetry**: Real-time telemetry availability depends on upstream sources.

@@ -222,17 +222,12 @@ def ingest_high_fidelity_replay(year: int, race_id: str, session_type: str = 'R'
         # BUT this is huge. 
         # Splitting by lap is better.
         
-        # Create a dict of TelemetryFrames PER LAP
-        
-        driver_frames_by_lap = {} # lap -> [frames]
-        
+        # Build a flat, shared-timeline frame list per driver.
+        # This is the "time-first, driver-second" contract and prevents desyncs.
+        driver_frames_flat = []
         for i in range(len(timeline)):
-            lap_idx = int(frame_lap[i])
-            if lap_idx not in driver_frames_by_lap:
-                driver_frames_by_lap[lap_idx] = []
-            
-            tf = {
-                "t": float(frame_t[i]),
+            driver_frames_flat.append({
+                "t": float(frame_t[i]),           # seconds since race start
                 "driver_id": code,
                 "x": float(frame_x[i]),
                 "y": float(frame_y[i]),
@@ -243,9 +238,8 @@ def ingest_high_fidelity_replay(year: int, race_id: str, session_type: str = 'R'
                 "drs": int(frame_drs[i]),
                 "throttle": float(frame_throttle[i]),
                 "brake": float(frame_brake[i]),
-                # omitted compound for brevity, can merge later
-            }
-            driver_frames_by_lap[lap_idx].append(tf)
+                "lap": int(frame_lap[i])
+            })
             
         # Store to Local Cache (Always)
         try:
@@ -253,9 +247,9 @@ def ingest_high_fidelity_replay(year: int, race_id: str, session_type: str = 'R'
             os.makedirs(cache_dir, exist_ok=True)
             cache_file = os.path.join(cache_dir, f"{race_id}_{code}.json")
             
-            # Save dict of lap -> frames
+            # Save flat list (preferred for replay engine)
             with open(cache_file, 'w') as f:
-                json.dump(driver_frames_by_lap, f)
+                json.dump(driver_frames_flat, f)
             
             logger.info(f"Saved local cache to {cache_file} ({ len(timeline) } frames)")
                 

@@ -6,15 +6,18 @@ const engine = new ReplayEngine(BAHRAIN_MAIN_TRACK, BAHRAIN_PIT_TRACK, BAHRAIN_T
 let lastTick = 0;
 let isLooping = false;
 const TARGET_FPS = 120;
+const STATE_FPS = 30;
+let lastStateBroadcast = 0;
 
 self.onmessage = (e: MessageEvent) => {
     try {
-        const { type, payload } = e.data;
+            const { type, payload } = e.data;
 
-        switch (type) {
-            case 'LOAD':
-                engine.loadData(payload.metadata, payload.telemetry);
+            switch (type) {
+                case 'LOAD':
+                engine.loadData(payload.metadata, payload.telemetry, payload.totalLapsHint);
                 self.postMessage({ type: 'LOADED', payload: { duration: engine.getDuration() } });
+                broadcastState(true);
                 break;
             case 'PLAY':
                 startLoop();
@@ -24,7 +27,7 @@ self.onmessage = (e: MessageEvent) => {
                 break;
             case 'SEEK':
                 engine.seek(payload.t);
-                broadcastState();
+                broadcastState(true);
                 break;
             case 'SET_SPEED':
                 engine.setSpeed(payload.speed);
@@ -77,6 +80,10 @@ function requestNextTick() {
 
 function startLoop() {
     if (isLooping) return;
+    if (engine.getDuration() <= 0) {
+        broadcastState();
+        return;
+    }
     isLooping = true;
     lastTick = performance.now();
     engine.play();
@@ -86,10 +93,15 @@ function startLoop() {
 function stopLoop() {
     isLooping = false;
     engine.pause();
-    broadcastState();
+    broadcastState(true);
 }
 
-function broadcastState() {
+function broadcastState(force = false) {
+    const now = performance.now();
+    if (!force && now - lastStateBroadcast < 1000 / STATE_FPS) {
+        return;
+    }
+    lastStateBroadcast = now;
     // Authoritative snapshot broadcast
     self.postMessage({ type: 'STATE_UPDATE', payload: engine.getState() });
 }

@@ -1,0 +1,21 @@
+{
+  "season": 2024,
+  "round": 1,
+  "race_id": "2024_1_bahrain",
+  "validated": false,
+  "validation_status": "UNREVIEWED",
+  "generated_at": "2026-02-17T06:22:04.808747+00:00",
+  "sources": {
+    "classification": "ergast",
+    "pit_events": "ergast",
+    "stint_sequences": "fastf1.laps.Compound+Stint",
+    "sc_periods": "fastf1.track_status",
+    "dnf_events": "ergast"
+  },
+  "notes": [],
+  "source_agreement_score": 1.0,
+  "manual_review_required": false,
+  "audit_ok": true,
+  "audit_issues": [],
+  "audit_checked_at": "2026-02-17T06:22:25.176870+00:00"
+}

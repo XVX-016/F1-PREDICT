@@ -172,6 +172,50 @@ class SimulationResponse(BaseModel):
     
     metadata: Dict[str, Any]
     trace: Optional[List[LapFrame]] = None
+    run_output: Optional[Dict[str, Any]] = None
+
+
+class LapState(BaseModel):
+    lap: int
+    track_state: Literal["GREEN", "VSC", "SC"]
+    sc_probability: float = Field(..., ge=0, le=1)
+    field_compression_factor: float = Field(..., ge=0, le=1)
+
+
+class StintModel(BaseModel):
+    compound: Literal["soft", "medium", "hard"]
+    degradation_curve: List[float]
+    cliff_lap_probability: List[float]
+
+
+class PitEVPoint(BaseModel):
+    lap: int
+    expected_finish: float
+    variance: float
+
+
+class DriverSimulationProfile(BaseModel):
+    driver_id: str
+    finishing_position_distribution: Dict[int, float]
+    stint_models: List[StintModel]
+    pit_ev: List[PitEVPoint]
+    dnf_hazard_timeline: List[float]
+    lap_time_profile: List[float] = Field(default_factory=list)
+    gap_profile: List[float] = Field(default_factory=list)
+    position_profile: List[float] = Field(default_factory=list)
+
+
+class PitDecisionProfile(BaseModel):
+    optimal_lap: int
+    ev_curve: List[PitEVPoint]
+    confidence_bands: Dict[str, List[int]]
+
+
+class SimulationRunOutput(BaseModel):
+    metadata: Dict[str, Any]
+    lap_states: List[LapState]
+    drivers: List[DriverSimulationProfile]
+    pit_decision_profile: Optional[PitDecisionProfile] = None
 
 class SimulationTraceArtifact(BaseModel):
     """

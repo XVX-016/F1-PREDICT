@@ -2,7 +2,7 @@
 // We use unknown here to allow diverse response types, but consumers should cast safely
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const TIMEOUT_DURATION = 10000; // 10 seconds
+const TIMEOUT_DURATION = 15000; // 15 seconds
 
 import { ENV_CONFIG } from '../config/environment';
 
@@ -318,7 +318,7 @@ export const getConstructorStandings = async () => {
 
 export const getArchiveRaces = async (year: number) => {
   const key = `archive-races-${year}`;
-  return getCachedOrFetch<JolpicaApiResponse<JolpicaRace>>(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/races?limit=100`));
+  return getCachedOrFetch<JolpicaApiResponse<JolpicaRace>>(key, () => fetchWithTimeout(`${ENV_CONFIG.JOLPICA_BASE_URL}/${year}/races?limit=100`), 'races');
 };
 
 export const getArchiveResults = async (year: number, round?: number) => {

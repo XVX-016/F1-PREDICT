@@ -2,6 +2,7 @@ import { useRaceStore } from '../stores/raceStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect, useRef, useState } from 'react';
 import { Settings, Play, Pause, ChevronRight, ChevronLeft } from 'lucide-react';
+import { SEASON_2026_DRIVERS } from '../data/season2026';
 import { SEASON_2026_SCHEDULE } from '../data/season2026';
 import { SEASON_2025_SCHEDULE } from '../data/season2025';
 
@@ -161,6 +162,11 @@ const TRACK_LAPS: Record<string, number> = {
     yas_marina: 58,
 };
 
+const SEASON_2025_DRIVER_IDS = [
+    'VER', 'NOR', 'LEC', 'HAM', 'SAI', 'PIA', 'RUS', 'PER', 'ALO', 'STR',
+    'GAS', 'OCO', 'ALB', 'TSU', 'HUL', 'MAG', 'BOT', 'ZHO', 'RIC', 'SAR'
+];
+
 const normalizeCircuitId = (circuitName: string): string => {
     const cleaned = circuitName
         .toLowerCase()
@@ -260,6 +266,7 @@ export const TrackInfoBadge = () => {
 export const DriverSelector = () => {
     const currentFrame = useRaceStore(useShallow(s => s.currentFrame));
     const simulationResult = useRaceStore(useShallow(s => s.simulationResult));
+    const context = useRaceStore(useShallow(s => s.context));
     const selectedDriverId = useRaceStore(useShallow(s => s.selectedDriverId));
     const selectDriver = useRaceStore(s => s.selectDriver);
 
@@ -274,7 +281,19 @@ export const DriverSelector = () => {
                     teamId: 'FIELD',
                     position: d.finishPosition
                 }))
-            : [];
+            : (context?.season === 2026
+                ? SEASON_2026_DRIVERS.map((d, idx) => ({
+                    driverId: d.id.toUpperCase(),
+                    name: d.name,
+                    teamId: d.teamId.toUpperCase(),
+                    position: idx + 1
+                }))
+                : SEASON_2025_DRIVER_IDS.map((id, idx) => ({
+                    driverId: id,
+                    name: id,
+                    teamId: 'FIELD',
+                    position: idx + 1
+                })));
 
     return (
         <div className="space-y-2">

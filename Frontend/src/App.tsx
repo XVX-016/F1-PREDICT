@@ -23,9 +23,7 @@ const queryClient = new QueryClient({
 const BackendStatusIndicator = () => {
   const { data: status, isLoading, isError } = useRaceStatus();
 
-  // Check if offline
-  // status might be undefined if error, or match our fallback mocks
-  const isOffline = isError || (status?.raceId === 'offline-demo') || (status?.name === 'Backend Initializing...');
+  const isOffline = isError || (status?.name === 'Backend Initializing...');
 
   if (!isOffline && !isLoading) return null;
 

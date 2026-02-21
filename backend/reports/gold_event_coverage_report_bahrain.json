@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-02-17T06:22:25.177875+00:00",
+  "root": "backend/data/gold/v1",
+  "num_races": 1,
+  "ok_races": 1,
+  "failed_races": 0,
+  "results": [
+    {
+      "race_dir": "backend/data/gold/v1\\2024_1_bahrain",
+      "ok": true,
+      "issues": [],
+      "driver_count": 20,
+      "lap_count": 57,
+      "pit_event_count": 43,
+      "sc_period_count": 0,
+      "dnf_event_count": 0,
+      "checks_total": 437,
+      "checks_passed": 437,
+      "source_agreement_score": 1.0,
+      "manual_review_required": false
+    }
+  ]
+}

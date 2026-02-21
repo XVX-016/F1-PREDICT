@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-02-17T16:28:47.942979+00:00",
+  "races": [
+    "bahrain",
+    "abu_dhabi"
+  ],
+  "seed": 42,
+  "iterations": 50,
+  "trials": 1,
+  "best_loss_mae": 5042697.749452,
+  "best_error_breakdown": {},
+  "best_race_breakdown": {},
+  "best_stability_details": {
+    "tau": 0.8421052631578947,
+    "position_mae": 1.5,
+    "scm": 0.06710526315789475,
+    "tier_crossings": 5.0,
+    "curvature_index_ms": 1914.6948970020458,
+    "intrinsic_min_gap_ms": 980.0,
+    "interaction_max_ms": 7105.225921009667,
+    "interaction_ratio": 7.250230531642518,
+    "ratio_excess": 4.250230531642518,
+    "loss": 5042697.749451995
+  },
+  "history": [
+    {
+      "trial": 0,
+      "loss_mae": 6051718.096165051,
+      "accepted": true
+    },
+    {
+      "trial": 1,
+      "loss_mae": 5042697.749452,
+      "accepted": true,
+      "stability": {
+        "tau": 0.8421052631578947,
+        "position_mae": 1.5,
+        "scm": 0.06710526315789475,
+        "tier_crossings": 5.0,
+        "curvature_index_ms": 1914.6948970020458,
+        "intrinsic_min_gap_ms": 980.0,
+        "interaction_max_ms": 7105.225921009667,
+        "interaction_ratio": 7.250230531642518,
+        "ratio_excess": 4.250230531642518,
+        "loss": 5042697.749451995
+      }
+    }
+  ],
+  "output_params_file": "backend/data/rigorous_model_params.v1.calibrated.stability.smoke.json"
+}

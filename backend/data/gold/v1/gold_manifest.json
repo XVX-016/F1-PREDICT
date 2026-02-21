@@ -1,0 +1,25 @@
+{
+  "version": "v1",
+  "dataset_version": "v1",
+  "generated_at": "2026-02-17T06:22:23.863308+00:00",
+  "root": "backend/data/gold/v1",
+  "race_count": 1,
+  "file_count": 7,
+  "pipeline_commit": "98c4449a724c8ef75e1ee8b0db1ed5279a1630d2",
+  "python_version": "3.11.0",
+  "races": [
+    {
+      "race_id": "2024_1_bahrain",
+      "race_hash": "f057d66787c7da21d0c89cb829a7593b97e9929d1e8cac4664406f376bd7a376",
+      "files": {
+        "classification.json": "afd46446ca398c1510ff2e03a892958a13bdf81aa8c34f5952dfcbca6777a2be",
+        "dnf_events.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "lap_count.json": "09fcc8c4c2c1f77aacb4c72d2403c99674f68247987537c658eb6e6df34608ad",
+        "metadata.json": "c4b9b2f897566a6ec188f3f4161bf5bf540aff6b46728ed46a3ed4dcf26566a2",
+        "pit_events.json": "bcff7d62b6d1653852ab7283bd9db39ccdd04c1ec9161d57b2b85802dc925dca",
+        "sc_periods.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "stint_sequences.json": "aeb2ca1db9d111054f04a32675e8211717c3eae2e2e0422ce3e9911d8b83607e"
+      }
+    }
+  ]
+}

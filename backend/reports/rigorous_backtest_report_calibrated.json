@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-02-17T04:25:18.011453+00:00",
+  "engine": "rigorous",
+  "cases": [
+    {
+      "race_id": "bahrain",
+      "seed": 17,
+      "iterations": 400,
+      "runtime_ms": 428.576,
+      "reproducible": true,
+      "fingerprint": "5a1b35be918fc8014f49f8fd702e6f9fc3f335fce8c8f44859c205c8f66f8eae",
+      "model_params_signature": "b115663d3e55446c",
+      "focus_driver": "VER",
+      "convergence_l1": {
+        "250_vs_target": 0.096,
+        "500_vs_target": 0.0
+      }
+    },
+    {
+      "race_id": "bahrain",
+      "seed": 42,
+      "iterations": 400,
+      "runtime_ms": 416.138,
+      "reproducible": true,
+      "fingerprint": "23254163b9aa1f215a7f87f8a960525c9a0c12bf9aab766927c306a374fa6879",
+      "model_params_signature": "b115663d3e55446c",
+      "focus_driver": "VER",
+      "convergence_l1": {
+        "250_vs_target": 0.072,
+        "500_vs_target": 0.0
+      }
+    },
+    {
+      "race_id": "abu_dhabi",
+      "seed": 17,
+      "iterations": 400,
+      "runtime_ms": 470.023,
+      "reproducible": true,
+      "fingerprint": "bb529fe711aadfbec33e1543229edb6753ad507838f80f6bc110e55c0c01904e",
+      "model_params_signature": "b115663d3e55446c",
+      "focus_driver": "VER",
+      "convergence_l1": {
+        "250_vs_target": 0.103,
+        "500_vs_target": 0.0
+      }
+    },
+    {
+      "race_id": "abu_dhabi",
+      "seed": 42,
+      "iterations": 400,
+      "runtime_ms": 401.764,
+      "reproducible": true,
+      "fingerprint": "cd3c45e6dea99499e0ea0ce3a3bc4612aca93d627d9a5c54e64f26749aecdbb7",
+      "model_params_signature": "b115663d3e55446c",
+      "focus_driver": "VER",
+      "convergence_l1": {
+        "250_vs_target": 0.102,
+        "500_vs_target": 0.0
+      }
+    }
+  ],
+  "summary": {
+    "num_cases": 4,
+    "all_reproducible": true,
+    "avg_runtime_ms": 429.125,
+    "max_runtime_ms": 470.023
+  }
+}

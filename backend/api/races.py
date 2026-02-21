@@ -7,16 +7,99 @@ import os
 import json
 import glob
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Union
+import math
 from services.simulation_engine import simulation_engine
 from database.supabase_client import get_db
-from models.domain import SimulationRequest, SimulationResponse, RaceTimeline
+from models.domain import SimulationRequest, SimulationResponse, RaceTimeline, SimulationRunOutput
 from dependencies import get_redis_client
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["races"])
+
+def _resolve_replay_prefix(race_id: str, cache_dir: str) -> str:
+    if not os.path.isdir(cache_dir):
+        return race_id
+    # Exact match first.
+    if glob.glob(os.path.join(cache_dir, f"{race_id}_*.json")):
+        return race_id
+    target = race_id.lower()
+    prefixes = set()
+    for fname in os.listdir(cache_dir):
+        if not fname.endswith(".json"):
+            continue
+        base = fname[:-5]
+        if "_" not in base:
+            continue
+        prefix = base.rsplit("_", 1)[0]
+        prefixes.add(prefix)
+    matches = [p for p in prefixes if p.lower() == target]
+    return matches[0] if matches else race_id
+
+def _list_replay_prefixes(cache_dir: str) -> Dict[str, int]:
+    available: Dict[str, set] = {}
+    if not os.path.isdir(cache_dir):
+        return {}
+    for fname in os.listdir(cache_dir):
+        if not fname.endswith(".json"):
+            continue
+        base = fname[:-5]
+        if "_" not in base:
+            continue
+        prefix, driver = base.rsplit("_", 1)
+        if not prefix or not driver:
+            continue
+        available.setdefault(prefix, set()).add(driver)
+    return {prefix: len(drivers) for prefix, drivers in available.items()}
+
+def _flatten_cache_payload(payload: Union[List[Dict[str, Any]], Dict[str, Any]]) -> List[Dict[str, Any]]:
+    if isinstance(payload, list):
+        return payload
+    if not isinstance(payload, dict):
+        return []
+    entries = [(k, v) for k, v in payload.items() if isinstance(v, list)]
+    if not entries:
+        return []
+    bucketed = all("_" in k for k, _ in entries)
+    if bucketed:
+        entries.sort(key=lambda kv: int(kv[0].split("_", 1)[0]))
+        return [item for _, bucket in entries for item in bucket]
+    # Treat as lap-keyed dict when possible
+    entries.sort(key=lambda kv: int(kv[0]) if str(kv[0]).isdigit() else kv[0])
+    flattened: List[Dict[str, Any]] = []
+    for lap_key, bucket in entries:
+        lap_number = int(lap_key) if str(lap_key).isdigit() else None
+        for frame in bucket:
+            if isinstance(frame, dict) and lap_number is not None and "lap" not in frame:
+                frame = {**frame, "lap": lap_number}
+            flattened.append(frame)
+    return flattened
+
+def _downsample_frames(frames: List[Dict[str, Any]], max_frames: Optional[int], stride: Optional[int]) -> List[Dict[str, Any]]:
+    if not frames:
+        return frames
+    if stride is None:
+        if not max_frames or max_frames <= 0 or len(frames) <= max_frames:
+            return frames
+        stride = max(1, math.ceil(len(frames) / max_frames))
+    if stride <= 1:
+        return frames
+    sampled = frames[::stride]
+    if sampled and sampled[-1] is not frames[-1]:
+        sampled.append(frames[-1])
+    return sampled
+
+@router.get("/replay/available")
+async def get_replay_available():
+    cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
+    prefixes = _list_replay_prefixes(cache_dir)
+    return {
+        "available": sorted(prefixes.keys()),
+        "drivers": prefixes,
+        "generated_at": datetime.utcnow().isoformat()
+    }
 
 @router.get("/")
 async def get_races(season: int = 2026):
@@ -57,6 +140,21 @@ async def simulate_race(race_id: str, request: SimulationRequest):
         logger.error(f"Simulation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Simulation failed: {str(e)}")
 
+
+@router.post("/{race_id}/simulate-rigorous", response_model=SimulationRunOutput)
+async def simulate_race_rigorous(race_id: str, request: SimulationRequest):
+    """
+    Executes the canonical race-state Monte Carlo engine.
+    This endpoint returns strict SimulationRunOutput for decision analytics.
+    """
+    try:
+        request.track_id = race_id
+        logger.info(f"Triggering rigorous simulation for {race_id}")
+        return simulation_engine.run_rigorous_output(request)
+    except Exception as e:
+        logger.error(f"Rigorous simulation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Rigorous simulation failed: {str(e)}")
+
 @router.get("/{race_id}/timeline", response_model=RaceTimeline)
 async def get_race_timeline(race_id: str, source: str = "REPLAY"):
     """
@@ -76,7 +174,7 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
         
         if r:
             # Get metadata
-            meta_json = r.get(f"race:{race_id}:meta")
+            meta_json = r.get(f"race:{race_id}:replay:meta") or r.get(f"race:{race_id}:meta")
             if meta_json:
                 meta = json.loads(meta_json)
             
@@ -84,8 +182,13 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
             try:
                 lap_keys = r.keys(f"race:{race_id}:replay:lap:*")
                 for k in sorted(lap_keys, key=lambda x: int(x.split(":")[-1])):
+                    raw = r.get(k)
+                    if raw:
+                        laps.append(json.loads(raw))
+                        continue
+
                     lap_data = r.hgetall(k)
-                    for driver, frame_json in lap_data.items():
+                    for _, frame_json in lap_data.items():
                         laps.append(json.loads(frame_json))
             except Exception as e:
                 logger.warning(f"Redis lap fetch failed: {e}")
@@ -110,12 +213,41 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
             })
 
         telemetry_urls = {}
+        lap_count = int(meta.get("lap_count") or meta.get("max_lap") or 0)
+        total_time_ms = int(meta.get("total_time_ms") or 0)
         cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
-        files = glob.glob(os.path.join(cache_dir, f"{race_id}_*.json"))
+        resolved_race_id = _resolve_replay_prefix(race_id, cache_dir)
+        files = glob.glob(os.path.join(cache_dir, f"{resolved_race_id}_*.json"))
         supabase_url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
         if files and not telemetry:
+            # Infer lap/time metadata from one representative driver cache when missing.
+            if lap_count <= 0 or total_time_ms <= 0:
+                try:
+                    with open(files[0], "r", encoding="utf-8") as sample_f:
+                        sample_data = json.load(sample_f)
+                    if isinstance(sample_data, dict):
+                        numeric_laps = [int(k) for k in sample_data.keys() if str(k).isdigit()]
+                        if numeric_laps and lap_count <= 0:
+                            lap_count = max(numeric_laps)
+                        if total_time_ms <= 0:
+                            max_t = 0.0
+                            for frames in sample_data.values():
+                                if isinstance(frames, list):
+                                    for frame in frames:
+                                        if isinstance(frame, dict):
+                                            max_t = max(max_t, float(frame.get("t", 0.0) or 0.0))
+                            total_time_ms = int(max_t * 1000) if max_t < 1e5 else int(max_t)
+                    elif isinstance(sample_data, list):
+                        if lap_count <= 0:
+                            lap_count = max((int(frame.get("lap", 1)) for frame in sample_data if isinstance(frame, dict)), default=0)
+                        if total_time_ms <= 0:
+                            max_t = max((float(frame.get("t", 0.0) or 0.0) for frame in sample_data if isinstance(frame, dict)), default=0.0)
+                            total_time_ms = int(max_t * 1000) if max_t < 1e5 else int(max_t)
+                except Exception as e:
+                    logger.warning(f"Could not infer replay metadata from cache for {race_id}: {e}")
+
             if supabase_url:
-                logger.info(f"Mapping {len(files)} telemetry files to Supabase for {race_id}")
+                logger.info(f"Mapping {len(files)} telemetry files to Supabase for {resolved_race_id}")
                 for fpath in files:
                     fname = os.path.basename(fpath)
                     parts = fname.replace(".json", "").split("_")
@@ -125,40 +257,53 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
                         telemetry_urls[driver_code] = storage_url
             else:
                 # Local development fallback: stream telemetry via API endpoints.
-                logger.info(f"Mapping {len(files)} telemetry files to local API for {race_id}")
+                logger.info(f"Mapping {len(files)} telemetry files to local API for {resolved_race_id}")
                 for fpath in files:
                     fname = os.path.basename(fpath)
                     parts = fname.replace(".json", "").split("_")
                     if len(parts) >= 2:
                         driver_code = parts[-1]
-                        telemetry_urls[driver_code] = f"/api/races/{race_id}/telemetry/{driver_code}"
+                        telemetry_urls[driver_code] = f"/api/races/{resolved_race_id}/telemetry/{driver_code}"
         elif not files:
             logger.warning(f"No telemetry found for {race_id}")
+        
+        if lap_count > 0:
+            meta["lap_count"] = lap_count
 
         return RaceTimeline(
             meta=meta,
             laps=laps,
             telemetry=telemetry,
             telemetry_urls=telemetry_urls if telemetry_urls else None,
-            summary={"total_time_ms": 0}
+            summary={"total_time_ms": total_time_ms}
         )
     except Exception as e:
         logger.error(f"Failed to fetch timeline: {e}")
         raise HTTPException(status_code=500, detail=f"Timeline fetch failed: {str(e)}")
 
 @router.get("/{race_id}/telemetry/{driver_code}")
-async def get_driver_telemetry(race_id: str, driver_code: str):
+async def get_driver_telemetry(
+    race_id: str,
+    driver_code: str,
+    max_frames: Optional[int] = None,
+    stride: Optional[int] = None
+):
     """
     Local telemetry passthrough endpoint for replay development.
     Returns cached JSON exactly as produced by ingestion scripts.
     """
     try:
         cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
-        cache_file = os.path.join(cache_dir, f"{race_id}_{driver_code.upper()}.json")
+        resolved_race_id = _resolve_replay_prefix(race_id, cache_dir)
+        cache_file = os.path.join(cache_dir, f"{resolved_race_id}_{driver_code.upper()}.json")
         if not os.path.exists(cache_file):
             raise HTTPException(status_code=404, detail="Telemetry not found")
         with open(cache_file, "r", encoding="utf-8") as f:
-            return json.load(f)
+            payload = json.load(f)
+        if max_frames or stride:
+            frames = _flatten_cache_payload(payload)
+            return _downsample_frames(frames, max_frames, stride)
+        return payload
     except HTTPException:
         raise
     except Exception as e:

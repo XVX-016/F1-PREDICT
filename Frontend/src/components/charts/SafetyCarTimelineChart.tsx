@@ -22,6 +22,21 @@ export default function SafetyCarTimelineChart() {
         });
     }, [simulationResult]);
 
+    const totalLaps = timeline.length || 1;
+    const chartW = 1000;
+    const chartH = 140;
+    const pxPerLap = chartW / Math.max(totalLaps - 1, 1);
+    const baseY = 36;
+    const cfY = 104;
+
+    const toPath = (isBaseline: boolean) => timeline.map((p, i) => {
+        const x = i * pxPerLap;
+        const y = isBaseline
+            ? (p.baselineSC ? baseY - 20 : baseY)
+            : (p.counterfactualSC ? cfY - 20 : cfY);
+        return `${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    }).join(' ');
+
     if (simulationState === 'empty' || timeline.length === 0) {
         return (
             <div className="h-full flex items-center justify-center text-gray-500 font-mono text-xs">
@@ -32,31 +47,40 @@ export default function SafetyCarTimelineChart() {
 
     return (
         <div className="h-full w-full flex flex-col">
-            <div className="flex-1 grid grid-cols-1 gap-4">
-                <div>
-                    <div className="text-[10px] text-white/40 uppercase font-mono mb-2">Baseline SC Laps</div>
-                    <div className="grid grid-cols-12 sm:grid-cols-16 md:grid-cols-20 gap-1">
-                        {timeline.map((p) => (
-                            <div
-                                key={`b-${p.lap}`}
-                                className={`h-4 rounded-sm border ${p.baselineSC ? 'bg-[#E10600] border-[#E10600]' : 'bg-white/5 border-white/10'} ${p.lap === currentLap ? 'ring-1 ring-white' : ''}`}
-                                title={`Lap ${p.lap}: ${p.baselineSC ? 'SC' : 'GREEN'}`}
-                            />
-                        ))}
-                    </div>
-                </div>
+            <div className="text-[10px] text-white/40 uppercase font-mono mb-2 flex items-center gap-4">
+                <span className="inline-flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#E10600]" /> Baseline
+                </span>
+                <span className="inline-flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#00CED1]" /> Counterfactual
+                </span>
+                <span className="inline-flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-white" /> Current Lap
+                </span>
+            </div>
 
-                <div>
-                    <div className="text-[10px] text-white/40 uppercase font-mono mb-2">Counterfactual SC Laps</div>
-                    <div className="grid grid-cols-12 sm:grid-cols-16 md:grid-cols-20 gap-1">
-                        {timeline.map((p) => (
-                            <div
-                                key={`c-${p.lap}`}
-                                className={`h-4 rounded-sm border ${p.counterfactualSC ? 'bg-[#00CED1] border-[#00CED1]' : 'bg-white/5 border-white/10'} ${p.lap === currentLap ? 'ring-1 ring-white' : ''}`}
-                                title={`Lap ${p.lap}: ${p.counterfactualSC ? 'SC' : 'GREEN'}`}
-                            />
-                        ))}
-                    </div>
+            <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden rounded border border-white/10 bg-black/20">
+                <div className="min-w-[720px] h-full px-3 py-2">
+                    <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full">
+                        <line x1="0" y1={baseY} x2={chartW} y2={baseY} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                        <line x1="0" y1={cfY} x2={chartW} y2={cfY} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+
+                        <path d={toPath(true)} fill="none" stroke="#E10600" strokeWidth="2.5" />
+                        <path d={toPath(false)} fill="none" stroke="#00CED1" strokeWidth="2.5" />
+
+                        {timeline.map((p, i) => {
+                            const x = i * pxPerLap;
+                            const by = p.baselineSC ? baseY - 20 : baseY;
+                            const cy = p.counterfactualSC ? cfY - 20 : cfY;
+                            const isCurrent = p.lap === currentLap;
+                            return (
+                                <g key={`pt-${p.lap}`}>
+                                    <circle cx={x} cy={by} r={isCurrent ? 4 : 2.5} fill={isCurrent ? '#fff' : '#E10600'} />
+                                    <circle cx={x} cy={cy} r={isCurrent ? 4 : 2.5} fill={isCurrent ? '#fff' : '#00CED1'} />
+                                </g>
+                            );
+                        })}
+                    </svg>
                 </div>
             </div>
 

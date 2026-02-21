@@ -1,0 +1,389 @@
+[
+  {
+    "driver": "ALB",
+    "lap": 15,
+    "stop": 1,
+    "duration_ms": 24681,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "ALB",
+    "lap": 36,
+    "stop": 2,
+    "duration_ms": 24610,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "ALO",
+    "lap": 15,
+    "stop": 1,
+    "duration_ms": 24786,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "ALO",
+    "lap": 41,
+    "stop": 2,
+    "duration_ms": 25109,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "BOT",
+    "lap": 12,
+    "stop": 1,
+    "duration_ms": 26420,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "BOT",
+    "lap": 30,
+    "stop": 2,
+    "duration_ms": null,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "GAS",
+    "lap": 12,
+    "stop": 1,
+    "duration_ms": 29980,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "GAS",
+    "lap": 31,
+    "stop": 2,
+    "duration_ms": 26462,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "GAS",
+    "lap": 43,
+    "stop": 3,
+    "duration_ms": 25240,
+    "stint_index": 3,
+    "compound_in": "hard",
+    "compound_out": "soft"
+  },
+  {
+    "driver": "HAM",
+    "lap": 12,
+    "stop": 1,
+    "duration_ms": 25087,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "HAM",
+    "lap": 33,
+    "stop": 2,
+    "duration_ms": 24094,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "HUL",
+    "lap": 1,
+    "stop": 1,
+    "duration_ms": 36604,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "HUL",
+    "lap": 20,
+    "stop": 2,
+    "duration_ms": 24768,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "HUL",
+    "lap": 41,
+    "stop": 3,
+    "duration_ms": 24387,
+    "stint_index": 3,
+    "compound_in": "hard",
+    "compound_out": "soft"
+  },
+  {
+    "driver": "LEC",
+    "lap": 11,
+    "stop": 1,
+    "duration_ms": 24069,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "LEC",
+    "lap": 34,
+    "stop": 2,
+    "duration_ms": 24136,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "MAG",
+    "lap": 11,
+    "stop": 1,
+    "duration_ms": 25951,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "MAG",
+    "lap": 32,
+    "stop": 2,
+    "duration_ms": 24446,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "NOR",
+    "lap": 13,
+    "stop": 1,
+    "duration_ms": 24205,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "NOR",
+    "lap": 33,
+    "stop": 2,
+    "duration_ms": 24705,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "OCO",
+    "lap": 10,
+    "stop": 1,
+    "duration_ms": 24877,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "OCO",
+    "lap": 30,
+    "stop": 2,
+    "duration_ms": 25145,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "PER",
+    "lap": 12,
+    "stop": 1,
+    "duration_ms": 24516,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "PER",
+    "lap": 36,
+    "stop": 2,
+    "duration_ms": 24563,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "soft"
+  },
+  {
+    "driver": "PIA",
+    "lap": 12,
+    "stop": 1,
+    "duration_ms": 25450,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "PIA",
+    "lap": 34,
+    "stop": 2,
+    "duration_ms": 24852,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "RIC",
+    "lap": 13,
+    "stop": 1,
+    "duration_ms": 24988,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "RIC",
+    "lap": 35,
+    "stop": 2,
+    "duration_ms": 24856,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "soft"
+  },
+  {
+    "driver": "RUS",
+    "lap": 11,
+    "stop": 1,
+    "duration_ms": 24778,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "RUS",
+    "lap": 31,
+    "stop": 2,
+    "duration_ms": 24866,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "SAI",
+    "lap": 14,
+    "stop": 1,
+    "duration_ms": 24474,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "SAI",
+    "lap": 35,
+    "stop": 2,
+    "duration_ms": 23866,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "SAR",
+    "lap": 10,
+    "stop": 1,
+    "duration_ms": 35729,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "SAR",
+    "lap": 28,
+    "stop": 2,
+    "duration_ms": 25070,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "SAR",
+    "lap": 40,
+    "stop": 3,
+    "duration_ms": 25346,
+    "stint_index": 3,
+    "compound_in": "hard",
+    "compound_out": "soft"
+  },
+  {
+    "driver": "STR",
+    "lap": 9,
+    "stop": 1,
+    "duration_ms": 24418,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "STR",
+    "lap": 27,
+    "stop": 2,
+    "duration_ms": 24545,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "TSU",
+    "lap": 14,
+    "stop": 1,
+    "duration_ms": 24724,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "TSU",
+    "lap": 34,
+    "stop": 2,
+    "duration_ms": 24324,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "VER",
+    "lap": 17,
+    "stop": 1,
+    "duration_ms": 25064,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "VER",
+    "lap": 37,
+    "stop": 2,
+    "duration_ms": 24209,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "soft"
+  },
+  {
+    "driver": "ZHO",
+    "lap": 9,
+    "stop": 1,
+    "duration_ms": 25208,
+    "stint_index": 1,
+    "compound_in": "soft",
+    "compound_out": "hard"
+  },
+  {
+    "driver": "ZHO",
+    "lap": 28,
+    "stop": 2,
+    "duration_ms": 25094,
+    "stint_index": 2,
+    "compound_in": "hard",
+    "compound_out": "hard"
+  }
+]
