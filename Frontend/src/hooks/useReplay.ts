@@ -142,11 +142,22 @@ export function useReplay(raceId: string) {
                 setLoading(false);
             }, 30000);
             try {
-                const res = await fetch(`${API_BASE}/api/races/${raceId}/timeline`);
-                if (!res.ok) {
-                    const body = await res.text().catch(() => '');
-                    const detail = body ? `: ${body.slice(0, 200)}` : '';
-                    throw new Error(`Failed to fetch timeline (${res.status})${detail}`);
+                let res: Response | null = null;
+                let lastTimelineErr: unknown = null;
+                for (const base of apiBases) {
+                    try {
+                        const tryRes = await fetch(`${base}/api/races/${raceId}/timeline`);
+                        if (tryRes.ok) {
+                            res = tryRes;
+                            break;
+                        }
+                        lastTimelineErr = new Error(`Timeline ${tryRes.status} @ ${base}`);
+                    } catch (err) {
+                        lastTimelineErr = err;
+                    }
+                }
+                if (!res) {
+                    throw lastTimelineErr || new Error('Failed to fetch timeline');
                 }
                 const timeline: RaceTimeline = await res.json();
 
@@ -165,13 +176,18 @@ export function useReplay(raceId: string) {
                         const resolvedUrl = /^https?:\/\//i.test(url)
                             ? url
                             : `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
-                        const fallbackLocalUrl = `${API_BASE}/api/races/${raceId}/telemetry/${code}`;
+                        const fallbackLocalUrl = `${apiBases[0]}/api/races/${raceId}/telemetry/${code}`;
                         const localQuery = `max_frames=${MAX_FRAMES_PER_DRIVER}`;
                         const resolvedWithQuery = resolvedUrl.startsWith(API_BASE)
                             ? appendQuery(resolvedUrl, localQuery)
                             : resolvedUrl;
                         const fallbackWithQuery = appendQuery(fallbackLocalUrl, localQuery);
                         const candidates = [resolvedUrl];
+                        apiBases.forEach((base) => {
+                            const local = `${base}/api/races/${raceId}/telemetry/${code}`;
+                            candidates.push(appendQuery(local, localQuery));
+                            candidates.push(local);
+                        });
                         if (resolvedWithQuery !== resolvedUrl) candidates.unshift(resolvedWithQuery);
                         if (fallbackWithQuery !== resolvedUrl && fallbackWithQuery !== resolvedWithQuery) {
                             candidates.push(fallbackWithQuery);
@@ -410,3 +426,10 @@ export function useReplay(raceId: string) {
         trackPath
     };
 }
+    const apiBases = (() => {
+        const primary = API_BASE.replace(/\/$/, '');
+        const out = [primary];
+        if (primary.includes('localhost')) out.push(primary.replace('localhost', '127.0.0.1'));
+        if (primary.includes('127.0.0.1')) out.push(primary.replace('127.0.0.1', 'localhost'));
+        return Array.from(new Set(out));
+    })();

@@ -8,6 +8,7 @@ interface TrackMapProps {
     circuitImage?: string;
     circuitLabel?: string;
     trackPath?: Array<{ x: number; y: number }>;
+    circuitKey?: string;
 }
 
 type MapTransform = {
@@ -39,11 +40,29 @@ const TRACK_TRANSFORMS: Record<string, MapTransform> = {
     silverstone: { rotateDeg: 0, scaleX: 1, scaleY: 1, translateX: 0, translateY: 0 }
 };
 
-const extractTrackKey = (circuitImage?: string): string => {
-    if (!circuitImage) return 'default';
-    const lower = circuitImage.toLowerCase();
+const TRACK_NUDGES: Record<string, { x: number; y: number }> = {
+    aus: { x: 0.0, y: 0.0 },
+    bhr: { x: 0.0, y: 0.0 },
+    jap: { x: 0.0, y: 0.0 },
+    chn: { x: 0.0, y: 0.0 },
+    mco: { x: 0.0, y: 0.0 },
+    gbr: { x: 0.0, y: 0.0 },
+    default: { x: 0.0, y: 0.0 },
+};
+const GLOBAL_ROTATE_DEG = 180;
+
+const extractTrackKey = (circuitImage?: string, circuitKey?: string): string => {
+    const source = (circuitKey || circuitImage || '').toLowerCase();
+    if (!source) return 'default';
+    const lower = source;
     const m = lower.match(/f1_2024_([a-z0-9]+)_outline\.png/);
     if (m?.[1]) return m[1];
+    if (lower.includes('bahrain')) return 'bhr';
+    if (lower.includes('australia') || lower.includes('albert')) return 'aus';
+    if (lower.includes('japan') || lower.includes('suzuka')) return 'jap';
+    if (lower.includes('china') || lower.includes('shanghai')) return 'chn';
+    if (lower.includes('monaco')) return 'mco';
+    if (lower.includes('british') || lower.includes('silverstone')) return 'gbr';
     if (lower.includes('silverstone')) return 'silverstone';
     return 'default';
 };
@@ -107,7 +126,7 @@ const computeAutoRotateDeg = (points: Array<{ x: number; y: number }>) => {
 const computeFitTransform = (
     points: Array<{ x: number; y: number }>,
     base: MapTransform,
-    padding = 0.04
+    padding = 0.03
 ) => {
     if (!points.length) return base;
     const mapped = points.map((p) => applyTransformRaw(p.x, p.y, base));
@@ -140,15 +159,35 @@ const computeFitTransform = (
     };
 };
 
-export const TrackMap = ({ drivers, loading, circuitImage, circuitLabel, trackPath }: TrackMapProps) => {
-    const trackKey = extractTrackKey(circuitImage);
+const chooseStableOrientation = (points: Array<{ x: number; y: number }>, base: MapTransform): MapTransform => {
+    if (points.length < 4) return base;
+    const q1 = points[Math.floor(points.length * 0.25)];
+    const q3 = points[Math.floor(points.length * 0.75)];
+    const a = applyTransformRaw(q1.x, q1.y, base);
+    const b = applyTransformRaw(q3.x, q3.y, base);
+    // Keep race travel visually left-to-right to avoid random 180deg flips between tracks.
+    if (a.x > b.x) {
+        return { ...base, rotateDeg: base.rotateDeg + 180 };
+    }
+    return base;
+};
+
+export const TrackMap = ({ drivers, loading, circuitImage, circuitLabel, trackPath, circuitKey }: TrackMapProps) => {
+    const trackKey = extractTrackKey(circuitImage, circuitKey);
     const baseTransform = TRACK_TRANSFORMS[trackKey] || DEFAULT_TRANSFORM;
     const autoRotateDeg = computeAutoRotateDeg(trackPath ?? []);
     const autoTransform = {
         ...baseTransform,
-        rotateDeg: baseTransform.rotateDeg + autoRotateDeg
+        rotateDeg: baseTransform.rotateDeg + autoRotateDeg + GLOBAL_ROTATE_DEG
     };
-    const transform = computeFitTransform(trackPath ?? [], autoTransform);
+    const orientedTransform = chooseStableOrientation(trackPath ?? [], autoTransform);
+    const fitted = computeFitTransform(trackPath ?? [], orientedTransform);
+    const nudge = TRACK_NUDGES[trackKey] || TRACK_NUDGES.default;
+    const transform = {
+        ...fitted,
+        translateX: fitted.translateX + nudge.x,
+        translateY: fitted.translateY + nudge.y
+    };
 
     const normalizedDrivers = useMemo(() => {
         return drivers.map((d) => {
@@ -173,7 +212,7 @@ export const TrackMap = ({ drivers, loading, circuitImage, circuitLabel, trackPa
 
     if (drivers.length === 0 && !loading) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-black/40 rounded-xl border border-white/5 relative">
+            <div className="w-full h-full flex flex-col items-center justify-center bg-black/20 relative">
                 {circuitImage && (
                     <img
                         src={circuitImage}
@@ -195,7 +234,7 @@ export const TrackMap = ({ drivers, loading, circuitImage, circuitLabel, trackPa
     }
 
     return (
-        <div className="w-full h-full relative bg-black/40 rounded-xl overflow-hidden border border-white/5 group">
+        <div className="w-full h-full relative bg-transparent overflow-hidden group">
             {circuitImage && (
                 <img
                     src={circuitImage}

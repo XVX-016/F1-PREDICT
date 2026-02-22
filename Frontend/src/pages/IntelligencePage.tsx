@@ -8,9 +8,11 @@ import ModelAssumptionsAccordion from '../components/intelligence/ModelAssumptio
 import { DataEnvelope, BaselineOrderItem, DriverRiskPrior, PodiumProbability } from '../types/intelligence';
 import { useIntelligence } from '../hooks/useIntelligence';
 import { DRIVER_INFO } from '../utils/ReplayDataHelper';
-import { SEASON_2025_SCHEDULE } from '../data/season2025';
+import { SEASON_2026_SCHEDULE } from '../data/season2026';
+import { SEASON_2026_DRIVERS } from '../data/season2026';
+import { normalizeCircuitId } from '../utils/circuitIds';
 
-const SEASON_2025_DRIVER_IDS = Object.keys(DRIVER_INFO);
+const FIELD_DRIVER_IDS = Array.from(new Set(SEASON_2026_DRIVERS.map((d) => d.id.toUpperCase())));
 type BaselineSummaryRow = {
     driver_id: string;
     delta?: number;
@@ -24,55 +26,13 @@ const rankConfidence = (value: number): 'HIGH' | 'MEDIUM' | 'LOW' => {
     return 'LOW';
 };
 
-const normalizeCircuitId = (circuitName: string): string => {
-    const cleaned = circuitName
-        .toLowerCase()
-        .replace(/grand prix/g, '')
-        .replace(/circuit/g, '')
-        .replace(/autodrome|autodromo|international|street|raceway/g, '')
-        .replace(/[^\w\s]/g, '')
-        .trim()
-        .replace(/\s+/g, '_');
-
-    const aliases: Record<string, string> = {
-        albert_park: 'albert_park',
-        shanghai: 'shanghai',
-        suzuka: 'suzuka',
-        bahrain_international: 'bahrain',
-        jeddah_corniche: 'jeddah',
-        miami: 'miami',
-        imola: 'imola',
-        circuit_de_monaco: 'monaco',
-        de_barcelonacatalunya: 'catalunya',
-        barcelonacatalunya: 'catalunya',
-        gilles_villeneuve: 'montreal',
-        red_bull_ring: 'spielberg',
-        de_spafrancorchamps: 'spa',
-        hungaroring: 'hungaroring',
-        zandvoort: 'zandvoort',
-        monza: 'monza',
-        baku_city: 'baku',
-        marina_bay: 'marina_bay',
-        of_the_americas: 'cota',
-        the_americas: 'cota',
-        autdromo_hermanos_rodrguez: 'mexico_city',
-        autodromo_hermanos_rodriguez: 'mexico_city',
-        interlagos: 'interlagos',
-        las_vegas_strip: 'las_vegas',
-        lusail: 'lusail',
-        yas_marina: 'abu_dhabi'
-    };
-
-    return aliases[cleaned] || cleaned;
-};
-
 const IntelligencePage = () => {
-    const [selectedCircuit, setSelectedCircuit] = useState(`${SEASON_2025_SCHEDULE[0].round}_2025`);
+    const [selectedCircuit, setSelectedCircuit] = useState(`${SEASON_2026_SCHEDULE[0].round}_2026`);
     const [selectedSession, setSelectedSession] = useState<'RACE' | 'SPRINT'>('RACE');
     const [selectedCondition, setSelectedCondition] = useState<'DRY' | 'INTERMEDIATE' | 'WET'>('DRY');
 
     const selectedRound = Number(selectedCircuit.split('_')[0]);
-    const selectedRace = SEASON_2025_SCHEDULE.find((r) => r.round === selectedRound) || SEASON_2025_SCHEDULE[0];
+    const selectedRace = SEASON_2026_SCHEDULE.find((r) => r.round === selectedRound) || SEASON_2026_SCHEDULE[0];
     const raceId = normalizeCircuitId(selectedRace.circuit);
 
     const {
@@ -82,7 +42,7 @@ const IntelligencePage = () => {
         isLoading,
         isError,
         rigorousUnavailable
-    } = useIntelligence(raceId, SEASON_2025_DRIVER_IDS, selectedSession, selectedCondition);
+    } = useIntelligence(raceId, FIELD_DRIVER_IDS, selectedSession, selectedCondition);
 
     const computedAt = intelligence?.generated_at || new Date().toISOString();
     const baseContext = useMemo(() => ({
@@ -100,7 +60,7 @@ const IntelligencePage = () => {
         reason: isError ? 'Backend baseline service unavailable.' : undefined,
         source: 'HYBRID',
         computedAt,
-        data: SEASON_2025_DRIVER_IDS.map((driverId) => {
+        data: FIELD_DRIVER_IDS.map((driverId) => {
             const row = baselineMap.get(driverId);
             const info = DRIVER_INFO[driverId];
             return {
@@ -126,7 +86,7 @@ const IntelligencePage = () => {
         reason: isError ? 'Backend intelligence service unavailable.' : undefined,
         source: 'SIMULATION',
         computedAt,
-        data: SEASON_2025_DRIVER_IDS.map((driverId) => {
+        data: FIELD_DRIVER_IDS.map((driverId) => {
             const podium = intelligence?.podium_probability?.[driverId] || [0, 0, 0];
             const p1 = podium[0] || 0;
             const p2 = podium[1] || 0;
@@ -150,7 +110,7 @@ const IntelligencePage = () => {
         reason: isError ? 'Driver priors cannot be derived without intelligence data.' : undefined,
         source: 'HYBRID',
         computedAt,
-        data: SEASON_2025_DRIVER_IDS.map((driverId) => {
+        data: FIELD_DRIVER_IDS.map((driverId) => {
             const info = DRIVER_INFO[driverId];
             const pace = intelligence?.pace_distributions?.[driverId];
             const robustness = intelligence?.robustness_score?.[driverId];
@@ -214,7 +174,7 @@ const IntelligencePage = () => {
                     </h1>
                 </header>
 
-                {isFallbackOrDegraded && (
+                {!isLoading && isFallbackOrDegraded && (
                     <div className="mb-6 bg-yellow-900/20 border border-yellow-500/50 p-4 rounded-lg flex items-start gap-3">
                         <div className="text-yellow-500 mt-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -343,7 +303,7 @@ const IntelligencePage = () => {
                                 Note: Information on this page is sourced from backend baseline and intelligence services for the selected race context.
                                 For live telemetry and dynamic race strategy updates, switch to the <span className="text-white/40 font-bold decoration-[#E10600] underline underline-offset-4 cursor-pointer hover:text-white">Simulation Page</span>.
                                 <br /><br />
-                                Runtime: {isLoading ? 'LOADING' : 'READY'} | Backend Race ID: {raceId} | Field: {SEASON_2025_DRIVER_IDS.length} Drivers
+                                Runtime: {isLoading ? 'LOADING' : 'READY'} | Backend Race ID: {raceId} | Field: {FIELD_DRIVER_IDS.length} Drivers
                             </p>
                         </div>
                     </section>

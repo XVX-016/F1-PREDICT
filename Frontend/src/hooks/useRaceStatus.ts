@@ -1,6 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASES = (() => {
+    const primary = API_BASE_URL.replace(/\/$/, '');
+    const out = [primary];
+    if (primary.includes('localhost')) out.push(primary.replace('localhost', '127.0.0.1'));
+    if (primary.includes('127.0.0.1')) out.push(primary.replace('127.0.0.1', 'localhost'));
+    return Array.from(new Set(out));
+})();
 
 export interface RaceStatus {
     raceId: string;
@@ -19,31 +26,36 @@ export const useRaceStatus = () => {
     return useQuery<RaceStatus>({
         queryKey: ['raceStatus'],
         queryFn: async () => {
-            const statusUrl = `${API_BASE_URL}/api/race-status`;
-            const response = await fetch(statusUrl);
-            if (response.ok) {
-                return await response.json();
-            }
+            for (const base of API_BASES) {
+                try {
+                    const statusUrl = `${base}/api/race-status`;
+                    const response = await fetch(statusUrl);
+                    if (response.ok) {
+                        return await response.json();
+                    }
 
-            // Backend might still be healthy even if race-status endpoint is missing/misconfigured.
-            const healthUrl = `${API_BASE_URL}/health`;
-            const healthRes = await fetch(healthUrl);
-            if (healthRes.ok) {
-                return {
-                    raceId: "backend-online",
-                    name: "Backend Online",
-                    round: 0,
-                    session: "N/A",
-                    status: "UPCOMING",
-                    trackTemp: "N/A",
-                    airTemp: "N/A",
-                    humidity: "N/A",
-                    windSpeed: "N/A",
-                    nextSessionTime: new Date().toISOString()
-                } as RaceStatus;
+                    // Backend might still be healthy even if race-status endpoint is missing/misconfigured.
+                    const healthUrl = `${base}/health`;
+                    const healthRes = await fetch(healthUrl);
+                    if (healthRes.ok) {
+                        return {
+                            raceId: "backend-online",
+                            name: "Backend Online",
+                            round: 0,
+                            session: "N/A",
+                            status: "UPCOMING",
+                            trackTemp: "N/A",
+                            airTemp: "N/A",
+                            humidity: "N/A",
+                            windSpeed: "N/A",
+                            nextSessionTime: new Date().toISOString()
+                        } as RaceStatus;
+                    }
+                } catch {
+                    // Try next base host
+                }
             }
-
-            throw new Error(`Race status unavailable (${response.status})`);
+            throw new Error('Race status unavailable (all backend hosts failed)');
         },
         refetchInterval: 30000, // Increase interval in demo mode to reduce noise
         staleTime: 10000,

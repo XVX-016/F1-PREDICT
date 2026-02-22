@@ -1,8 +1,6 @@
 import {
     SimulationProvider,
     SimulationLayout,
-    SimulationSidebar,
-    SidebarSection,
     SeasonSelect,
     RaceSelect,
     TrackInfoBadge,
@@ -34,14 +32,11 @@ import SafetyCarTimelineChart from '../components/charts/SafetyCarTimelineChart'
 import { useEffect, useState } from 'react';
 
 export default function SimulationPage() {
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         const applyMobileLayout = () => {
-            const mobile = window.innerWidth < 1024;
-            setIsMobile(mobile);
-            setIsSidebarCollapsed(mobile);
+            setIsMobile(window.innerWidth < 1024);
         };
         applyMobileLayout();
         window.addEventListener('resize', applyMobileLayout);
@@ -57,42 +52,9 @@ export default function SimulationPage() {
                     </h1>
                 </header>
             </div>
+
             <SimulationLayout>
-
-                {/* ─────────────────────────────
-           LEFT PANEL — INPUTS
-        ───────────────────────────── */}
-                <SimulationSidebar
-                    isCollapsed={isSidebarCollapsed}
-                    onToggle={() => setIsSidebarCollapsed(v => !v)}
-                >
-                    <SidebarSection title="Race Context" isFirst>
-                        <SeasonSelect />
-                        <RaceSelect />
-                        <TrackInfoBadge />
-                        <div className="mt-4">
-                            <DriverSelector />
-                        </div>
-                    </SidebarSection>
-
-                    <SidebarSection title="Simulation Parameters">
-                        <TyreDegMultiplier />
-                        <FuelBurnRate />
-                        <SafetyCarProbability />
-                        <AdvancedSettings>
-                            <WeatherVariance />
-                            <PitStrategyEditor />
-                            <DisableSafetyCarToggle />
-                            <OverrideGridPositions />
-                        </AdvancedSettings>
-                    </SidebarSection>
-                </SimulationSidebar>
-
-                {/* ─────────────────────────────
-           MAIN PANEL — RUN + OUTPUT
-        ───────────────────────────── */}
                 <SimulationMain>
-
                     <SimulationControlBar>
                         <RunSimulationButton />
                         <ReplayToggle />
@@ -101,6 +63,39 @@ export default function SimulationPage() {
                         <SimulationStatusIndicator />
                     </SimulationControlBar>
 
+                    <div className="border-b border-white/10 bg-black/55 backdrop-blur-xl px-4 lg:px-6 py-4 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                                <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">Season</div>
+                                <SeasonSelect />
+                            </div>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                                <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">Race</div>
+                                <RaceSelect />
+                            </div>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                                <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">Driver Focus</div>
+                                <DriverSelector />
+                            </div>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-center">
+                                <TrackInfoBadge />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                            <TyreDegMultiplier />
+                            <FuelBurnRate />
+                            <SafetyCarProbability />
+                            <WeatherVariance />
+                        </div>
+
+                        <AdvancedSettings>
+                            <PitStrategyEditor />
+                            <DisableSafetyCarToggle />
+                            <OverrideGridPositions />
+                        </AdvancedSettings>
+                    </div>
+
                     <ReplayTimeline>
                         <LapScrubber />
                         <TimeScrubber />
@@ -108,7 +103,6 @@ export default function SimulationPage() {
 
                     <SimulationViewport>
                         <div className="mx-auto w-full max-w-[1500px] p-3 sm:p-4 lg:p-6 pt-6 lg:pt-8">
-                            {/* CORE ANALYSIS: PACE & GAPS */}
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 items-stretch">
                                 <div className="h-[340px] sm:h-[380px] lg:h-[460px] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5 ring-inset">
                                     <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
@@ -140,14 +134,11 @@ export default function SimulationPage() {
                                     <SafetyCarTimelineChart />
                                 </div>
                             </div>
-
                         </div>
                     </SimulationViewport>
                 </SimulationMain>
-
             </SimulationLayout>
 
-            {/* Footer Disclaimer - True Page Centered */}
             <div className={`pb-16 lg:pb-24 flex flex-col items-center justify-center ${isMobile ? 'mt-10' : 'mt-20 lg:mt-32'}`}>
                 <div className="h-px w-full max-w-7xl bg-white/10 mb-16" />
                 <p className="text-[10px] text-white/20 uppercase tracking-[0.2em] leading-relaxed font-mono text-center max-w-2xl px-8">
