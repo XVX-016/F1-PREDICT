@@ -34,8 +34,8 @@ jobs:
       - name: Install frontend deps
         run: npm --prefix Frontend ci
 
-      - name: Install backend deps
-        run: pip install -r backend/requirements.txt
+      - name: Install backend + test deps
+        run: pip install -r backend/requirements-dev.txt
 
       - name: Run rigorous unit tests
         run: python -m pytest -q backend/tests/unit/test_rigorous_engine.py
