@@ -161,7 +161,14 @@ export function useReplay(raceId: string) {
                 }
                 const timeline: RaceTimeline = await res.json();
 
-                if (!timeline || (!timeline.telemetry && !timeline.laps && !timeline.telemetry_urls)) {
+                const hasTimelineTelemetry =
+                    Array.isArray(timeline?.telemetry) && timeline.telemetry.length > 0;
+                const hasTimelineLaps =
+                    Array.isArray(timeline?.laps) && timeline.laps.length > 0;
+                const hasTelemetryUrls =
+                    !!timeline?.telemetry_urls && Object.keys(timeline.telemetry_urls).length > 0;
+
+                if (!timeline || (!hasTimelineTelemetry && !hasTimelineLaps && !hasTelemetryUrls)) {
                     throw new Error('Malformed timeline data received');
                 }
 
@@ -358,6 +365,9 @@ export function useReplay(raceId: string) {
                     }
                 } else {
                     const { metadata, telemetry } = transformTimelineData(timeline);
+                    if (!telemetry || Object.keys(telemetry).length === 0) {
+                        throw new Error('Timeline contained no usable telemetry');
+                    }
                     finalTelemetry = telemetry;
                     finalMetadata = metadata.map(m => ({
                         ...m,

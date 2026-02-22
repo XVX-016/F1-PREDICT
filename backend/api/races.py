@@ -91,6 +91,29 @@ def _downsample_frames(frames: List[Dict[str, Any]], max_frames: Optional[int], 
         sampled.append(frames[-1])
     return sampled
 
+def _list_bucket_files_for_prefix(prefix: str, bucket: str = "race-telemetry") -> List[str]:
+    """
+    List telemetry files in Supabase storage for a race prefix.
+    Works in deployed/serverless environments where local replay_cache is unavailable.
+    """
+    try:
+        db = get_db()
+    except Exception as e:
+        logger.warning(f"Supabase client unavailable for bucket listing: {e}")
+        return []
+
+    try:
+        # Keep listing bounded; current payload size is < 1k files in practice.
+        rows = db.storage.from_(bucket).list(
+            path="",
+            options={"limit": 1000, "offset": 0, "search": f"{prefix}_"}
+        )
+        names = [row.get("name") for row in (rows or []) if isinstance(row, dict) and row.get("name")]
+        return [name for name in names if name.startswith(f"{prefix}_") and name.endswith(".json")]
+    except Exception as e:
+        logger.warning(f"Failed to list Supabase storage files for prefix {prefix}: {e}")
+        return []
+
 @router.get("/replay/available")
 async def get_replay_available():
     cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
@@ -219,9 +242,18 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
         resolved_race_id = _resolve_replay_prefix(race_id, cache_dir)
         files = glob.glob(os.path.join(cache_dir, f"{resolved_race_id}_*.json"))
         supabase_url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
-        if files and not telemetry:
+        remote_files: List[str] = []
+
+        # In cloud/serverless deployments, local cache is usually empty.
+        # If Supabase is configured, discover files directly from storage bucket.
+        if not files and supabase_url:
+            remote_files = _list_bucket_files_for_prefix(resolved_race_id)
+
+        has_local = len(files) > 0
+        has_remote = len(remote_files) > 0
+        if (has_local or has_remote) and not telemetry:
             # Infer lap/time metadata from one representative driver cache when missing.
-            if lap_count <= 0 or total_time_ms <= 0:
+            if (lap_count <= 0 or total_time_ms <= 0) and has_local:
                 try:
                     with open(files[0], "r", encoding="utf-8") as sample_f:
                         sample_data = json.load(sample_f)
@@ -247,9 +279,9 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
                     logger.warning(f"Could not infer replay metadata from cache for {race_id}: {e}")
 
             if supabase_url:
-                logger.info(f"Mapping {len(files)} telemetry files to Supabase for {resolved_race_id}")
-                for fpath in files:
-                    fname = os.path.basename(fpath)
+                source_files = [os.path.basename(fpath) for fpath in files] if has_local else remote_files
+                logger.info(f"Mapping {len(source_files)} telemetry files to Supabase for {resolved_race_id}")
+                for fname in source_files:
                     parts = fname.replace(".json", "").split("_")
                     if len(parts) >= 2:
                         driver_code = parts[-1]
@@ -264,7 +296,7 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
                     if len(parts) >= 2:
                         driver_code = parts[-1]
                         telemetry_urls[driver_code] = f"/api/races/{resolved_race_id}/telemetry/{driver_code}"
-        elif not files:
+        elif not has_local and not has_remote:
             logger.warning(f"No telemetry found for {race_id}")
         
         if lap_count > 0:
