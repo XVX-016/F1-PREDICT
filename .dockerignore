@@ -29,11 +29,6 @@ Thumbs.db
 .git
 .gitignore
 
-# Docker
-Dockerfile*
-docker-compose*.yml
-.dockerignore
-
 # Logs
 logs
 *.log

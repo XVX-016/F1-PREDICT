@@ -1,6 +1,6 @@
 ﻿const REPO_URL = 'https://github.com/XVX-016/F1-PREDICT';
-const ARCHITECTURE_DOC = `${REPO_URL}#architecture`;
-const API_DOC = `${REPO_URL}#overview`;
+const ARCHITECTURE_DOC = `${REPO_URL}/blob/main/docs/architecture.md`;
+const API_DOC = `${REPO_URL}/blob/main/docs/api.md`;
 const GOLD_DATASET_DOC = `${REPO_URL}/blob/main/docs/gold_dataset_spec.md`;
 const RIGOROUS_GOVERNANCE_DOC = `${REPO_URL}/blob/main/docs/rigorous_governance.md`;
 
@@ -66,3 +66,4 @@ export default function Footer() {
         </footer>
     );
 }
+
