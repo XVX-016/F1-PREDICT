@@ -2,8 +2,6 @@
 
 Simulation-first Formula 1 strategy platform with deterministic replay and inference-first intelligence workflows.
 
-Repository: https://github.com/XVX-016/F1-PREDICT
-
 ## Current Architecture
 
 - Backend API: FastAPI (`version: 2.0.0`, `architecture: simulation-first`)
