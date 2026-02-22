@@ -49,7 +49,7 @@ const TRACK_NUDGES: Record<string, { x: number; y: number }> = {
     gbr: { x: 0.0, y: 0.0 },
     default: { x: 0.0, y: 0.0 },
 };
-const GLOBAL_ROTATE_DEG = 180;
+const GLOBAL_ROTATE_DEG = 0;
 
 const extractTrackKey = (circuitImage?: string, circuitKey?: string): string => {
     const source = (circuitKey || circuitImage || '').toLowerCase();
@@ -123,6 +123,59 @@ const computeAutoRotateDeg = (points: Array<{ x: number; y: number }>) => {
     return (-angle * 180) / Math.PI;
 };
 
+const bboxAspectForRotation = (
+    points: Array<{ x: number; y: number }>,
+    rotateDeg: number
+) => {
+    if (points.length < 3) return 0;
+    const probe: MapTransform = {
+        rotateDeg,
+        scaleX: 1,
+        scaleY: 1,
+        translateX: 0,
+        translateY: 0
+    };
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const p of points) {
+        if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
+        const mapped = applyTransformRaw(p.x, p.y, probe);
+        minX = Math.min(minX, mapped.x);
+        maxX = Math.max(maxX, mapped.x);
+        minY = Math.min(minY, mapped.y);
+        maxY = Math.max(maxY, mapped.y);
+    }
+    if (!Number.isFinite(minX) || !Number.isFinite(minY)) return 0;
+    const width = Math.max(1e-6, maxX - minX);
+    const height = Math.max(1e-6, maxY - minY);
+    return width / height;
+};
+
+const chooseHorizontalRotation = (
+    points: Array<{ x: number; y: number }>,
+    baseRotateDeg: number
+) => {
+    if (points.length < 3) return baseRotateDeg;
+    const candidates = [
+        baseRotateDeg,
+        baseRotateDeg + 90,
+        baseRotateDeg + 180,
+        baseRotateDeg + 270
+    ];
+    let best = candidates[0];
+    let bestScore = -Infinity;
+    for (const cand of candidates) {
+        const score = bboxAspectForRotation(points, cand);
+        if (score > bestScore) {
+            bestScore = score;
+            best = cand;
+        }
+    }
+    return best;
+};
+
 const computeFitTransform = (
     points: Array<{ x: number; y: number }>,
     base: MapTransform,
@@ -176,9 +229,11 @@ export const TrackMap = ({ drivers, loading, circuitImage, circuitLabel, trackPa
     const trackKey = extractTrackKey(circuitImage, circuitKey);
     const baseTransform = TRACK_TRANSFORMS[trackKey] || DEFAULT_TRANSFORM;
     const autoRotateDeg = computeAutoRotateDeg(trackPath ?? []);
+    const rawRotateDeg = baseTransform.rotateDeg + autoRotateDeg + GLOBAL_ROTATE_DEG;
+    const horizontalRotateDeg = chooseHorizontalRotation(trackPath ?? [], rawRotateDeg);
     const autoTransform = {
         ...baseTransform,
-        rotateDeg: baseTransform.rotateDeg + autoRotateDeg + GLOBAL_ROTATE_DEG
+        rotateDeg: horizontalRotateDeg
     };
     const orientedTransform = chooseStableOrientation(trackPath ?? [], autoTransform);
     const fitted = computeFitTransform(trackPath ?? [], orientedTransform);
