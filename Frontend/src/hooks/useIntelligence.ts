@@ -25,6 +25,7 @@ export const useIntelligence = (
         queryFn: () => getIntelligence(raceId, driversCsv),
         enabled: !!raceId,
         staleTime: 1000 * 60 * 5, // 5 minutes
+        placeholderData: undefined,
     });
 
     const baselineSummaryQuery = useQuery({
@@ -32,6 +33,7 @@ export const useIntelligence = (
         queryFn: () => getBaselineSummary(raceId, driversCsv!),
         enabled: !!raceId && !!driversCsv,
         staleTime: 1000 * 60 * 5,
+        placeholderData: undefined,
     });
 
     const rigorousQuery = useQuery({
@@ -57,16 +59,19 @@ export const useIntelligence = (
         },
         enabled: !!raceId,
         staleTime: 1000 * 60 * 5,
-        retry: false
+        retry: false,
+        placeholderData: undefined,
     });
+
+    const isLoading = intelligenceQuery.isFetching || baselineSummaryQuery.isFetching || rigorousQuery.isFetching;
 
     return {
         intelligence: intelligenceQuery.data,
         baselineSummary: baselineSummaryQuery.data,
         rigorous: rigorousQuery.data,
-        isLoading: intelligenceQuery.isLoading || baselineSummaryQuery.isLoading || rigorousQuery.isLoading,
+        isLoading,
         isError: intelligenceQuery.isError || baselineSummaryQuery.isError,
         error: intelligenceQuery.error || baselineSummaryQuery.error || rigorousQuery.error,
-        rigorousUnavailable: rigorousQuery.data == null
+        rigorousUnavailable: !isLoading && rigorousQuery.data == null
     };
 };

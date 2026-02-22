@@ -1,5 +1,5 @@
 import React from 'react';
-import { SEASON_2025_SCHEDULE } from '../../data/season2025';
+import { SEASON_2026_SCHEDULE } from '../../data/season2026';
 
 interface RaceBriefingControlsProps {
     selectedCircuit: string;
@@ -32,8 +32,8 @@ export const RaceBriefingControls: React.FC<RaceBriefingControlsProps> = ({
                     onChange={(e) => onCircuitChange(e.target.value)}
                     className="bg-[#1e1e24] text-white text-sm border border-white/10 rounded px-3 py-2 outline-none focus:border-[#E10600] transition-colors appearance-none cursor-pointer w-full font-mono"
                 >
-                    {SEASON_2025_SCHEDULE.map(race => (
-                        <option key={race.round} value={`${race.round}_2025`}>
+                    {SEASON_2026_SCHEDULE.map(race => (
+                        <option key={race.round} value={`${race.round}_2026`}>
                             {race.raceName.toUpperCase()}
                         </option>
                     ))}

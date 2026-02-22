@@ -5,6 +5,7 @@ import { Settings, Play, Pause, ChevronRight, ChevronLeft } from 'lucide-react';
 import { SEASON_2026_DRIVERS } from '../data/season2026';
 import { SEASON_2026_SCHEDULE } from '../data/season2026';
 import { SEASON_2025_SCHEDULE } from '../data/season2025';
+import { normalizeCircuitId } from '../utils/circuitIds';
 
 // Components
 import LapTimeChart from '../components/charts/LapTimeChart';
@@ -118,7 +119,7 @@ export const SidebarSection = ({ title, children, isFirst = false }: { title: st
 );
 
 export const SimulationMain = ({ children }: { children: React.ReactNode }) => <main className="flex-1 flex flex-col min-w-0 bg-transparent relative">{children}</main>;
-export const SimulationControlBar = ({ children }: { children: React.ReactNode }) => <div className="min-h-16 flex items-center px-4 lg:px-6 gap-3 lg:gap-4 bg-black/60 backdrop-blur-xl sticky top-0 z-40 border-b border-white/5 overflow-x-auto no-scrollbar">{children}</div>;
+export const SimulationControlBar = ({ children }: { children: React.ReactNode }) => <div className="min-h-16 flex flex-wrap items-center px-4 lg:px-6 gap-2 lg:gap-4 bg-black/60 backdrop-blur-xl sticky top-0 z-40 border-b border-white/5">{children}</div>;
 export const ReplayTimeline = ({ children }: { children: React.ReactNode }) => <div className="min-h-24 border-b border-white/10 bg-black/60 backdrop-blur-xl px-4 lg:px-6 py-4 flex flex-col justify-center gap-2 sticky top-16 z-40">{children}</div>;
 export const SimulationViewport = ({ children }: { children: React.ReactNode }) => <div className="flex-1 relative p-0">{children}</div>;
 
@@ -166,33 +167,6 @@ const SEASON_2025_DRIVER_IDS = [
     'VER', 'NOR', 'LEC', 'HAM', 'SAI', 'PIA', 'RUS', 'PER', 'ALO', 'STR',
     'GAS', 'OCO', 'ALB', 'TSU', 'HUL', 'MAG', 'BOT', 'ZHO', 'RIC', 'SAR'
 ];
-
-const normalizeCircuitId = (circuitName: string): string => {
-    const cleaned = circuitName
-        .toLowerCase()
-        .replace(/grand prix/g, '')
-        .replace(/circuit/g, '')
-        .replace(/autodrome|autodromo|international|street|raceway/g, '')
-        .replace(/[^\w\s]/g, '')
-        .trim()
-        .replace(/\s+/g, '_');
-    const aliases: Record<string, string> = {
-        bahrain_international: 'bahrain',
-        jeddah_corniche: 'jeddah',
-        circuit_de_monaco: 'monaco',
-        red_bull_ring: 'spielberg',
-        circuit_de_spafrancorchamps: 'spa',
-        marina_bay: 'marina_bay',
-        circuit_of_the_americas: 'cota',
-        autdromo_hermanos_rodrguez: 'mexico_city',
-        autodromo_hermanos_rodriguez: 'mexico_city',
-        interlagos: 'interlagos',
-        las_vegas_strip: 'las_vegas',
-        lusail: 'lusail',
-        yas_marina: 'yas_marina',
-    };
-    return aliases[cleaned] || cleaned;
-};
 
 export const SeasonSelect = () => {
     const context = useRaceStore(useShallow(s => s.context));
@@ -403,13 +377,21 @@ export const WeatherVariance = () => {
 };
 
 export const AdvancedSettings = ({ children }: { children: React.ReactNode }) => {
+    const [open, setOpen] = useState(false);
     return (
         <div className="mt-4">
-            <div className="flex items-center gap-2 p-2 text-[10px] uppercase font-black text-white/40 mb-2">
+            <button
+                type="button"
+                onClick={() => setOpen(v => !v)}
+                className="w-full flex items-center justify-between gap-2 p-2 text-[10px] uppercase font-black text-white/40 mb-2 bg-white/5 border border-white/10 rounded"
+            >
+                <span className="flex items-center gap-2">
                 <Settings className="w-3 h-3 text-[#E10600]" />
                 Advanced Parameters
-            </div>
-            <div className="space-y-4 pl-2 border-l border-white/10">{children}</div>
+                </span>
+                <span className="text-white/60">{open ? 'Hide' : 'Show'}</span>
+            </button>
+            {open && <div className="space-y-4 pl-2 border-l border-white/10">{children}</div>}
         </div>
     );
 };
@@ -437,7 +419,7 @@ export const RunSimulationButton = () => {
     return (
         <button
             onClick={() => runSimulation()}
-            className="bg-[#E10600] text-white px-4 py-2 font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-lg shadow-[#E10600]/20"
+            className="bg-[#E10600] text-white px-4 py-2 font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-lg shadow-[#E10600]/20 min-w-[128px] text-center"
         >
             Run Simulation
         </button>
@@ -451,7 +433,7 @@ export const ReplayToggle = () => {
     return (
         <button
             onClick={togglePlay}
-            className={`px-4 py-2 font-bold text-xs uppercase border border-white/10 transition-colors w-32 flex items-center justify-center gap-2 ${isPlaying ? 'bg-[#E10600] text-white border-[#E10600]' : 'bg-white/5 text-white hover:bg-white/10'
+            className={`px-4 py-2 font-bold text-xs uppercase border border-white/10 transition-colors min-w-[112px] sm:w-32 flex items-center justify-center gap-2 ${isPlaying ? 'bg-[#E10600] text-white border-[#E10600]' : 'bg-white/5 text-white hover:bg-white/10'
                 }`}
         >
             {isPlaying ? (
@@ -471,7 +453,7 @@ export const PlaybackSpeedSlider = () => {
     const speed = useRaceStore(useShallow(s => s.playbackSpeed));
     const setPlaybackSpeed = useRaceStore(s => s.setPlaybackSpeed);
     return (
-        <div className="flex items-center gap-4 bg-white/5 px-4 py-2 rounded-sm border border-white/10 min-w-[200px]">
+        <div className="flex items-center gap-4 bg-white/5 px-4 py-2 rounded-sm border border-white/10 w-full sm:w-auto sm:min-w-[220px]">
             <span className="text-[10px] font-bold text-white uppercase whitespace-nowrap">Speed: {speed}x</span>
             <input
                 type="range"
@@ -530,7 +512,7 @@ export const SimulationStatusIndicator = () => {
             break;
     }
 
-    return <div className={`ml-auto text-[10px] font-mono font-bold ${color}`}>{status}</div>;
+    return <div className={`w-full sm:w-auto sm:ml-auto text-right text-[10px] font-mono font-bold ${color}`}>{status}</div>;
 };
 
 export const LapScrubber = () => {

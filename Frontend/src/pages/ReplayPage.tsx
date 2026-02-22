@@ -27,9 +27,8 @@ const LeaderboardOverlay = ({
         <div className="p-2 bg-white/5 border-b border-white/10 flex justify-between items-center px-4">
             <span className="text-[10px] font-mono font-black uppercase text-white tracking-[0.2em] flex items-center gap-2">
                 <Navigation className="w-3 h-3 text-[#E10600]" />
-                Classification
+                Driver Rankings
             </span>
-            <span className="text-[9px] font-mono text-white/40 uppercase">120HZ BASE</span>
         </div>
         <div className="overflow-y-auto custom-scrollbar p-1 space-y-0.5">
             {drivers.map((d: DriverState) => (
@@ -164,15 +163,17 @@ const TimelineScrubber = ({
     };
 
     return (
-        <div className="absolute bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 w-[95%] lg:w-[90%] max-w-4xl h-14 lg:h-16 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-2xl px-4 lg:px-6 flex items-center gap-4 shadow-2xl ring-1 ring-white/10">
-            <button
-                onClick={() => setPlaying(!playing)}
-                className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shrink-0 shadow-lg"
-            >
-                {playing ? <Pause className="fill-black w-4 h-4" /> : <Play className="fill-black w-4 h-4 ml-0.5" />}
-            </button>
+        <div className="absolute bottom-1 lg:bottom-2 left-[48.5%] -translate-x-1/2 w-[95%] lg:w-[90%] max-w-4xl h-14 lg:h-16 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-2xl px-3 sm:px-4 lg:px-6 grid grid-cols-[56px_1fr_136px] sm:grid-cols-[112px_1fr_112px] lg:grid-cols-[172px_1fr_172px] items-center gap-2 sm:gap-3 shadow-2xl ring-1 ring-white/10">
+            <div className="flex items-center justify-center">
+                <button
+                    onClick={() => setPlaying(!playing)}
+                    className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shrink-0 shadow-lg"
+                >
+                    {playing ? <Pause className="fill-black w-4 h-4" /> : <Play className="fill-black w-4 h-4 ml-0.5" />}
+                </button>
+            </div>
 
-            <div className="flex-1 flex flex-col justify-center gap-2 group relative py-2">
+            <div className="flex-1 flex flex-col justify-center gap-2 group relative py-1 -ml-8 pr-6">
                 <input
                     type="range"
                     min={0}
@@ -188,16 +189,18 @@ const TimelineScrubber = ({
                 </div>
             </div>
 
-            <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1 shrink-0">
-                {[1, 2, 5, 10].map(s => (
-                    <button
-                        key={s}
-                        onClick={() => setSpeed(s)}
-                        className={`w-10 h-8 rounded-lg text-[10px] font-mono font-black transition-all ${speed === s ? 'bg-white text-black shadow-md' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-                    >
-                        {s}x
-                    </button>
-                ))}
+            <div className="flex items-center justify-end">
+                <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1 shrink-0">
+                    {[1, 2, 5, 10].map(s => (
+                        <button
+                            key={s}
+                            onClick={() => setSpeed(s)}
+                            className={`w-10 h-8 rounded-lg text-[10px] font-mono font-black transition-all ${speed === s ? 'bg-white text-black shadow-md' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                        >
+                            {s}x
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -312,6 +315,9 @@ const ReplayPage = () => {
         ? state.drivers[selectedDriverId]
         : driversSorted.length > 0 ? driversSorted[0] : null;
 
+    const mapShiftX = !isMobile ? -2 : 0;
+    const mapShiftY = !isMobile ? -4 : -2;
+
     return (
         <div className="min-h-screen w-full text-white flex flex-col pt-16 bg-[#050505]">
             <SimulationLayout>
@@ -319,14 +325,20 @@ const ReplayPage = () => {
                     <div className="relative w-full h-[calc(100svh-4rem)] bg-[#050505] overflow-hidden flex flex-col">
 
                         {/* 1. Main Canvas Area (Track Map) Area */}
-                        <div className="absolute inset-0 z-0">
-                            <TrackMap
-                                drivers={driversSorted}
-                                loading={loading}
-                                circuitImage={showCircuitImage ? resolveAssetUrl(selectedRaceInfo?.trackImg) : undefined}
-                                circuitLabel={selectedRaceInfo?.circuit}
-                                trackPath={trackPath}
-                            />
+                        <div className="absolute inset-0 z-0 flex items-center justify-center px-2 sm:px-4 lg:px-8 pt-16 pb-20">
+                            <div
+                                className="w-full h-full max-w-[1580px]"
+                                style={{ transform: `translate(${mapShiftX}px, ${mapShiftY}px)` }}
+                            >
+                                <TrackMap
+                                    drivers={driversSorted}
+                                    loading={loading}
+                                    circuitImage={showCircuitImage ? resolveAssetUrl(selectedRaceInfo?.trackImg) : undefined}
+                                    circuitLabel={selectedRaceInfo?.circuit}
+                                    trackPath={trackPath}
+                                    circuitKey={`${selectedRaceInfo?.raceName || ''} ${selectedRaceInfo?.circuit || ''} ${selectedRace}`}
+                                />
+                            </div>
                         </div>
 
                         {/* 2. Top Bar (Overlay) */}
