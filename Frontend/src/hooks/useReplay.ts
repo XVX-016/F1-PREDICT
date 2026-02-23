@@ -4,9 +4,16 @@ import { RaceTimeline } from '../types/domain';
 import { ReplayState, TelemetrySample } from "../utils/ReplayEngine";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const TELEMETRY_TIMEOUT_MS = 45000;
-const MAX_FRAMES_PER_DRIVER = 12000;
-const TELEMETRY_CONCURRENCY = 4;
+const TELEMETRY_TIMEOUT_MS = 90000;
+const MAX_FRAMES_PER_DRIVER = 8000;
+const TELEMETRY_CONCURRENCY = 2;
+const apiBases = (() => {
+    const primary = API_BASE.replace(/\/$/, '');
+    const out = [primary];
+    if (primary.includes('localhost')) out.push(primary.replace('localhost', '127.0.0.1'));
+    if (primary.includes('127.0.0.1')) out.push(primary.replace('127.0.0.1', 'localhost'));
+    return Array.from(new Set(out));
+})();
 
 export function useReplay(raceId: string) {
     const [state, setState] = useState<ReplayState | null>(null);
@@ -183,25 +190,47 @@ export function useReplay(raceId: string) {
                         const resolvedUrl = /^https?:\/\//i.test(url)
                             ? url
                             : `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+                        const resolvedOrigin = (() => {
+                            try {
+                                return new URL(resolvedUrl, window.location.origin).origin;
+                            } catch {
+                                return '';
+                            }
+                        })();
+                        const apiOrigin = (() => {
+                            try {
+                                return new URL(API_BASE, window.location.origin).origin;
+                            } catch {
+                                return '';
+                            }
+                        })();
+                        const isRemoteStorage = resolvedOrigin !== '' && apiOrigin !== '' && resolvedOrigin !== apiOrigin;
                         const fallbackLocalUrl = `${apiBases[0]}/api/races/${raceId}/telemetry/${code}`;
                         const localQuery = `max_frames=${MAX_FRAMES_PER_DRIVER}`;
                         const resolvedWithQuery = resolvedUrl.startsWith(API_BASE)
                             ? appendQuery(resolvedUrl, localQuery)
                             : resolvedUrl;
                         const fallbackWithQuery = appendQuery(fallbackLocalUrl, localQuery);
-                        const candidates = [resolvedUrl];
-                        apiBases.forEach((base) => {
-                            const local = `${base}/api/races/${raceId}/telemetry/${code}`;
-                            candidates.push(appendQuery(local, localQuery));
-                            candidates.push(local);
-                        });
-                        if (resolvedWithQuery !== resolvedUrl) candidates.unshift(resolvedWithQuery);
-                        if (fallbackWithQuery !== resolvedUrl && fallbackWithQuery !== resolvedWithQuery) {
-                            candidates.push(fallbackWithQuery);
-                        }
-                        if (fallbackLocalUrl !== resolvedUrl) candidates.push(fallbackLocalUrl);
+                        const candidates: string[] = [];
+                        if (resolvedWithQuery !== resolvedUrl) candidates.push(resolvedWithQuery);
+                        candidates.push(resolvedUrl);
 
-                        for (const candidateUrl of candidates) {
+                        // Only attempt local backend fallbacks when telemetry URL points to the API origin.
+                        if (!isRemoteStorage) {
+                            apiBases.forEach((base) => {
+                                const local = `${base}/api/races/${raceId}/telemetry/${code}`;
+                                candidates.push(appendQuery(local, localQuery));
+                                candidates.push(local);
+                            });
+                            if (fallbackWithQuery !== resolvedUrl && fallbackWithQuery !== resolvedWithQuery) {
+                                candidates.push(fallbackWithQuery);
+                            }
+                            if (fallbackLocalUrl !== resolvedUrl) candidates.push(fallbackLocalUrl);
+                        }
+
+                        const dedupedCandidates = Array.from(new Set(candidates));
+
+                        for (const candidateUrl of dedupedCandidates) {
                             try {
                                 const tRes = await fetchJsonWithTimeout(candidateUrl);
                                 if (!tRes.ok) continue;
@@ -436,10 +465,3 @@ export function useReplay(raceId: string) {
         trackPath
     };
 }
-    const apiBases = (() => {
-        const primary = API_BASE.replace(/\/$/, '');
-        const out = [primary];
-        if (primary.includes('localhost')) out.push(primary.replace('localhost', '127.0.0.1'));
-        if (primary.includes('127.0.0.1')) out.push(primary.replace('127.0.0.1', 'localhost'));
-        return Array.from(new Set(out));
-    })();

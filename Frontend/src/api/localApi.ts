@@ -1,4 +1,4 @@
-// Local API service for F1 data (replaces external Jolpica API calls)
+﻿// Local API service for F1 data (replaces external Jolpica API calls)
 // This service will connect to locally running Jolpica and Fast-F1 instances
 
 // Use Vite dev server proxies to avoid CORS and port coupling
@@ -9,7 +9,7 @@ const INTERNAL_API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost
 // API cache for better performance
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const TIMEOUT_DURATION = 10000; // 10 seconds
+const TIMEOUT_DURATION = 20000; // default 20 seconds
 
 // Helper function to create a timeout promise
 const createTimeout = (ms: number) => {
@@ -19,11 +19,11 @@ const createTimeout = (ms: number) => {
 };
 
 // Helper function to fetch with timeout and retry
-const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
+const fetchWithTimeout = async (url: string, retries = 2, timeoutMs = TIMEOUT_DURATION): Promise<any> => {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
       const response = await Promise.race([
         fetch(url, {
@@ -33,7 +33,7 @@ const fetchWithTimeout = async (url: string, retries = 2): Promise<any> => {
             'Content-Type': 'application/json'
           }
         }),
-        createTimeout(TIMEOUT_DURATION)
+        createTimeout(timeoutMs)
       ]) as Response;
 
       clearTimeout(timeoutId);
@@ -131,11 +131,11 @@ export const getIntelligence = async (raceId: string, drivers?: string) => {
   return fetchWithTimeout(url);
 };
 
-const postWithTimeout = async (url: string, body: any, retries = 1): Promise<any> => {
+const postWithTimeout = async (url: string, body: any, retries = 1, timeoutMs = TIMEOUT_DURATION): Promise<any> => {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
       const response = await Promise.race([
         fetch(url, {
@@ -147,7 +147,7 @@ const postWithTimeout = async (url: string, body: any, retries = 1): Promise<any
           },
           body: JSON.stringify(body)
         }),
-        createTimeout(TIMEOUT_DURATION)
+        createTimeout(timeoutMs)
       ]) as Response;
 
       clearTimeout(timeoutId);
@@ -176,7 +176,7 @@ export const getBaselineSummary = async (raceId: string, drivers: string) => {
 };
 
 export const getRigorousSimulation = async (raceId: string, body: Record<string, any>) => {
-  return postWithTimeout(`${INTERNAL_API_BASE}/api/races/${raceId}/simulate-rigorous`, body, 0);
+  return postWithTimeout(`${INTERNAL_API_BASE}/api/races/${raceId}/simulate-rigorous`, body, 0, 60000);
 };
 
 // Archive API functions
@@ -238,3 +238,4 @@ export const checkLocalServices = async () => {
     return { jolpica: false, fastF1: false };
   }
 };
+
