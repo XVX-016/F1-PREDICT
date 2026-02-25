@@ -106,10 +106,12 @@ def _list_bucket_files_for_prefix(prefix: str, bucket: str = "race-telemetry") -
         # Keep listing bounded; current payload size is < 1k files in practice.
         rows = db.storage.from_(bucket).list(
             path="",
-            options={"limit": 1000, "offset": 0, "search": f"{prefix}_"}
+            options={"limit": 1000, "offset": 0, "search": f"{prefix}_" if prefix else ".json"}
         )
         names = [row.get("name") for row in (rows or []) if isinstance(row, dict) and row.get("name")]
-        return [name for name in names if name.startswith(f"{prefix}_") and name.endswith(".json")]
+        if prefix:
+            return [name for name in names if name.startswith(f"{prefix}_") and name.endswith(".json")]
+        return [name for name in names if name.endswith(".json")]
     except Exception as e:
         logger.warning(f"Failed to list Supabase storage files for prefix {prefix}: {e}")
         return []
@@ -118,6 +120,15 @@ def _list_bucket_files_for_prefix(prefix: str, bucket: str = "race-telemetry") -
 async def get_replay_available():
     cache_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'replay_cache')
     prefixes = _list_replay_prefixes(cache_dir)
+    supabase_url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
+    if supabase_url:
+        remote_files = _list_bucket_files_for_prefix("")
+        for fname in remote_files:
+            base = fname[:-5] if fname.endswith(".json") else fname
+            if "_" not in base:
+                continue
+            prefix, _driver = base.rsplit("_", 1)
+            prefixes[prefix] = prefixes.get(prefix, 0) + 1
     return {
         "available": sorted(prefixes.keys()),
         "drivers": prefixes,

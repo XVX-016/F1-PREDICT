@@ -42,7 +42,7 @@ export const useIntelligence = (
             try {
                 return await getRigorousSimulation(raceId, {
                     track_id: raceId,
-                    iterations: 300,
+                    iterations: 120,
                     seed: stableSeed,
                     use_ml: true,
                     params: {
