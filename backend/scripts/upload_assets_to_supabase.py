@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 # Buckets to ensure exist and upload to
 BUCKETS = ["race-telemetry", "assets"]
 
+# Strictly limit which races are uploaded to Supabase to stay within storage limits (1GB free tier)
+# Bahrain 2025 ('4_2025')
+ALLOWED_REPLAY_RACES = ["4_2025"]
+
 def get_client() -> Client:
     url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
     # Check all possible service key names
@@ -102,6 +106,12 @@ def migrate():
         logger.info(f"Found {len(existing_remote)} files on Supabase. Skipping duplicates...")
 
         for i, f in enumerate(files):
+            # Filtering logic
+            prefix = f.name.rsplit("_", 1)[0] if "_" in f.name else ""
+            if prefix not in ALLOWED_REPLAY_RACES:
+                # logger.info(f"Skipping {f.name} (not in whitelist)")
+                continue
+
             if f.name in existing_remote:
                 continue
             

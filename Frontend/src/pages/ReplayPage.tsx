@@ -206,6 +206,8 @@ const TimelineScrubber = ({
     );
 };
 
+const REPLAY_WHITELIST = ["4_2025"];
+
 const ReplayPage = () => {
     const replay2024 = [
         {
@@ -221,7 +223,7 @@ const ReplayPage = () => {
     }));
 
     const [availableReplayIds, setAvailableReplayIds] = useState<string[] | null>(null);
-    const [selectedRace, setSelectedRace] = useState(replay2025[0]?.id ?? replay2024[0].id);
+    const [selectedRace, setSelectedRace] = useState(REPLAY_WHITELIST.includes(replay2025[3]?.id) ? (replay2025[3]?.id ?? replay2024[0].id) : replay2024[0].id);
     const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
     const [hasStarted, setHasStarted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -249,7 +251,9 @@ const ReplayPage = () => {
                 const payload = await res.json();
                 if (!isMounted) return;
                 if (payload?.available && Array.isArray(payload.available)) {
-                    setAvailableReplayIds(payload.available);
+                    // Filter available IDs by whitelist
+                    const filtered = payload.available.filter((id: string) => REPLAY_WHITELIST.includes(id));
+                    setAvailableReplayIds(filtered);
                 } else {
                     setAvailableReplayIds([]);
                 }
@@ -264,14 +268,11 @@ const ReplayPage = () => {
     }, []);
 
     const { filtered2024, filtered2025, allReplayOptions } = useMemo(() => {
-        const hasAvailability = (availableReplayIds?.length ?? 0) > 0;
-        const availableSet = new Set(availableReplayIds ?? []);
-        const filtered2024 = hasAvailability
-            ? replay2024.filter((race) => availableSet.has(race.id))
-            : replay2024;
-        const filtered2025 = hasAvailability
-            ? replay2025.filter((race) => availableSet.has(race.id))
-            : replay2025;
+        const availableSet = new Set(availableReplayIds ?? REPLAY_WHITELIST); // Fallback to whitelist if nothing fetched
+
+        const filtered2024 = replay2024.filter((race) => availableSet.has(race.id));
+        const filtered2025 = replay2025.filter((race) => availableSet.has(race.id));
+        
         return {
             filtered2024,
             filtered2025,
