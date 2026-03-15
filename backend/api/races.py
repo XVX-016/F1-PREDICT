@@ -2,7 +2,7 @@
 Race API endpoints
 Exposes track-first simulation and real strategy optimization.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 import os
 import json
 import glob
@@ -10,6 +10,8 @@ import logging
 from typing import Dict, Any, Optional, List, Union
 import math
 from services.simulation_engine import simulation_engine
+from services.simulation_cache import build_simulation_cache_key, normalize_simulation_request, read_cache, write_cache
+from services.simulation_history_service import simulation_history_service
 from database.supabase_client import get_db
 from models.domain import SimulationRequest, SimulationResponse, RaceTimeline, SimulationRunOutput
 from dependencies import get_redis_client
@@ -157,6 +159,12 @@ async def simulate_race(race_id: str, request: SimulationRequest):
     try:
         request.track_id = race_id
         logger.info(f"Triggering track-first simulation for {race_id}")
+        request_payload = request.model_dump()
+        cache_key = build_simulation_cache_key(race_id, request_payload)
+        cached = read_cache(cache_key)
+        if cached:
+            return SimulationResponse(**cached)
+
         results = simulation_engine.run_simulation(request)
         
         # Add metadata transparency
@@ -166,9 +174,18 @@ async def simulate_race(race_id: str, request: SimulationRequest):
         results.metadata.update({
             "source": "simulation_engine",
             "is_fallback": False,
-            "generated_at": datetime.utcnow().isoformat()
+            "generated_at": datetime.utcnow().isoformat(),
+            "cache_key": cache_key,
         })
-        
+
+        response_payload = results.model_dump()
+        write_cache(cache_key, response_payload)
+        simulation_history_service.record_run(
+            race_id=race_id,
+            request_payload=normalize_simulation_request(request_payload),
+            response_payload=response_payload,
+            user_id=(request.params or {}).get("user_id"),
+        )
         return results
     except Exception as e:
         logger.error(f"Simulation failed: {e}")
@@ -188,6 +205,28 @@ async def simulate_race_rigorous(race_id: str, request: SimulationRequest):
     except Exception as e:
         logger.error(f"Rigorous simulation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Rigorous simulation failed: {str(e)}")
+
+
+@router.get("/{race_id}/history")
+async def get_simulation_history(
+    race_id: str,
+    user_id: Optional[str] = Query(default=None),
+    limit: int = Query(default=10, ge=1, le=50),
+):
+    return {
+        "race_id": race_id,
+        "runs": simulation_history_service.list_recent_runs(race_id=race_id, user_id=user_id, limit=limit),
+    }
+
+
+@router.get("/history/recent")
+async def get_recent_simulation_history(
+    user_id: Optional[str] = Query(default=None),
+    limit: int = Query(default=10, ge=1, le=50),
+):
+    return {
+        "runs": simulation_history_service.list_recent_runs(user_id=user_id, limit=limit),
+    }
 
 @router.get("/{race_id}/timeline", response_model=RaceTimeline)
 async def get_race_timeline(race_id: str, source: str = "REPLAY"):

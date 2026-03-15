@@ -4,8 +4,8 @@ import * as d3 from 'd3';
 interface DataPoint {
     lap: number;
     p50: number; // Median
-    p05: number; // 5th percentile
-    p95: number; // 95th percentile
+    p10: number; // 10th percentile
+    p90: number; // 90th percentile
 }
 
 interface StrategyFanChartProps {
@@ -35,7 +35,7 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
             .domain([d3.min(data, d => d.lap) || 0, d3.max(data, d => d.lap) || 57])
             .range([0, innerWidth]);
 
-        const allValues = data.flatMap(d => [d.p05, d.p95, d.p50]);
+        const allValues = data.flatMap(d => [d.p10, d.p90, d.p50]);
         const yScale = d3.scaleLinear()
             .domain([d3.min(allValues) || 0, d3.max(allValues) || 120])
             .range([innerHeight, 0])
@@ -64,11 +64,11 @@ export const StrategyFanChart: React.FC<StrategyFanChartProps> = ({ data, width 
             .attr("opacity", 0.05)
             .call(d3.axisLeft(yScale).tickSize(-innerWidth).tickFormat(() => ""));
 
-        // Draw the "Fan" - Shaded area for p05-p95 (90% Confidence)
+        // Draw the "Fan" - Shaded area for p10-p90 (80% confidence interval)
         const area90 = d3.area<DataPoint>()
             .x(d => xScale(d.lap))
-            .y0(d => yScale(d.p05))
-            .y1(d => yScale(d.p95))
+            .y0(d => yScale(d.p10))
+            .y1(d => yScale(d.p90))
             .curve(d3.curveBasis);
 
         // Confidence Fan

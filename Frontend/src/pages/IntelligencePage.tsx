@@ -114,7 +114,7 @@ const IntelligencePage = () => {
             const info = DRIVER_INFO[driverId];
             const pace = intelligence?.pace_distributions?.[driverId];
             const robustness = intelligence?.robustness_score?.[driverId];
-            const spread = pace ? Math.max((pace.p95 || 0) - (pace.p05 || 0), 0) : 0;
+            const spread = pace ? Math.max((pace.p90 || 0) - (pace.p10 || 0), 0) : 0;
             const consistency = typeof robustness === 'number' ? robustness : 0.5;
             return {
                 driverId,

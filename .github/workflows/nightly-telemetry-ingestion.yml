@@ -1,0 +1,47 @@
+name: Nightly Telemetry Ingestion
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      FASTF1_CACHE_DIR: .fastf1_cache
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend deps
+        run: pip install -r backend/requirements-dev.txt
+
+      - name: Verify credentials
+        id: creds
+        shell: bash
+        run: |
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_SERVICE_KEY}" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip when credentials are absent
+        if: steps.creds.outputs.available != 'true'
+        run: echo "Supabase credentials not configured; nightly telemetry ingestion skipped."
+
+      - name: Populate telemetry features
+        if: steps.creds.outputs.available == 'true'
+        run: python backend/scripts/populate_telemetry_features.py
+
+      - name: Upload replay assets to Supabase
+        if: steps.creds.outputs.available == 'true'
+        run: python backend/scripts/upload_assets_to_supabase.py

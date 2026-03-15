@@ -9,6 +9,20 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/intelligence", tags=["Intelligence"])
 
+
+def _normalize_percentile_contract(analysis_dict):
+    pace_distributions = analysis_dict.get("pace_distributions", {}) if isinstance(analysis_dict, dict) else {}
+    for driver_id, dist in pace_distributions.items():
+        if not isinstance(dist, dict):
+            continue
+        if "p10" not in dist and "p05" in dist:
+            dist["p10"] = dist["p05"]
+        if "p90" not in dist and "p95" in dist:
+            dist["p90"] = dist["p95"]
+        dist.pop("p05", None)
+        dist.pop("p95", None)
+    return analysis_dict
+
 @router.get("/{race_id}", response_model=IntelligenceAnalysis)
 async def get_intelligence(race_id: str, drivers: Optional[str] = None):
     """
@@ -30,7 +44,7 @@ async def get_intelligence(race_id: str, drivers: Optional[str] = None):
         if r:
             cached_data = r.get(cache_key)
             if cached_data:
-                analysis_dict = json.loads(cached_data)
+                analysis_dict = _normalize_percentile_contract(json.loads(cached_data))
                 analysis = IntelligenceAnalysis(**analysis_dict)
         
         if not analysis:

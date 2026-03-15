@@ -122,7 +122,7 @@ class RaceTimeline(BaseModel):
     telemetry_urls: Optional[Dict[str, str]] = None
     summary: Dict[str, Any] = Field(
         ...,
-        description="Must include total_time_ms. For sim: p05, p50, p95, risk_spread_ms."
+        description="Must include total_time_ms. For sim: p10, p50, p90, risk_spread_ms."
     )
 
 # --- Simulation Contracts ---
@@ -162,8 +162,8 @@ class SimulationResponse(BaseModel):
     podium_probability: Dict[str, List[float]] # [P1, P2, P3]
     
     # Distribution Metrics
-    pace_distributions: Dict[str, Dict[str, float]] # {driver: {p05, p50, p95}}
-    robustness_score: Dict[str, float] # (p95 - p05) / p50
+    pace_distributions: Dict[str, Dict[str, float]] # {driver: {p10, p50, p90}}
+    robustness_score: Dict[str, float] # (p90 - p10) / p50
     
     strategy_recommendation: StrategyResult
     

@@ -8,6 +8,7 @@ import RaceDetailView from '../components/schedule/RaceDetailView';
 import { RaceCardSkeleton } from '../components/common/SkeletonLoaders';
 import PageContainer from '../components/layout/PageContainer';
 import { SEASON_2026_SCHEDULE } from '../data/season2026';
+import { getFeaturedRace, getRuntimeRaceStatus, sortByRaceStart, toRaceStartTime } from '../utils/raceStatus';
 
 
 type RaceSession = { date: string | null; time: string | null };
@@ -56,7 +57,7 @@ export default function SchedulePage({ }: SchedulePageProps) {
 
       try {
         const staticRaces: RaceItem[] = SEASON_2026_SCHEDULE.map(r => {
-          const startISO = `${r.date}T${r.time.replace('Z', '')}`; // Simplified ISO construction
+          const startISO = toRaceStartTime({ date: r.date, time: r.time }).toISOString();
           return {
             round: r.round,
             raceName: r.raceName,
@@ -71,7 +72,7 @@ export default function SchedulePage({ }: SchedulePageProps) {
             sprintQualifying: { date: null, time: null },
             sprint: { date: null, time: null },
             qualifying: { date: null, time: null },
-            status: 'upcoming', // All 2026 races are future/upcoming
+            status: getRaceStatusUTC(startISO),
             startISO: startISO,
             id: `2026-${r.round}`,
             trackImg: r.trackImg,
@@ -100,8 +101,8 @@ export default function SchedulePage({ }: SchedulePageProps) {
       return;
     }
 
-    const mappedRaces: RaceItem[] = (apiRaces || []).map((r: ApiRace) => {
-      const startISO = `${r.race_date}T${r.time || '00:00'}:00Z`;
+    const mappedRaces: RaceItem[] = sortByRaceStart((apiRaces || []).map((r: ApiRace) => {
+      const startISO = toRaceStartTime({ date: r.race_date, time: r.time || '00:00:00Z' }).toISOString();
       return {
         round: r.round,
         raceName: r.name,
@@ -120,19 +121,14 @@ export default function SchedulePage({ }: SchedulePageProps) {
         startISO: startISO,
         id: r.id
       };
-    });
+    }));
 
     setRaces(mappedRaces);
     setLoading(false);
   }, [apiRaces, apiLoading, apiError, selectedYear]);
 
   const getRaceStatusUTC = (startISO: string) => {
-    const raceDateTime = new Date(startISO);
-    const now = new Date();
-    const diff = raceDateTime.getTime() - now.getTime();
-    if (diff > 2 * 60 * 60 * 1000) return 'upcoming';
-    else if (diff > -3 * 60 * 60 * 1000) return 'live';
-    else return 'completed';
+    return getRuntimeRaceStatus({ startISO });
   };
 
   const getCountryFlag = (country: string) => {
@@ -146,14 +142,19 @@ export default function SchedulePage({ }: SchedulePageProps) {
     return flags[country] || '🏁';
   };
 
-  const filteredRaces = races.filter((race) => {
+  const runtimeRaces = sortByRaceStart(races).map((race) => ({
+    ...race,
+    startISO: race.startISO || toRaceStartTime(race).toISOString(),
+    status: getRaceStatusUTC(race.startISO || toRaceStartTime(race).toISOString()),
+  }));
+
+  const filteredRaces = runtimeRaces.filter((race) => {
     if (selectedFilter !== 'all' && race.status !== selectedFilter) return false;
     return true;
   });
 
   // Advanced Layout Logic
-  const upcomingRacesFull = races.filter(r => r.status === 'upcoming' || r.status === 'live');
-  const nextRace = upcomingRacesFull.length > 0 ? upcomingRacesFull[0] : null;
+  const nextRace = getFeaturedRace(runtimeRaces);
 
   const isCurrentSeason = selectedYear === 2026;
 
