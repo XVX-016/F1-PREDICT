@@ -30,7 +30,7 @@ class IntelligenceService:
             # 2. Get baseline pace deltas
             baseline_summary = baseline_service.compute_expected_race_order(race_id, driver_ids)
             pace_dist = {
-                b["driver_id"]: {"p05": b["delta"] - b["uncertainty"], "p50": b["delta"], "p95": b["delta"] + b["uncertainty"]}
+                b["driver_id"]: {"p10": b["delta"] - b["uncertainty"], "p50": b["delta"], "p90": b["delta"] + b["uncertainty"]}
                 for b in baseline_summary
             }
             

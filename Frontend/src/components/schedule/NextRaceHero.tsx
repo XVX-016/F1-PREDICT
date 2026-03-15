@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather';
 import { resolveAssetUrl } from '../../utils/assets';
+import { getRaceTimingState } from '../../utils/raceStatus';
 
 interface NextRaceHeroProps {
     race: any;
@@ -15,8 +16,8 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
 
     if (!race) return null;
 
-    // Calculate days until
-    const daysUntil = Math.ceil((new Date(race.startISO).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    const timing = getRaceTimingState(race);
+    const heroBadge = timing.status === 'completed' ? 'Latest Race' : timing.status === 'live' ? 'Live Now' : 'Next Race';
 
     return (
         <motion.div
@@ -43,7 +44,7 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <span className="bg-white text-[#E10600] text-xs font-black px-2 py-1 rounded uppercase tracking-wider">
-                            Next Race
+                            {heroBadge}
                         </span>
                         <span className="text-white/80 font-mono text-sm uppercase tracking-widest border border-white/20 px-2 py-0.5 rounded">
                             Round {race.round}
@@ -93,7 +94,7 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
                         <Clock className="w-5 h-5 text-white" />
                         <div>
                             <p className="text-[10px] text-white/60 uppercase font-bold tracking-widest">Lights Out In</p>
-                            <p className="text-2xl font-mono font-black text-white">{daysUntil} DAYS</p>
+                            <p className="text-2xl font-mono font-black text-white">{timing.countdown.toUpperCase()}</p>
                         </div>
                     </div>
                 </div>
@@ -102,7 +103,7 @@ export default function NextRaceHero({ race, getCountryFlag, onViewDetails }: Ne
             {/* Top Right Badge */}
             <div className="absolute top-0 right-0 p-6 hidden md:block">
                 <div className="bg-white text-[#E10600] px-4 py-2 rounded font-black italic text-xs uppercase tracking-widest shadow-lg group-hover:scale-105 transition-transform">
-                    Next Race &gt;
+                    {heroBadge} &gt;
                 </div>
             </div>
 

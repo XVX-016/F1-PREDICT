@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, Clock, MapPin, AlertCircle } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
+import { getRaceTimingState, toRaceStartTime } from '../../utils/raceStatus';
 
 interface RaceHeaderProps {
     race: {
@@ -17,33 +18,14 @@ interface RaceHeaderProps {
 export default function RaceHeader({ race }: RaceHeaderProps) {
     const [raceCountdown, setRaceCountdown] = useState('');
     const [predictionsCountdown, setPredictionsCountdown] = useState('');
+    const [timingState, setTimingState] = useState(() => getRaceTimingState({ startISO: race.startTime }));
 
     useEffect(() => {
         const updateCountdowns = () => {
             const now = new Date();
-
-            // Race countdown
-            const raceDate = new Date(race.startTime);
-            const raceDiff = raceDate.getTime() - now.getTime();
-
-            if (raceDiff <= 0) {
-                setRaceCountdown(race.status === 'finished' ? 'Finished' : 'Live Now');
-            } else {
-                const days = Math.floor(raceDiff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((raceDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((raceDiff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((raceDiff % (1000 * 60)) / 1000);
-
-                if (days > 0) {
-                    setRaceCountdown(`${days}d ${hours}h ${minutes}m`);
-                } else if (hours > 0) {
-                    setRaceCountdown(`${hours}h ${minutes}m ${seconds}s`);
-                } else if (minutes > 0) {
-                    setRaceCountdown(`${minutes}m ${seconds}s`);
-                } else {
-                    setRaceCountdown(`${seconds}s`);
-                }
-            }
+            const timing = getRaceTimingState({ startISO: race.startTime }, now);
+            setTimingState(timing);
+            setRaceCountdown(timing.countdown);
 
             // Predictions countdown
             if (race.predictionsCloseTime) {
@@ -69,10 +51,14 @@ export default function RaceHeader({ race }: RaceHeaderProps) {
         const interval = setInterval(updateCountdowns, 1000);
 
         return () => clearInterval(interval);
-    }, [race.startTime, race.predictionsCloseTime, race.status]);
+    }, [race.startTime, race.predictionsCloseTime]);
+
+    useEffect(() => {
+        setTimingState(getRaceTimingState({ startISO: race.startTime }));
+    }, [race.startTime]);
 
     const formatDateTime = useMemo(() => {
-        const date = new Date(race.startTime);
+        const date = toRaceStartTime({ startISO: race.startTime });
         return date.toLocaleString('en-US', {
             weekday: 'short',
             month: 'short',
@@ -84,11 +70,20 @@ export default function RaceHeader({ race }: RaceHeaderProps) {
     }, [race.startTime]);
 
     const getStatusDisplay = () => {
-        if (race.status === 'finished') {
+        if (timingState.status === 'completed' || race.status === 'finished') {
             return (
                 <div className="flex items-center gap-2 bg-gray-600/30 px-4 py-2 rounded-full">
                     <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                     <span className="text-gray-300 font-semibold">Race Completed</span>
+                </div>
+            );
+        }
+
+        if (timingState.status === 'live') {
+            return (
+                <div className="flex items-center gap-2 bg-red-600/30 px-4 py-2 rounded-full border border-red-500/20">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-red-400 font-mono text-[10px] font-bold uppercase tracking-widest">Live</span>
                 </div>
             );
         }
@@ -139,7 +134,11 @@ export default function RaceHeader({ race }: RaceHeaderProps) {
                             <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-red-400 flex-shrink-0" />
                                 <span className="font-bold text-white">
-                                    {race.status === 'finished' ? 'Finished' : `Starts in ${raceCountdown}`}
+                                    {timingState.status === 'completed' || race.status === 'finished'
+                                        ? 'Race Complete'
+                                        : timingState.status === 'live'
+                                            ? 'LIVE'
+                                            : `Starts in ${raceCountdown}`}
                                 </span>
                             </div>
                         </div>

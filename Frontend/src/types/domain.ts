@@ -73,9 +73,9 @@ export interface SimulationResponse {
     dnf_risk: Record<string, number>;
     podium_probability: Record<string, number[]>;
     pace_distributions: Record<string, {
-        p05: number;
+        p10: number;
         p50: number;
-        p95: number;
+        p90: number;
     }>;
     robustness_score: Record<string, number>;
     event_attribution?: Record<string, Record<string, number>>;

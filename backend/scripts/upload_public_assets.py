@@ -40,6 +40,7 @@ def main():
         if p.exists(): load_dotenv(dotenv_path=p)
 
     client = get_client()
+    assets_bucket = os.getenv("SUPABASE_ASSETS_BUCKET", "assets")
     
     # Target: public assets
     frontend_public = root / "Frontend" / "public"
@@ -51,7 +52,7 @@ def main():
     all_files = [p for p in frontend_public.rglob('*') if p.is_file()]
     
     logger.info("Fetching existing assets from Supabase...")
-    existing_assets = list_all_files(client, "assets")
+    existing_assets = list_all_files(client, assets_bucket)
     
     logger.info(f"Total assets to check: {len(all_files)}")
     for i, f in enumerate(all_files):
@@ -73,7 +74,7 @@ def main():
                 elif ext == ".json": content_type = "application/json"
                 elif ext in [".glb", ".gltf"]: content_type = "model/gltf-binary"
                 
-                client.storage.from_("assets").upload(
+                client.storage.from_(assets_bucket).upload(
                     path=rel_path,
                     file=file_data,
                     file_options={"upsert": "true", "content-type": content_type}

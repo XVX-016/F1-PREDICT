@@ -42,7 +42,7 @@ const TRACK_TRANSFORMS: Record<string, MapTransform> = {
 
 const TRACK_NUDGES: Record<string, { x: number; y: number }> = {
     aus: { x: 0.0, y: 0.0 },
-    bhr: { x: 0.0, y: 0.0 },
+    bhr: { x: -0.03, y: -0.01 },
     jap: { x: 0.0, y: 0.0 },
     chn: { x: 0.0, y: 0.0 },
     mco: { x: 0.0, y: 0.0 },

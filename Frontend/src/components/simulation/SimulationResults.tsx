@@ -75,7 +75,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
                         </div>
                         {topDrivers.slice(0, 3).map(([driver]) => {
                             const score = results.robustness_score[driver] || 0;
-                            // Lower spread means higher robustness. Score is (p95-p05)/p50. 
+                            // Lower spread means higher robustness. Score is (p90-p10)/p50. 
                             // Let's normalize it for display: 1 - (score * multiplier)
                             const displayRobustness = Math.max(0, 1 - (score * 50));
                             return (
@@ -94,7 +94,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
                             )
                         })}
                         <p className="text-[8px] font-mono text-slate-600 uppercase leading-relaxed mt-4">
-                            Model stability based on P05-P95 pace variation over {results.metadata.iterations} iterations.
+                            Model stability based on P10-P90 pace variation over {results.metadata.iterations} iterations.
                         </p>
                     </div>
 
@@ -114,7 +114,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
             <div className="bg-[#121217] border border-[#1f1f26] rounded-md p-6 overflow-x-auto">
                 <div className="flex items-center gap-2 mb-6">
                     <Waves size={14} className="text-blue-500" />
-                    <h4 className="text-[10px] font-mono font-black text-white uppercase tracking-widest">Pace Distribution Map (P05/P50/P95)</h4>
+                    <h4 className="text-[10px] font-mono font-black text-white uppercase tracking-widest">Pace Distribution Map (P10/P50/P90)</h4>
                 </div>
                 <div className="flex gap-4 min-w-[600px]">
                     {topDrivers.map(([driver]) => {
@@ -124,9 +124,9 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({ results, isRunnin
                             <div key={driver + '_dist'} className="flex-1 bg-black/40 border border-[#1f1f26] p-4 rounded text-center space-y-3">
                                 <span className="text-xs font-black text-white">{driver}</span>
                                 <div className="space-y-1">
-                                    <div className="flex justify-between text-[8px] font-mono text-slate-500 uppercase"><span>Aggressive</span><span>{(dist.p05 / 1000).toFixed(3)}s</span></div>
+                                    <div className="flex justify-between text-[8px] font-mono text-slate-500 uppercase"><span>Aggressive</span><span>{(dist.p10 / 1000).toFixed(3)}s</span></div>
                                     <div className="flex justify-between text-[9px] font-mono text-red-500 font-bold uppercase"><span>Median</span><span>{(dist.p50 / 1000).toFixed(3)}s</span></div>
-                                    <div className="flex justify-between text-[8px] font-mono text-slate-500 uppercase"><span>Defensive</span><span>{(dist.p95 / 1000).toFixed(3)}s</span></div>
+                                    <div className="flex justify-between text-[8px] font-mono text-slate-500 uppercase"><span>Defensive</span><span>{(dist.p90 / 1000).toFixed(3)}s</span></div>
                                 </div>
                             </div>
                         )

@@ -270,21 +270,18 @@ export const DriverSelector = () => {
                 })));
 
     return (
-        <div className="space-y-2">
-            <label className="text-[10px] uppercase font-bold text-gray-400">Driver Focus</label>
-            <select
-                className="w-full bg-black border border-white/20 p-2 text-xs rounded text-white"
-                value={selectedDriverId || ""}
-                onChange={(e) => selectDriver(e.target.value || null)}
-            >
-                <option value="">-- Global View --</option>
-                {drivers.map(d => (
-                    <option key={d.driverId} value={d.driverId}>
-                        P{d.position} - {d.name} ({d.teamId})
-                    </option>
-                ))}
-            </select>
-        </div>
+        <select
+            className="w-full bg-black border border-white/20 p-2 text-xs rounded text-white"
+            value={selectedDriverId || ""}
+            onChange={(e) => selectDriver(e.target.value || null)}
+        >
+            <option value="">-- Global View --</option>
+            {drivers.map(d => (
+                <option key={d.driverId} value={d.driverId}>
+                    P{d.position} - {d.name} ({d.teamId})
+                </option>
+            ))}
+        </select>
     );
 };
 

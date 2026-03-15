@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star } from 'lucide-react';
+import { resolveAssetUrl } from '../utils/assets';
 
 interface Driver {
   driverId: string;
@@ -24,8 +25,6 @@ export default function EnhancedPodium({ drivers, className = '' }: EnhancedPodi
     3: { height: 'h-52', bgColor: 'bg-gradient-to-b from-orange-400 to-orange-600', borderColor: 'border-orange-300', icon: Star, iconColor: 'text-orange-800' }
   };
 
-  const STORAGE_BASE = `https://uivvxlorutmjgouporrv.supabase.co/storage/v1/object/public/assets/avatars`;
-
   // Build a safe avatar filename strictly from driver name
   const getAvatarSrc = (driverName: string) => {
     const normalized = driverName
@@ -34,7 +33,7 @@ export default function EnhancedPodium({ drivers, className = '' }: EnhancedPodi
       .toLowerCase()
       .replace(/[^a-z\s]/g, '')
       .replace(/\s+/g, '');
-    return `${STORAGE_BASE}/${normalized}.png`;
+    return resolveAssetUrl(`/avatars/${normalized}.png`);
   };
 
   return (

@@ -13,8 +13,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Buckets to ensure exist and upload to
-BUCKETS = ["race-telemetry", "assets"]
+# Strictly limit which races are uploaded to Supabase to stay within storage limits (1GB free tier)
+# Bahrain 2025 ('4_2025')
+ALLOWED_REPLAY_RACES = ["4_2025"]
 
 def get_client() -> Client:
     url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
@@ -72,6 +73,11 @@ def list_all_files(client: Client, bucket: str) -> Set[str]:
 
 def migrate():
     client = get_client()
+    telemetry_bucket = os.getenv("SUPABASE_TELEMETRY_BUCKET", "race-telemetry")
+    assets_bucket = os.getenv("SUPABASE_ASSETS_BUCKET", "assets")
+    buckets = [telemetry_bucket, assets_bucket]
+    skip_telemetry = os.getenv("SKIP_TELEMETRY", "").lower() in {"1", "true", "yes"}
+    skip_assets = os.getenv("SKIP_ASSETS", "").lower() in {"1", "true", "yes"}
     
     # 1. Ensure buckets exist
     try:
@@ -81,7 +87,7 @@ def migrate():
         logger.warning(f"Could not list buckets: {e}. Will try creating them anyway.")
         existing_buckets = []
 
-    for bucket in BUCKETS:
+    for bucket in buckets:
         if bucket not in existing_buckets:
             try:
                 logger.info(f"Creating bucket: {bucket}")
@@ -93,15 +99,21 @@ def migrate():
 
     # 2. Upload Telemetry JSONs
     telemetry_dir = Path(__file__).parent.parent / "data" / "replay_cache"
-    if telemetry_dir.exists():
+    if not skip_telemetry and telemetry_dir.exists():
         files = list(telemetry_dir.glob("*.json"))
         logger.info(f"Total telemetry files to check: {len(files)}")
         
         logger.info("Fetching existing telemetry files from Supabase...")
-        existing_remote = list_all_files(client, "race-telemetry")
+        existing_remote = list_all_files(client, telemetry_bucket)
         logger.info(f"Found {len(existing_remote)} files on Supabase. Skipping duplicates...")
 
         for i, f in enumerate(files):
+            # Filtering logic
+            prefix = f.name.rsplit("_", 1)[0] if "_" in f.name else ""
+            if prefix not in ALLOWED_REPLAY_RACES:
+                # logger.info(f"Skipping {f.name} (not in whitelist)")
+                continue
+
             if f.name in existing_remote:
                 continue
             
@@ -110,7 +122,7 @@ def migrate():
                 @retry_on_error()
                 def upload_telemetry():
                     with open(f, 'rb') as file_data:
-                        client.storage.from_("race-telemetry").upload(
+                        client.storage.from_(telemetry_bucket).upload(
                             path=f.name,
                             file=file_data,
                             file_options={"upsert": "true", "content-type": "application/json"}
@@ -123,12 +135,12 @@ def migrate():
 
     # 3. Upload ALL Public Assets Recursively
     frontend_public = Path(__file__).parent.parent.parent / "Frontend" / "public"
-    if frontend_public.exists():
+    if not skip_assets and frontend_public.exists():
         logger.info(f"Recursively gathering files from {frontend_public}...")
         all_files = [p for p in frontend_public.rglob('*') if p.is_file()]
         
         logger.info("Fetching existing assets from Supabase...")
-        existing_assets = list_all_files(client, "assets")
+        existing_assets = list_all_files(client, assets_bucket)
         
         logger.info(f"Total assets to check: {len(all_files)}")
         for i, f in enumerate(all_files):
@@ -153,7 +165,7 @@ def migrate():
                     
                     @retry_on_error()
                     def upload_asset():
-                        client.storage.from_("assets").upload(
+                        client.storage.from_(assets_bucket).upload(
                             path=rel_path,
                             file=file_data,
                             file_options={"upsert": "true", "content-type": content_type}

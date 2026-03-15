@@ -41,7 +41,14 @@ FEATURES = [
     "sector_consistency",
     "clean_air_delta",
     "recent_form",
-    "grid_position"
+    "grid_position",
+    "tyre_age_compound_factor",
+    "track_temperature",
+    "qualifying_pace_delta",
+    "drs_activation_rate",
+    "sector_variance",
+    "track_evolution_coefficient",
+    "weather_delta",
 ]
 
 TARGET = "target_pace_delta"
@@ -253,7 +260,11 @@ class ModelTrainer:
         Main training pipeline with GroupKFold CV split by race.
         """
         df = self.load_training_data()
-        
+
+        for feature in FEATURES:
+            if feature not in df.columns:
+                df[feature] = 0.0
+
         # Validate required columns
         missing = [f for f in FEATURES if f not in df.columns]
         if missing:
@@ -350,8 +361,8 @@ class ModelTrainer:
         residuals = y.values - oof_preds
         residual_stats = {
             "residual_std_ms": float(np.std(residuals)),
-            "residual_p05_ms": float(np.percentile(residuals, 5)),
-            "residual_p95_ms": float(np.percentile(residuals, 95)),
+            "residual_p10_ms": float(np.percentile(residuals, 10)),
+            "residual_p90_ms": float(np.percentile(residuals, 90)),
             "residual_mean_ms": float(np.mean(residuals)),
         }
         
@@ -366,8 +377,8 @@ class ModelTrainer:
         logger.info("RESIDUAL DISTRIBUTION (for uncertainty bands)")
         logger.info("="*60)
         logger.info(f"Residual Std:    {residual_stats['residual_std_ms']:.2f} ms")
-        logger.info(f"Residual P05:    {residual_stats['residual_p05_ms']:.2f} ms")
-        logger.info(f"Residual P95:    {residual_stats['residual_p95_ms']:.2f} ms")
+        logger.info(f"Residual P10:    {residual_stats['residual_p10_ms']:.2f} ms")
+        logger.info(f"Residual P90:    {residual_stats['residual_p90_ms']:.2f} ms")
         
         # Calculate improvement
         improvement_vs_zero = ((baselines['zero_baseline_mae'] - oof_mae) / baselines['zero_baseline_mae']) * 100
@@ -419,9 +430,10 @@ class ModelTrainer:
             "improvement_vs_mean_pct": float(improvement_vs_mean),
             # Residual stats for uncertainty bands
             "residual_std_ms": residual_stats["residual_std_ms"],
-            "residual_p05_ms": residual_stats["residual_p05_ms"],
-            "residual_p95_ms": residual_stats["residual_p95_ms"],
+            "residual_p10_ms": residual_stats["residual_p10_ms"],
+            "residual_p90_ms": residual_stats["residual_p90_ms"],
             # Features and training info
+            "feature_version": "telemetry_features_v1",
             "features": FEATURES,
             "n_samples": len(df),
             "n_folds": n_splits,

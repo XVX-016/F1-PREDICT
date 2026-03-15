@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 class FastF1FeatureExtractor:
     def __init__(self):
         self.db = get_db()
+        self.feature_version = "telemetry_features_v1"
 
     def extract_features(self, season: int, round_num: int) -> pd.DataFrame:
         """
@@ -79,7 +80,19 @@ class FastF1FeatureExtractor:
                 # Feature: clean_air_delta (vs dirty air)
                 # Simplified: diff between top 25% pace and mean pace
                 clean_air_delta = float(avg_clean_lap_ms - lap_times_ms.quantile(0.25))
-                
+                track_temperature = 0.0
+                if "TrackTemp" in clean_laps.columns and clean_laps["TrackTemp"].notna().any():
+                    track_temperature = float(clean_laps["TrackTemp"].dropna().mean())
+
+                tyre_age_compound_factor = float(max(len(clean_laps), 1))
+                qualifying_pace_delta = float(lap_times_ms.min() - avg_clean_lap_ms)
+                drs_activation_rate = 0.0
+                if "DRS" in clean_laps.columns and clean_laps["DRS"].notna().any():
+                    drs_activation_rate = float(clean_laps["DRS"].fillna(0).mean())
+                sector_variance = sector_consistency
+                track_evolution_coefficient = float((lap_times_ms.iloc[-1] - lap_times_ms.iloc[0]) / max(len(lap_times_ms), 1))
+                weather_delta = 0.0
+
                 # Recent Form EWMA (placeholder for now, will implement fetch logic)
                 recent_form_ewma = self._calculate_recent_form(driver_id, season, round_num)
 
@@ -90,7 +103,16 @@ class FastF1FeatureExtractor:
                     "tire_deg_rate": tire_deg_rate,
                     "sector_consistency": sector_consistency,
                     "clean_air_delta": clean_air_delta,
-                    "recent_form_ewma": recent_form_ewma
+                    "recent_form_ewma": recent_form_ewma,
+                    "feature_version": self.feature_version,
+                    "feature_metadata": {"season": season, "round": round_num},
+                    "tyre_age_compound_factor": tyre_age_compound_factor,
+                    "track_temperature": track_temperature,
+                    "qualifying_pace_delta": qualifying_pace_delta,
+                    "drs_activation_rate": drs_activation_rate,
+                    "sector_variance": sector_variance,
+                    "track_evolution_coefficient": track_evolution_coefficient,
+                    "weather_delta": weather_delta,
                 }
                 
                 features_list.append(feat)

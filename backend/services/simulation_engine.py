@@ -6,6 +6,8 @@ import json
 from typing import Dict, List, Any, Optional
 from engine.simulation.simulator import RaceSimulator
 from engine.simulation.rigorous import RigorousSimulationEngine
+from services.ml_residual_service import ml_residual_service
+from services.sc_probability_service import sc_probability_service
 from services.strategy_optimizer import StrategyOptimizer
 from models.domain import TrackModel, DriverModel, StrategyResult, StrategyStint, SimulationRequest, SimulationResponse, TrackTyreWearFactors, SimulationRunOutput
 
@@ -22,6 +24,8 @@ class SimulationEngine:
         self.optimizer = StrategyOptimizer(self.simulator)
         self.model_version = "v3.0.0-engineering"
         self.default_rigorous_params = self._load_default_rigorous_params()
+        self.ml_residual_service = ml_residual_service
+        self.sc_probability_service = sc_probability_service
 
     def _load_default_rigorous_params(self) -> Dict[str, float]:
         """
@@ -123,18 +127,17 @@ class SimulationEngine:
             driver_ids = [row.driver_id for row in driver_rows] if driver_rows else fallback_driver_ids
         profiles = {}
         raw_pace_by_driver: Dict[str, float] = {}
+        residual_feature_rows: List[Dict[str, Any]] = []
         for i, d in enumerate(driver_ids):
-            ml_offset = 0.0
-            if use_ml:
-                ml_offset = (i * 10) - 50
-                ml_offset += rng.normal(0, 10)
-
             row = next((x for x in driver_rows if x.driver_id == d), None)
             team_name = row.constructor if row else "FIELD"
-            base_pace = 90000 + ml_offset
+            base_pace = 90000.0
             if row:
                 # Convert tier multipliers to pace deltas (faster tier -> lower lap time).
                 base_pace += (1.10 - row.tier_multiplier) * 900
+            elif use_ml:
+                # Small non-artifact fallback only when no row exists for the driver pool.
+                base_pace += float(rng.normal(0, 10))
             raw_pace_by_driver[d] = float(base_pace)
 
             profiles[d] = DriverModel(
@@ -147,6 +150,22 @@ class SimulationEngine:
                 dnf_rate=0.02 if not row else max(0.005, 0.03 * (1.2 - row.car_reliability)),
                 restart_skill=restart_calibrations.get(d, default_skill)
             )
+            residual_feature_rows.append({
+                "driver_id": d,
+                "avg_long_run_pace_ms": float(base_pace),
+                "tire_deg_rate": float(1.0 - profiles[d].tyre_management) * 0.12,
+                "sector_consistency": float(max(1.0, (1.0 - profiles[d].racecraft) * 250.0)),
+                "clean_air_delta": float((0.5 - profiles[d].racecraft) * 120.0),
+                "recent_form": 0.0 if not row else float((row.race_pace - 0.8) * 10.0),
+                "grid_position": i + 1,
+                "tyre_age_compound_factor": float((1.0 - profiles[d].tyre_management) * 12.0),
+                "track_temperature": 35.0,
+                "qualifying_pace_delta": float((base_pace - 90000.0) / 10.0),
+                "drs_activation_rate": float(np.clip(0.35 + profiles[d].racecraft * 0.3, 0.0, 1.0)),
+                "sector_variance": float(max(1.0, (1.0 - profiles[d].racecraft) * 180.0)),
+                "track_evolution_coefficient": 0.15,
+                "weather_delta": 0.0,
+            })
         if profiles:
             scale = float(np.clip(pace_spread_scale, 0.5, 4.0))
             pace_values = np.array([raw_pace_by_driver[d] for d in profiles.keys()], dtype=float)
@@ -158,6 +177,10 @@ class SimulationEngine:
                 for d in profiles.keys():
                     if d in forced_rank_offsets_ms:
                         profiles[d].pace_base_ms = float(center + float(forced_rank_offsets_ms[d]))
+            elif use_ml:
+                residuals = self.ml_residual_service.predict_residuals(residual_feature_rows)
+                for d in profiles.keys():
+                    profiles[d].pace_base_ms = float(profiles[d].pace_base_ms + residuals.get(d, 0.0))
         return profiles
 
     def run_rigorous_output(self, request: SimulationRequest) -> SimulationRunOutput:
@@ -179,6 +202,11 @@ class SimulationEngine:
         merged_params = dict(self.default_rigorous_params)
         if isinstance(overrides, dict):
             merged_params.update(overrides)
+        sc_profile = self.sc_probability_service.summary(
+            track,
+            float(request_params.get("weather_delta", 0.0) or 0.0)
+        )
+        merged_params.setdefault("sc_peak_probability", sc_profile["peak_probability"])
         return self.rigorous_simulator.run(
             race_id=request.track_id,
             track=track,
@@ -200,6 +228,10 @@ class SimulationEngine:
         pace_spread_scale = float(request.params.get("pace_spread_scale", 1.0))
         forced_rank_offsets_ms = request.params.get("forced_rank_offsets_ms")
         driver_ids_override = request.params.get("driver_ids")
+        sc_summary = self.sc_probability_service.summary(
+            track,
+            float(request.params.get("weather_delta", 0.0) or 0.0)
+        )
         driver_profiles = self._get_driver_profiles(
             request.track_id,
             request.use_ml,
@@ -301,24 +333,24 @@ class SimulationEngine:
             times = all_race_times[d]
             if not times:
                 # If driver DNF'd every time (unlikely but possible)
-                pace_distributions[d] = {"p05": 0, "p50": 0, "p95": 0}
+                pace_distributions[d] = {"p10": 0, "p50": 0, "p90": 0}
                 robustness_scores[d] = 0.0
                 continue
                 
-            p05 = np.percentile(times, 5)
+            p10 = np.percentile(times, 10)
             p50 = np.percentile(times, 50)
-            p95 = np.percentile(times, 95)
+            p90 = np.percentile(times, 90)
             
             pace_distributions[d] = {
-                "p05": float(p05),
+                "p10": float(p10),
                 "p50": float(p50),
-                "p95": float(p95)
+                "p90": float(p90)
             }
             
-            # Robustness: (P95 - P05) / P50
+            # Robustness: (P90 - P10) / P50
             # Higher spread = less robust strategy
             if p50 > 0:
-                robustness_scores[d] = (p95 - p05) / p50
+                robustness_scores[d] = (p90 - p10) / p50
             else:
                 robustness_scores[d] = 0.0
 
@@ -378,7 +410,10 @@ class SimulationEngine:
                 "compute_ms": compute_ms,
                 "seed": base_seed,
                 "params": request.params,
-                "events": [e.dict() for e in request.events]
+                "events": [e.dict() for e in request.events],
+                "ml_model_version": self.ml_residual_service.model_version,
+                "feature_version": self.ml_residual_service.feature_version,
+                "sc_model": sc_summary,
             },
             trace=final_trace,
             run_output=run_output
@@ -453,18 +488,22 @@ class SimulationEngine:
             
             # Aggregate Result for this strategy
             times = all_race_times[focus_driver]
-            p05 = np.percentile(times, 5) if times else 0
+            p10 = np.percentile(times, 10) if times else 0
             p50 = np.percentile(times, 50) if times else 0
-            p95 = np.percentile(times, 95) if times else 0
+            p90 = np.percentile(times, 90) if times else 0
             
             comparison_results.append(SimulationResponse(
                 win_probability={focus_driver: win_counts[focus_driver] / iterations},
                 dnf_risk={focus_driver: dnf_counts[focus_driver] / iterations},
                 podium_probability={focus_driver: [0, 0, 0]}, # Simplified
-                pace_distributions={focus_driver: {"p05": float(p05), "p50": float(p50), "p95": float(p95)}},
-                robustness_score={focus_driver: (p95 - p05) / p50 if p50 > 0 else 0.0},
+                pace_distributions={focus_driver: {"p10": float(p10), "p50": float(p50), "p90": float(p90)}},
+                robustness_score={focus_driver: (p90 - p10) / p50 if p50 > 0 else 0.0},
                 strategy_recommendation=strat,
-                metadata={"compute_ms": int((time.time() - start_time) * 1000)}
+                metadata={
+                    "compute_ms": int((time.time() - start_time) * 1000),
+                    "ml_model_version": self.ml_residual_service.model_version,
+                    "feature_version": self.ml_residual_service.feature_version,
+                }
             ))
             
         return comparison_results

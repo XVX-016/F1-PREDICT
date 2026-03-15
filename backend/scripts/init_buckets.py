@@ -17,7 +17,9 @@ def init_buckets():
         return
 
     client = create_client(url, key)
-    buckets = ["race-telemetry", "assets"]
+    telemetry_bucket = os.getenv("SUPABASE_TELEMETRY_BUCKET", "race-telemetry")
+    assets_bucket = os.getenv("SUPABASE_ASSETS_BUCKET", "assets")
+    buckets = [telemetry_bucket, assets_bucket]
     
     existing = [b.name for b in client.storage.list_buckets()]
     for b in buckets:

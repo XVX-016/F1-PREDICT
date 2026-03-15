@@ -30,7 +30,7 @@ export const RaceBriefingControls: React.FC<RaceBriefingControlsProps> = ({
                 <select
                     value={selectedCircuit}
                     onChange={(e) => onCircuitChange(e.target.value)}
-                    className="bg-[#1e1e24] text-white text-sm border border-white/10 rounded px-3 py-2 outline-none focus:border-[#E10600] transition-colors appearance-none cursor-pointer w-full font-mono"
+                    className="bg-black text-white text-sm border border-[#1f1f26] rounded px-3 py-2 outline-none focus:border-[#E10600] transition-colors appearance-none cursor-pointer w-full font-mono"
                 >
                     {SEASON_2026_SCHEDULE.map(race => (
                         <option key={race.round} value={`${race.round}_2026`}>
@@ -43,12 +43,12 @@ export const RaceBriefingControls: React.FC<RaceBriefingControlsProps> = ({
             {/* Session Type */}
             <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Session Type</label>
-                <div className="flex gap-1 bg-[#1e1e24] p-1 rounded border border-white/10">
+                <div className="flex gap-1 bg-black p-1 rounded border border-[#1f1f26]">
                     {(['RACE', 'SPRINT'] as const).map((type) => (
                         <button
                             key={type}
                             onClick={() => onSessionChange(type)}
-                            className={`px-4 py-1 text-[10px] font-bold rounded transition-all uppercase tracking-wider ${selectedSession === type ? 'bg-[#E10600] text-white shadow-lg shadow-[#E10600]/20' : 'text-white/40 hover:text-white'}`}
+                            className={`px-4 py-1 text-[10px] font-bold rounded transition-all uppercase tracking-wider border ${selectedSession === type ? 'bg-[#E10600] border-[#E10600] text-white shadow-lg shadow-[#E10600]/20' : 'bg-black border-[#1f1f26] text-white hover:border-white/20'}`}
                         >
                             {type}
                         </button>
@@ -59,12 +59,12 @@ export const RaceBriefingControls: React.FC<RaceBriefingControlsProps> = ({
             {/* Track Condition */}
             <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Track Condition</label>
-                <div className="flex gap-1 bg-[#1e1e24] p-1 rounded border border-white/10">
+                <div className="flex gap-1 bg-black p-1 rounded border border-[#1f1f26]">
                     {(['DRY', 'INTERMEDIATE', 'WET'] as const).map(type => (
                         <button
                             key={type}
                             onClick={() => onConditionChange(type)}
-                            className={`px-3 py-1 text-[10px] font-bold rounded transition-all uppercase tracking-wider ${selectedCondition === type ? 'bg-white/10 text-white border border-white/10' : 'text-white/40 hover:text-white'}`}
+                            className={`px-3 py-1 text-[10px] font-bold rounded transition-all uppercase tracking-wider border ${selectedCondition === type ? 'bg-white text-black border-white' : 'bg-black border-[#1f1f26] text-white hover:border-white/20'}`}
                         >
                             {type}
                         </button>

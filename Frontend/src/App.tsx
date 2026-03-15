@@ -5,7 +5,7 @@ import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useRaceStatus } from './hooks/useRaceStatus';
+import { useBackendStatus } from './hooks/useBackendStatus';
 import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 
 // Initialize TanStack Query Client
@@ -21,23 +21,23 @@ const queryClient = new QueryClient({
 
 // Backend Status Indicator Component
 const BackendStatusIndicator = () => {
-  const { data: status, isLoading, isError } = useRaceStatus();
+  const { data: status, isLoading } = useBackendStatus();
+  const connectivity = status?.connectivity ?? 'offline';
+  const liveDataEnabled = import.meta.env.VITE_LIVE_DATA_ENABLED === 'true';
 
-  const isOffline = isError || (status?.name === 'Backend Initializing...');
-
-  if (!isOffline && !isLoading) return null;
+  if (!isLoading && (connectivity === 'online' || (!liveDataEnabled && connectivity === 'offline'))) return null;
 
   return (
-    <div className={`fixed bottom-4 right-4 z-[9999] px-4 py-2 rounded-full border backdrop-blur-md text-xs font-bold flex items-center gap-2 shadow-2xl transition-all duration-500 ${isOffline
+    <div className={`fixed bottom-4 right-4 z-[9999] px-4 py-2 rounded-full border backdrop-blur-md text-xs font-bold flex items-center gap-2 shadow-2xl transition-all duration-500 ${connectivity === 'offline'
       ? 'bg-red-500/10 border-red-500 text-red-500'
-      : 'bg-[#E10600]/10 border-[#E10600] text-[#E10600]'
+      : 'bg-amber-500/10 border-amber-500 text-amber-400'
       }`}>
       {isLoading ? (
         <>
           <Loader2 className="w-3 h-3 animate-spin" />
           <span>CONNECTING...</span>
         </>
-      ) : isOffline ? (
+      ) : connectivity === 'offline' ? (
         <>
           <AlertTriangle className="w-3 h-3" />
           <span>BACKEND OFFLINE - DEMO MODE</span>
@@ -45,7 +45,7 @@ const BackendStatusIndicator = () => {
       ) : (
         <>
           <CheckCircle2 className="w-3 h-3" />
-          <span>LIVE</span>
+          <span>BACKEND DEGRADED</span>
         </>
       )}
     </div>

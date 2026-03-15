@@ -33,24 +33,6 @@ export const useRaceStatus = () => {
                     if (response.ok) {
                         return await response.json();
                     }
-
-                    // Backend might still be healthy even if race-status endpoint is missing/misconfigured.
-                    const healthUrl = `${base}/health`;
-                    const healthRes = await fetch(healthUrl);
-                    if (healthRes.ok) {
-                        return {
-                            raceId: "backend-online",
-                            name: "Backend Online",
-                            round: 0,
-                            session: "N/A",
-                            status: "UPCOMING",
-                            trackTemp: "N/A",
-                            airTemp: "N/A",
-                            humidity: "N/A",
-                            windSpeed: "N/A",
-                            nextSessionTime: new Date().toISOString()
-                        } as RaceStatus;
-                    }
                 } catch {
                     // Try next base host
                 }
