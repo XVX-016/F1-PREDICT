@@ -34,3 +34,6 @@ flowchart LR
 - Backend `/health` reports `version: 2.0.0` and `architecture: simulation-first`.
 - Replay uses a shared-timeline telemetry contract per driver.
 - In cloud deployments, replay data should be served from Supabase storage when local cache is unavailable.
+- Frontend comparison cards call the backend `POST /api/races/{race_id}/compare` route and consume returned `baseline`, `challenger`, and `delta` metrics directly.
+- Current replay storage is verified for Bahrain (`4_2025`) telemetry; additional race replay caches still need ingestion/upload before the Replay page is calendar-complete.
+- Current simulation/intelligence backend coverage is broader than replay coverage, but fully race-specific modeling still depends on expanding explicit track definitions in the simulation engine.

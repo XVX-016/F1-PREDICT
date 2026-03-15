@@ -20,6 +20,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["races"])
+TELEMETRY_BUCKET = os.getenv("SUPABASE_TELEMETRY_BUCKET", "race-telemetry")
 
 def _resolve_replay_prefix(race_id: str, cache_dir: str) -> str:
     if not os.path.isdir(cache_dir):
@@ -93,7 +94,7 @@ def _downsample_frames(frames: List[Dict[str, Any]], max_frames: Optional[int], 
         sampled.append(frames[-1])
     return sampled
 
-def _list_bucket_files_for_prefix(prefix: str, bucket: str = "race-telemetry") -> List[str]:
+def _list_bucket_files_for_prefix(prefix: str, bucket: str = TELEMETRY_BUCKET) -> List[str]:
     """
     List telemetry files in Supabase storage for a race prefix.
     Works in deployed/serverless environments where local replay_cache is unavailable.
@@ -335,7 +336,7 @@ async def get_race_timeline(race_id: str, source: str = "REPLAY"):
                     parts = fname.replace(".json", "").split("_")
                     if len(parts) >= 2:
                         driver_code = parts[-1]
-                        storage_url = f"{supabase_url}/storage/v1/object/public/race-telemetry/{fname}"
+                        storage_url = f"{supabase_url}/storage/v1/object/public/{TELEMETRY_BUCKET}/{fname}"
                         telemetry_urls[driver_code] = storage_url
             else:
                 # Local development fallback: stream telemetry via API endpoints.

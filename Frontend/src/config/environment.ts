@@ -6,7 +6,8 @@ export const ENV_CONFIG = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://f1-predict.onrender.com',
   BACKEND_URL: import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://f1-predict.onrender.com',
   ML_SERVICE_URL: import.meta.env.VITE_ML_SERVICE_URL || import.meta.env.VITE_API_BASE_URL || 'https://f1-predict.onrender.com',
-  SUPABASE_ASSETS_BASE: 'https://uivvxlorutmjgouporrv.supabase.co/storage/v1/object/public/assets',
+  SUPABASE_ASSETS_BUCKET: import.meta.env.VITE_SUPABASE_ASSETS_BUCKET || 'assets',
+  SUPABASE_ASSETS_BASE: `${import.meta.env.VITE_SUPABASE_URL || 'https://uivvxlorutmjgouporrv.supabase.co'}/storage/v1/object/public/${import.meta.env.VITE_SUPABASE_ASSETS_BUCKET || 'assets'}`,
 
   // ML Service Proxy (Vite dev server)
   ML_SERVICE_PROXY: import.meta.env.VITE_MODEL_SERVICE_PROXY || '/ml',

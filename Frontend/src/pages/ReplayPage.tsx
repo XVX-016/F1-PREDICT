@@ -3,7 +3,7 @@ import {
     SimulationLayout,
     SimulationMain,
 } from './SimulationPage.components';
-import { Play, Pause, Activity, Navigation, Timer } from 'lucide-react';
+import { Play, Pause, Activity, Navigation, Timer, ChevronDown } from 'lucide-react';
 import { useReplay } from '../hooks/useReplay';
 import { TrackMap } from '../components/replay/TrackMap';
 import { DriverState } from '../utils/ReplayEngine';
@@ -316,8 +316,8 @@ const ReplayPage = () => {
         ? state.drivers[selectedDriverId]
         : driversSorted.length > 0 ? driversSorted[0] : null;
 
-    const mapShiftX = !isMobile ? -2 : 0;
-    const mapShiftY = !isMobile ? -4 : -2;
+    const mapShiftX = !isMobile ? 0 : 0;
+    const mapShiftY = !isMobile ? -10 : -2;
 
     return (
         <div className="min-h-screen w-full text-white flex flex-col pt-16 bg-[#050505]">
@@ -346,7 +346,7 @@ const ReplayPage = () => {
                         <div className="absolute top-0 left-0 right-0 p-4 lg:p-8 z-10 pointer-events-none">
                             <div className="relative flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                                 <div className="pointer-events-auto">
-                                    <h1 className="text-3xl lg:text-5xl font-extrabold text-white tracking-[0.14em] uppercase">
+                                    <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter uppercase italic">
                                         REPLAY
                                     </h1>
                                     <div className="flex items-center gap-3 lg:gap-4 mt-3">
@@ -355,18 +355,12 @@ const ReplayPage = () => {
                                             <span className="text-[#E10600] text-lg font-black leading-none">{state?.currentLap || 1}</span>
                                             <span className="text-white/30 text-[10px]">/ {state?.totalLaps || 53}</span>
                                         </div>
-                                        <div className="h-9 bg-black/70 backdrop-blur-xl px-3 border border-white/10 rounded-lg flex items-center gap-2">
-                                            <span className={`w-2 h-2 rounded-full ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
-                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${loading ? 'text-yellow-500' : 'text-white/40'}`}>
-                                                {loading ? 'SYNCHRONIZING' : 'OPERATIONAL'}
-                                            </span>
-                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="pointer-events-auto w-full lg:w-auto flex justify-center lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-0">
-                                    <div className="w-full max-w-xs lg:max-w-sm">
-                                        <label className="text-[9px] font-mono font-bold text-white/40 uppercase tracking-widest block mb-2 text-center">Select Event</label>
+                                    <div className="w-full max-w-sm lg:max-w-md">
+                                        <label className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-2 text-center">Select Event</label>
                                         <div className="relative">
                                             <select
                                                 value={selectedRace}
@@ -374,7 +368,7 @@ const ReplayPage = () => {
                                                     setSelectedRace(e.target.value);
                                                     setHasStarted(false);
                                                 }}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs font-mono font-bold text-white focus:outline-none focus:border-[#E10600]/50 transition-colors appearance-none cursor-pointer"
+                                                className="w-full min-w-[260px] lg:min-w-[320px] bg-white/5 border border-white/10 rounded-xl pl-5 pr-12 py-3 text-sm font-semibold tracking-wide text-white focus:outline-none focus:border-[#E10600]/50 transition-colors appearance-none cursor-pointer"
                                             >
                                                 <optgroup label="2024 Replay Cache" className="bg-[#15151e]" style={{ color: '#000', backgroundColor: '#fff' }}>
                                                     {filtered2024.map((r) => (
@@ -399,8 +393,8 @@ const ReplayPage = () => {
                                                     ))}
                                                 </optgroup>
                                             </select>
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
-                                                <Navigation className="w-3 h-3 rotate-180" />
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/30">
+                                                <ChevronDown className="w-4 h-4" />
                                             </div>
                                         </div>
                                     </div>

@@ -9,16 +9,12 @@ import {
     FuelBurnRate,
     SafetyCarProbability,
     WeatherVariance,
-    PitStrategyEditor,
-    DisableSafetyCarToggle,
-    OverrideGridPositions,
     SimulationMain,
     SimulationControlBar,
     RunSimulationButton,
     ReplayToggle,
     ResetSimulationButton,
     PlaybackSpeedSlider,
-    AdvancedSettings,
     SimulationStatusIndicator,
     ReplayTimeline,
     LapScrubber,
@@ -99,14 +95,22 @@ export default function SimulationPage() {
         return () => window.removeEventListener('resize', applyMobileLayout);
     }, []);
 
+    const totalLaps = context?.totalLaps ?? 58;
+    const raceId = context?.circuitId || 'bahrain';
+    const pitLapGap = challengerConfig.pitLap - baselineConfig.pitLap;
+    const pitGapSummary =
+        pitLapGap === 0
+            ? 'Same lap'
+            : pitLapGap > 0
+                ? `B pits ${pitLapGap} laps later`
+                : `B pits ${Math.abs(pitLapGap)} laps earlier`;
+
     const runComparison = async () => {
         setComparisonLoading(true);
         setComparisonError(null);
 
         try {
             const focusDriver = selectedDriverId || 'VER';
-            const totalLaps = context?.totalLaps ?? 58;
-            const raceId = context?.circuitId || 'bahrain';
             const body = {
                 track_id: raceId,
                 iterations: 500,
@@ -148,85 +152,146 @@ export default function SimulationPage() {
                         <span className="text-[#E10600]">Race</span> Simulation
                     </h1>
                 </header>
-                <div className="mt-6 grid grid-cols-1 xl:grid-cols-[1.1fr_1.1fr_1.4fr] gap-4">
-                    {[baselineConfig, challengerConfig].map((config, index) => (
-                        <div key={config.name} className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
-                            <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">{index === 0 ? 'Baseline Strategy' : 'Challenger Strategy'}</div>
-                            <input
-                                value={config.name}
-                                onChange={(e) => (index === 0 ? setBaselineConfig({ ...config, name: e.target.value }) : setChallengerConfig({ ...config, name: e.target.value }))}
-                                className="w-full bg-black border border-white/20 rounded px-3 py-2 text-sm text-white"
-                            />
-                            <div className="grid grid-cols-2 gap-3">
-                                <select
-                                    value={config.openingCompound}
-                                    onChange={(e) => (index === 0 ? setBaselineConfig({ ...config, openingCompound: e.target.value as StrategyEditorConfig['openingCompound'] }) : setChallengerConfig({ ...config, openingCompound: e.target.value as StrategyEditorConfig['openingCompound'] }))}
-                                    className="w-full bg-black border border-white/20 rounded px-3 py-2 text-xs text-white"
-                                >
-                                    <option value="soft">Soft</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="hard">Hard</option>
-                                </select>
-                                <select
-                                    value={config.closingCompound}
-                                    onChange={(e) => (index === 0 ? setBaselineConfig({ ...config, closingCompound: e.target.value as StrategyEditorConfig['closingCompound'] }) : setChallengerConfig({ ...config, closingCompound: e.target.value as StrategyEditorConfig['closingCompound'] }))}
-                                    className="w-full bg-black border border-white/20 rounded px-3 py-2 text-xs text-white"
-                                >
-                                    <option value="soft">Soft</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="hard">Hard</option>
-                                </select>
-                            </div>
-                            <div>
-                                <div className="flex justify-between text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">
-                                    <span>Pit Lap</span>
-                                    <span>L{config.pitLap}</span>
+
+                <div className="mt-5">
+                    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden relative">
+                        <div className="px-5 py-3 border-b border-white/8 flex items-center gap-3 flex-wrap">
+                            <span className="text-[10px] uppercase tracking-[0.15em] text-white/35 font-bold">Strategy Comparison</span>
+                            <span className="text-[10px] text-white/20">same seed</span>
+                            <span className="text-[10px] text-white/20">same race context</span>
+                            <span className="text-[10px] text-white/20">pit timing delta only</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 xl:grid-cols-[1fr_56px_1fr]">
+                            {[
+                                {
+                                    config: baselineConfig,
+                                    setConfig: setBaselineConfig,
+                                    color: '#E10600',
+                                    label: 'Baseline',
+                                },
+                                {
+                                    config: challengerConfig,
+                                    setConfig: setChallengerConfig,
+                                    color: '#00d4ff',
+                                    label: 'Challenger',
+                                },
+                            ].map(({ config, setConfig, color, label }, idx) => (
+                                <div key={label} className={idx === 1 ? 'xl:col-start-3' : ''}>
+                                    {idx === 1 && (
+                                        <div className="hidden xl:flex absolute left-1/2 -translate-x-1/2 top-[92px] z-10 bg-black border border-white/15 rounded-full px-3 py-1 text-[11px] font-black text-[#E10600] tracking-wider">
+                                            VS
+                                        </div>
+                                    )}
+                                    <div className="p-4 space-y-2.5">
+                                        <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.15em] text-white/30 font-bold">
+                                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
+                                            {label}
+                                        </div>
+                                        <input
+                                            value={config.name}
+                                            onChange={(e) => setConfig({ ...config, name: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/12 rounded-md px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+                                        />
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1.5">
+                                                <div className="text-[10px] uppercase tracking-widest text-white/35 font-bold">Stint 1</div>
+                                                <select
+                                                    value={config.openingCompound}
+                                                    onChange={(e) => setConfig({ ...config, openingCompound: e.target.value as StrategyEditorConfig['openingCompound'] })}
+                                                    className="w-full bg-black/50 border border-white/12 rounded-md px-2 py-2 text-xs text-white outline-none"
+                                                >
+                                                    <option value="soft">Soft</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="hard">Hard</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <div className="text-[10px] uppercase tracking-widest text-white/35 font-bold">Stint 2</div>
+                                                <select
+                                                    value={config.closingCompound}
+                                                    onChange={(e) => setConfig({ ...config, closingCompound: e.target.value as StrategyEditorConfig['closingCompound'] })}
+                                                    className="w-full bg-black/50 border border-white/12 rounded-md px-2 py-2 text-xs text-white outline-none"
+                                                >
+                                                    <option value="soft">Soft</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="hard">Hard</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="flex justify-between text-[10px] uppercase tracking-widest text-white/35 font-bold mb-1.5">
+                                                <span>Pit Lap</span>
+                                                <span className="text-white font-black">L{config.pitLap}</span>
+                                            </div>
+                                            <div className="text-[10px] text-white/20 mb-2">
+                                                Stint 1: {config.pitLap} laps | Stint 2: {totalLaps - config.pitLap} laps
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min={5}
+                                                max={Math.max(6, totalLaps - 5)}
+                                                value={config.pitLap}
+                                                onChange={(e) => setConfig({ ...config, pitLap: Number(e.target.value) })}
+                                                className="w-full accent-[#E10600]"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <input
-                                    type="range"
-                                    min={5}
-                                    max={Math.max(6, (context?.totalLaps ?? 58) - 5)}
-                                    value={config.pitLap}
-                                    onChange={(e) => (index === 0 ? setBaselineConfig({ ...config, pitLap: Number(e.target.value) }) : setChallengerConfig({ ...config, pitLap: Number(e.target.value) }))}
-                                    className="w-full accent-[#E10600]"
-                                />
+                            ))}
+                        </div>
+
+                        <div className="border-t border-white/8 px-5 py-3.5 grid grid-cols-1 xl:grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-[11px] text-white/40">
+                                    Pit gap
+                                    <span className={`font-semibold ${pitLapGap === 0 ? 'text-white/30' : pitLapGap > 0 ? 'text-green-400' : 'text-[#E10600]'}`}>
+                                        {pitGapSummary}
+                                    </span>
+                                </div>
+                                <div className="text-[10px] text-white/20">
+                                    {baselineConfig.name}: {baselineConfig.openingCompound}{'->'}{baselineConfig.closingCompound} at L{baselineConfig.pitLap}
+                                    {' | '}
+                                    {challengerConfig.name}: {challengerConfig.openingCompound}{'->'}{challengerConfig.closingCompound} at L{challengerConfig.pitLap}
+                                </div>
+                                <div className="h-2 rounded-full bg-white/5 border border-white/10 overflow-hidden max-w-md">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-[#E10600] to-[#00d4ff]"
+                                        style={{ width: `${Math.min(100, (Math.abs(pitLapGap) / Math.max(totalLaps, 1)) * 100 + 8)}%` }}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                    <div className="bg-black/50 border border-white/10 rounded-xl p-4 flex flex-col justify-between">
-                        <div>
-                            <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold mb-2">Strategy Delta</div>
-                            <h2 className="text-xl font-black text-white uppercase tracking-tight mb-3">Pit Lap 18 vs 22 style head-to-head</h2>
-                            <p className="text-xs text-white/60 leading-relaxed">
-                                Runs both strategies under the same seed and race context so the delta reflects pit timing and compound choice, not random drift.
-                            </p>
-                        </div>
-                        <div className="mt-4 space-y-3">
+
                             <button
                                 onClick={runComparison}
                                 disabled={comparisonLoading}
-                                className="w-full bg-[#E10600] text-white px-4 py-3 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-red-700 disabled:opacity-60"
+                                title="Uses the backend /api/races/{race_id}/compare endpoint"
+                                className="bg-[#E10600] text-white px-6 py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-red-700 disabled:opacity-50 whitespace-nowrap"
                             >
-                                {comparisonLoading ? 'Comparing...' : 'Run Side-by-Side Comparison'}
+                                {comparisonLoading ? 'Comparing...' : 'Run Comparison'}
                             </button>
-                            {comparisonError && <div className="text-xs text-red-400">{comparisonError}</div>}
-                            {comparisonResults && (
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                                        <div className="text-[9px] uppercase tracking-widest text-white/40">Win Delta</div>
-                                        <div className="text-lg font-black text-white">{(comparisonResults.delta.win_probability * 100).toFixed(1)}%</div>
-                                    </div>
-                                    <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                                        <div className="text-[9px] uppercase tracking-widest text-white/40">Median Time</div>
-                                        <div className="text-lg font-black text-white">{(comparisonResults.delta.median_race_time_ms / 1000).toFixed(2)}s</div>
-                                    </div>
-                                    <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                                        <div className="text-[9px] uppercase tracking-widest text-white/40">Risk Spread</div>
-                                        <div className="text-lg font-black text-white">{comparisonResults.delta.risk_spread.toFixed(3)}</div>
-                                    </div>
+
+                            {comparisonResults ? (
+                                <div className="flex flex-wrap gap-2 justify-start xl:justify-end">
+                                    {[
+                                        { label: 'Win Delta', value: `${(comparisonResults.delta.win_probability * 100).toFixed(1)}%` },
+                                        { label: 'Time Delta', value: `${(comparisonResults.delta.median_race_time_ms / 1000).toFixed(2)}s` },
+                                        { label: 'Risk Spread', value: comparisonResults.delta.risk_spread.toFixed(3) },
+                                    ].map(({ label, value }) => (
+                                        <div key={label} className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-center min-w-[104px]">
+                                            <div className="text-[9px] uppercase tracking-widest text-white/30 mb-0.5">{label}</div>
+                                            <div className="text-sm font-black text-white">{value}</div>
+                                        </div>
+                                    ))}
                                 </div>
+                            ) : (
+                                <div className="text-right text-[10px] text-white/20">Results appear here after run</div>
                             )}
                         </div>
+
+                        {comparisonError && (
+                            <div className="px-5 py-2 border-t border-red-500/20 text-xs text-red-400">{comparisonError}</div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -241,22 +306,25 @@ export default function SimulationPage() {
                         <SimulationStatusIndicator />
                     </SimulationControlBar>
 
-                    <div className="border-b border-white/10 bg-black/55 backdrop-blur-xl px-4 lg:px-6 py-4 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-                            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                    <div className="border-b border-white/10 bg-black/55 backdrop-blur-xl px-4 lg:px-6 py-3 space-y-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 items-stretch">
+                            <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 min-h-[102px] flex flex-col">
                                 <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">Season</div>
                                 <SeasonSelect />
                             </div>
-                            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                            <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 min-h-[102px] flex flex-col">
                                 <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">Race</div>
                                 <RaceSelect />
                             </div>
-                            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                            <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 min-h-[102px] flex flex-col">
                                 <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">Driver Focus</div>
                                 <DriverSelector />
                             </div>
-                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-center">
-                                <TrackInfoBadge />
+                            <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 min-h-[102px] flex flex-col justify-start">
+                                <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-2">Track Meta</div>
+                                <div className="mt-2">
+                                    <TrackInfoBadge />
+                                </div>
                             </div>
                         </div>
 
@@ -266,12 +334,6 @@ export default function SimulationPage() {
                             <SafetyCarProbability />
                             <WeatherVariance />
                         </div>
-
-                        <AdvancedSettings>
-                            <PitStrategyEditor />
-                            <DisableSafetyCarToggle />
-                            <OverrideGridPositions />
-                        </AdvancedSettings>
                     </div>
 
                     <ReplayTimeline>

@@ -23,8 +23,9 @@ const queryClient = new QueryClient({
 const BackendStatusIndicator = () => {
   const { data: status, isLoading } = useBackendStatus();
   const connectivity = status?.connectivity ?? 'offline';
+  const liveDataEnabled = import.meta.env.VITE_LIVE_DATA_ENABLED === 'true';
 
-  if (!isLoading && connectivity === 'online') return null;
+  if (!isLoading && (connectivity === 'online' || (!liveDataEnabled && connectivity === 'offline'))) return null;
 
   return (
     <div className={`fixed bottom-4 right-4 z-[9999] px-4 py-2 rounded-full border backdrop-blur-md text-xs font-bold flex items-center gap-2 shadow-2xl transition-all duration-500 ${connectivity === 'offline'

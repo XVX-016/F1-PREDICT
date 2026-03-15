@@ -34,6 +34,13 @@ flowchart LR
 - `Replay`: ranked driver playback on normalized telemetry track maps
 - `Schedule/Drivers/Teams/Results`: season context and static race metadata
 
+## Recent Updates
+
+- Shared race-status logic now drives schedule/homepage featured-race selection and countdown states.
+- Frontend strategy comparison UI is wired to the backend `POST /api/races/{race_id}/compare` endpoint.
+- Replay assets resolve from Supabase public storage and uploaded Bahrain telemetry is available via the replay timeline contract.
+- Safety-car timeline visualization now uses lap-state heatmap rows instead of flat line traces.
+
 ## Data Principles
 
 - No fabricated race telemetry in replay cache
@@ -162,9 +169,11 @@ Direct links:
 ## Known Limitations
 
 - Replay availability depends on generated/uploaded telemetry cache per race.
+- Bahrain replay telemetry is currently the only verified uploaded race cache in the fresh Supabase storage path.
 - Some multi-car interaction effects are approximated.
 - Intelligence mode is analytical and bounded; it is not an FIA live control system.
 - When backend/data endpoints are unavailable, frontend enters demo/fallback behavior.
+- Strategy comparison is backend-supported, but true race-specific simulation fidelity is still constrained by the set of explicitly modeled tracks in the simulation engine.
 
 ## Legal
 

@@ -6,9 +6,13 @@ import { Activity, Zap, BarChart3 } from 'lucide-react';
 import { useWeather } from '../hooks/useWeather';
 import { SEASON_2026_SCHEDULE } from '../data/season2026';
 import { getAssetUrl } from '../utils/assets';
+import { getFeaturedRace, getRaceTimingState, toRaceStartTime } from '../utils/raceStatus';
+
+const toLegacyRaceStatus = (status: 'upcoming' | 'live' | 'completed'): Race['status'] =>
+  status === 'completed' ? 'finished' : status;
 
 export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
-  const { data: apiRaces, isLoading: apiLoading, error: apiError } = useRaces(2025);
+  const { data: apiRaces, isLoading: apiLoading } = useRaces(2026);
   const [nextRace, setNextRace] = useState<Race | null>(null);
 
   const toCircuitBannerImage = (circuitName: string, raceName: string): string => {
@@ -43,46 +47,51 @@ export default function HomePage({ setCurrentPage }: { setCurrentPage: (page: st
   };
 
   useEffect(() => {
-    // Determine next race from API or fallback
     const now = new Date();
-
-    if (apiRaces && apiRaces.length > 0) {
-      const mappedRaces: Race[] = apiRaces.map((r: ApiRace) => ({
+    const mappedApiRaces: Race[] = (apiRaces || []).map((r: ApiRace) => ({
         id: r.id,
         round: r.round,
         name: r.name,
         circuit: r.circuit,
         city: r.city,
         country: r.country,
-        startDate: r.race_date,
+        startDate: toRaceStartTime({ date: r.race_date, time: r.time }).toISOString(),
         endDate: r.race_date,
         timezone: "UTC",
         has_sprint: !!r.sprint_time,
-        status: "upcoming"
+        status: toLegacyRaceStatus(getRaceTimingState({ date: r.race_date, time: r.time }, now).status)
       }));
-      const sortedRaces = mappedRaces.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-      const next = sortedRaces.filter(r => new Date(r.startDate) >= now)[0];
-      if (next) setNextRace(next);
-    } else if (!apiLoading) {
-      // Fallback to SEASON_2026_SCHEDULE if API is offline/empty
-      const next = SEASON_2026_SCHEDULE.find(r => new Date(r.date) >= now);
-      if (next) {
+
+    const featuredApiRace = getFeaturedRace(mappedApiRaces.map((race) => ({
+      ...race,
+      startISO: race.startDate,
+    })), now) as (Race & { startISO?: string }) | null;
+
+    if (featuredApiRace) {
+      setNextRace(featuredApiRace);
+      return;
+    }
+
+    if (!apiLoading) {
+      const featuredStaticRace = getFeaturedRace(SEASON_2026_SCHEDULE, now);
+      if (featuredStaticRace) {
+        const timing = getRaceTimingState(featuredStaticRace, now);
         setNextRace({
-          id: `2026-${next.round}`,
-          round: next.round,
-          name: next.raceName,
-          circuit: next.circuit,
-          city: next.city,
-          country: next.country,
-          startDate: next.date,
-          endDate: next.date,
+          id: `2026-${featuredStaticRace.round}`,
+          round: featuredStaticRace.round,
+          name: featuredStaticRace.raceName,
+          circuit: featuredStaticRace.circuit,
+          city: featuredStaticRace.city,
+          country: featuredStaticRace.country,
+          startDate: timing.startTime.toISOString(),
+          endDate: timing.endTime.toISOString(),
           timezone: "UTC",
-          has_sprint: !!next.isSprint,
-          status: "upcoming"
+          has_sprint: !!featuredStaticRace.isSprint,
+          status: toLegacyRaceStatus(timing.status)
         } as Race);
       }
     }
-  }, [apiRaces, apiLoading, apiError]);
+  }, [apiRaces, apiLoading]);
 
   const { data: weather } = useWeather(nextRace?.city || nextRace?.country);
 
