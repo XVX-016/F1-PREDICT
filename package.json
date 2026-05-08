@@ -10,7 +10,7 @@
     "gold:freeze": "python backend/scripts/freeze_gold_dataset.py --root backend/data/gold/v1 --version v1 --out backend/data/gold/v1/gold_manifest.json"
   },
   "dependencies": {
-    "axios": "^1.15.0",
+    "axios": "^1.15.2",
     "node-cron": "^4.2.1"
   }
 }
